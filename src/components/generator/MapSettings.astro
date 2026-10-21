@@ -1,0 +1,984 @@
+---
+import type { Locale } from "../../i18n/config";
+import { getHomeContent } from "../../i18n/home";
+
+interface Props { lang?: Locale; }
+const { lang = "en" } = Astro.props;
+const copy = getHomeContent(lang).generator;
+---
+
+<div class="settings-panel" id="settings-panel">
+    <!-- Location Mode Toggle -->
+    <section class="settings-section">
+        <div class="section-label-row">
+            <span class="text-mono-eyebrow" style="color:var(--color-mute);"
+                >{copy.location}</span
+            >
+        </div>
+        <div class="mode-toggle" role="group" aria-label={copy.locationMode}>
+            <button
+                class="mode-btn active"
+                id="mode-address"
+                data-mode="address"
+                aria-pressed="true"
+            >
+                {copy.address}
+            </button>
+            <button
+                class="mode-btn"
+                id="mode-coordinates"
+                data-mode="coordinates"
+                aria-pressed="false"
+            >
+                {copy.coordinates}
+            </button>
+            <button
+                class="mode-btn"
+                id="mode-mymaps"
+                data-mode="mymaps"
+                aria-pressed="false"
+            >
+                {copy.myMaps}
+            </button>
+        </div>
+
+        <!-- Address input -->
+        <div id="address-input-group">
+            <label for="address-input" class="sr-only"
+                >{copy.searchLabel}</label
+            >
+            <div class="input-with-icon">
+                <svg
+                    class="input-icon"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    aria-hidden="true"
+                >
+                    <circle
+                        cx="6.5"
+                        cy="6.5"
+                        r="4"
+                        stroke="currentColor"
+                        stroke-width="1.4"></circle>
+                    <path
+                        d="M10.5 10.5L14 14"
+                        stroke="currentColor"
+                        stroke-width="1.4"
+                        stroke-linecap="round"></path>
+                </svg>
+                <input
+                    type="text"
+                    id="address-input"
+                    class="input input-with-icon-field"
+                    placeholder={copy.searchPlaceholder}
+                    autocomplete="off"
+                    spellcheck="false"
+                    maxlength="500"
+                />
+            </div>
+            <p class="hint-text">
+                {copy.searchHint}
+            </p>
+        </div>
+
+        <!-- Coordinate inputs -->
+        <div id="coords-input-group" style="display:none;">
+            <div class="coord-row">
+                <div class="coord-field">
+                    <label for="lat-input" class="field-label">{copy.latitude}</label>
+                    <input
+                        type="number"
+                        id="lat-input"
+                        class="input"
+                        placeholder="e.g. 40.7128"
+                        step="any"
+                        min="-90"
+                        max="90"
+                        aria-describedby="lat-error"
+                    />
+                    <span
+                        id="lat-error"
+                        class="error-text"
+                        role="alert"
+                        aria-live="polite"></span>
+                </div>
+                <div class="coord-field">
+                    <label for="lng-input" class="field-label">{copy.longitude}</label>
+                    <input
+                        type="number"
+                        id="lng-input"
+                        class="input"
+                        placeholder="e.g. -74.0060"
+                        step="any"
+                        min="-180"
+                        max="180"
+                        aria-describedby="lng-error"
+                    />
+                    <span
+                        id="lng-error"
+                        class="error-text"
+                        role="alert"
+                        aria-live="polite"></span>
+                </div>
+            </div>
+            <p class="hint-text">
+                {copy.coordinatesHint}
+                <br />
+                <a
+                    href="#"
+                    id="open-gmaps-link"
+                    class="hint-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >{copy.findCoordinates}</a
+                >
+            </p>
+        </div>
+
+        <!-- Google My Maps embed input -->
+        <div id="my-maps-input-group" style="display:none;">
+            <label for="my-maps-input" class="field-label"
+                >{copy.myMapsLabel}</label
+            >
+            <textarea
+                id="my-maps-input"
+                class="input my-maps-input"
+                rows="3"
+                maxlength="4000"
+                spellcheck="false"
+                aria-describedby="my-maps-hint my-maps-error"
+                placeholder={copy.myMapsPlaceholder}
+            ></textarea>
+            <span
+                id="my-maps-error"
+                class="error-text"
+                role="alert"
+                aria-live="polite"></span>
+            <p class="hint-text" id="my-maps-hint">
+                {copy.myMapsHint}
+                <br />
+                <a
+                    href="https://www.google.com/mymaps"
+                    class="hint-link"
+                    target="_blank"
+                    rel="noopener noreferrer">{copy.openMyMaps}</a
+                >
+            </p>
+        </div>
+    </section>
+
+    <!-- Directions Mode -->
+    <section class="settings-section" id="directions-section">
+        <div class="section-label-row">
+            <span class="text-mono-eyebrow" style="color:var(--color-mute);"
+                >{copy.mode}</span
+            >
+        </div>
+        <label class="toggle-row">
+            <input
+                type="checkbox"
+                id="directions-toggle"
+                class="toggle-input"
+                aria-label={copy.directions}
+            />
+            <span class="toggle-track" aria-hidden="true">
+                <span class="toggle-thumb"></span>
+            </span>
+            <span class="toggle-label">{copy.directions}</span>
+        </label>
+
+        <div
+            id="directions-group"
+            style="display:none;"
+            class="directions-group"
+        >
+            <div class="field">
+                <label for="directions-from" class="field-label">{copy.from}</label>
+                <input
+                    type="text"
+                    id="directions-from"
+                    class="input"
+                    placeholder={copy.fromPlaceholder}
+                    maxlength="500"
+                />
+            </div>
+            <div class="field">
+                <label for="directions-to" class="field-label">{copy.to}</label>
+                <input
+                    type="text"
+                    id="directions-to"
+                    class="input"
+                    placeholder={copy.toPlaceholder}
+                    maxlength="500"
+                />
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Type -->
+    <section class="settings-section" id="map-type-section">
+        <div class="section-label-row">
+            <span class="text-mono-eyebrow" style="color:var(--color-mute);"
+                >{copy.mapType}</span
+            >
+        </div>
+        <div class="type-toggle" role="group" aria-label={copy.mapType}>
+            <button
+                class="type-btn active"
+                data-type="roadmap"
+                aria-pressed="true"
+            >
+                <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 14 14"
+                    fill="none"
+                    aria-hidden="true"
+                >
+                    <rect
+                        x="1"
+                        y="1"
+                        width="12"
+                        height="12"
+                        rx="2"
+                        stroke="currentColor"
+                        stroke-width="1.2"></rect>
+                    <path
+                        d="M1 5h12M1 9h12M5 1v12"
+                        stroke="currentColor"
+                        stroke-width="1"
+                        opacity="0.5"></path>
+                </svg>
+                {copy.roadmap}
+            </button>
+            <button class="type-btn" data-type="satellite" aria-pressed="false">
+                <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 14 14"
+                    fill="none"
+                    aria-hidden="true"
+                >
+                    <circle
+                        cx="7"
+                        cy="7"
+                        r="5.5"
+                        stroke="currentColor"
+                        stroke-width="1.2"></circle>
+                    <ellipse
+                        cx="7"
+                        cy="7"
+                        rx="2.5"
+                        ry="5.5"
+                        stroke="currentColor"
+                        stroke-width="1"
+                        opacity="0.5"></ellipse>
+                    <path
+                        d="M1.5 7h11"
+                        stroke="currentColor"
+                        stroke-width="1"
+                        opacity="0.5"></path>
+                </svg>
+                {copy.satellite}
+            </button>
+        </div>
+    </section>
+
+    <!-- Zoom -->
+    <section class="settings-section" id="zoom-section">
+        <div class="section-label-row">
+            <span class="text-mono-eyebrow" style="color:var(--color-mute);"
+                >{copy.zoom}</span
+            >
+            <span class="value-badge" id="zoom-display">7</span>
+        </div>
+        <div class="slider-row">
+            <button
+                class="zoom-step-btn"
+                id="zoom-dec"
+                aria-label={copy.decreaseZoom}>−</button
+            >
+            <input
+                type="range"
+                id="zoom-slider"
+                class="slider"
+                min="1"
+                max="21"
+                value="7"
+                step="1"
+                aria-label={copy.zoomLevel}
+                aria-valuemin="1"
+                aria-valuemax="21"
+                aria-valuenow="7"
+            />
+            <button
+                class="zoom-step-btn"
+                id="zoom-inc"
+                aria-label={copy.increaseZoom}>+</button
+            >
+        </div>
+        <div class="zoom-labels">
+            <span>{copy.world}</span>
+            <span>{copy.street}</span>
+            <span>{copy.building}</span>
+        </div>
+    </section>
+
+    <!-- Dimensions -->
+    <section class="settings-section">
+        <div class="section-label-row">
+            <span class="text-mono-eyebrow" style="color:var(--color-mute);"
+                >{copy.dimensions}</span
+            >
+        </div>
+        <div class="preset-group" role="group" aria-label={copy.dimensionPresets}>
+            <button class="preset-btn" data-preset="small">{copy.small}</button>
+            <button class="preset-btn active" data-preset="standard"
+                >{copy.standard}</button
+            >
+            <button class="preset-btn" data-preset="large">{copy.large}</button>
+            <button class="preset-btn" data-preset="fullwidth"
+                >{copy.fullWidth}</button
+            >
+            <button class="preset-btn" data-preset="custom">{copy.custom}</button>
+        </div>
+        <div class="dim-inputs">
+            <div class="dim-field">
+                <label for="width-input" class="field-label">{copy.width}</label>
+                <div class="dim-input-wrap">
+                    <input
+                        type="number"
+                        id="width-input"
+                        class="input"
+                        value="600"
+                        min="50"
+                        max="4000"
+                        aria-describedby="width-error"
+                    />
+                    <select
+                        id="width-unit"
+                        class="unit-select"
+                        aria-label={copy.widthUnit}
+                    >
+                        <option value="px">px</option>
+                        <option value="%">%</option>
+                    </select>
+                </div>
+                <span
+                    id="width-error"
+                    class="error-text"
+                    role="alert"
+                    aria-live="polite"></span>
+            </div>
+            <span class="dim-x" aria-hidden="true">×</span>
+            <div class="dim-field">
+                <label for="height-input" class="field-label">{copy.height}</label>
+                <div class="dim-input-wrap">
+                    <input
+                        type="number"
+                        id="height-input"
+                        class="input"
+                        value="450"
+                        min="50"
+                        max="4000"
+                        aria-describedby="height-error"
+                    />
+                    <span class="unit-label">px</span>
+                </div>
+                <span
+                    id="height-error"
+                    class="error-text"
+                    role="alert"
+                    aria-live="polite"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Advanced Options -->
+    <section class="settings-section">
+        <details class="advanced-details">
+            <summary class="advanced-summary">
+                <span class="text-mono-eyebrow" style="color:var(--color-mute);"
+                    >{copy.advanced}</span
+                >
+                <svg
+                    class="chevron"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    aria-hidden="true"
+                >
+                    <path
+                        d="M3 4.5L6 7.5L9 4.5"
+                        stroke="currentColor"
+                        stroke-width="1.4"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"></path>
+                </svg>
+            </summary>
+            <div class="advanced-body">
+                <label class="toggle-row">
+                    <input
+                        type="checkbox"
+                        id="responsive-toggle"
+                        class="toggle-input"
+                        checked
+                        aria-label={copy.responsive}
+                    />
+                    <span class="toggle-track" aria-hidden="true"
+                        ><span class="toggle-thumb"></span></span
+                    >
+                    <span class="toggle-label">{copy.responsive}</span>
+                </label>
+                <p class="hint-text">
+                    {copy.responsiveHint}
+                </p>
+
+                <label class="toggle-row">
+                    <input
+                        type="checkbox"
+                        id="lazy-toggle"
+                        class="toggle-input"
+                        checked
+                        aria-label={copy.lazy}
+                    />
+                    <span class="toggle-track" aria-hidden="true"
+                        ><span class="toggle-thumb"></span></span
+                    >
+                    <span class="toggle-label">{copy.lazy}</span>
+                </label>
+
+                <label class="toggle-row">
+                    <input
+                        type="checkbox"
+                        id="fullscreen-toggle"
+                        class="toggle-input"
+                        checked
+                        aria-label={copy.fullscreen}
+                    />
+                    <span class="toggle-track" aria-hidden="true"
+                        ><span class="toggle-thumb"></span></span
+                    >
+                    <span class="toggle-label">{copy.fullscreen}</span>
+                </label>
+
+                <div class="field">
+                    <label for="border-radius-input" class="field-label"
+                        >{copy.radius}</label
+                    >
+                    <input
+                        type="number"
+                        id="border-radius-input"
+                        class="input"
+                        value="0"
+                        min="0"
+                        max="50"
+                    />
+                </div>
+
+                <div class="field">
+                    <label for="iframe-title-input" class="field-label"
+                        >{copy.iframeTitle}</label
+                    >
+                    <input
+                        type="text"
+                        id="iframe-title-input"
+                        class="input"
+                        value="Google Maps"
+                        maxlength="100"
+                    />
+                </div>
+            </div>
+        </details>
+    </section>
+
+    <!-- Generator actions -->
+    <section class="settings-section settings-footer">
+        <button
+            class="btn-ghost-sm"
+            id="reset-btn"
+            type="button"
+            aria-label={copy.reset}
+        >
+            <svg
+                width="13"
+                height="13"
+                viewBox="0 0 13 13"
+                fill="none"
+                aria-hidden="true"
+            >
+                <path
+                    d="M2 6.5A4.5 4.5 0 1 1 6.5 11"
+                    stroke="currentColor"
+                    stroke-width="1.4"
+                    stroke-linecap="round"></path>
+                <path
+                    d="M2 4.5V6.5H4"
+                    stroke="currentColor"
+                    stroke-width="1.4"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+            </svg>
+            {copy.reset}
+        </button>
+        <button
+            class="btn-primary generate-code-btn"
+            id="generate-code-btn"
+            type="button"
+        >
+            {copy.generate}
+        </button>
+    </section>
+</div>
+
+<style>
+    .settings-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .settings-section {
+        padding: var(--spacing-sm) 0;
+        border-bottom: 1px solid var(--color-hairline);
+    }
+    .settings-section:last-child {
+        border-bottom: none;
+    }
+
+    .section-label-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .value-badge {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--color-ink);
+        background-color: var(--color-hairline-soft);
+        border: 1px solid var(--color-hairline);
+        border-radius: var(--radius-sm);
+        padding: 2px 8px;
+        min-width: 36px;
+        text-align: center;
+    }
+
+    /* Mode Toggle */
+    .mode-toggle,
+    .type-toggle {
+        display: flex;
+        background-color: var(--color-hairline-soft);
+        border: 1px solid var(--color-hairline);
+        border-radius: var(--radius-sm);
+        padding: 3px;
+        gap: 3px;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .mode-btn,
+    .type-btn {
+        flex: 1;
+        min-width: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 6px 8px;
+        border-radius: 4px;
+        border: none;
+        background: transparent;
+        color: var(--color-mute);
+        font-family: var(--font-sans);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition:
+            background-color 0.15s ease,
+            color 0.15s ease;
+    }
+
+    .mode-btn.active,
+    .type-btn.active {
+        background-color: var(--color-canvas-elevated);
+        color: var(--color-ink);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+
+    .mode-btn:hover:not(.active),
+    .type-btn:hover:not(.active) {
+        color: var(--color-ink);
+    }
+
+    /* Input with icon */
+    .input-with-icon {
+        position: relative;
+    }
+    .input-icon {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--color-mute);
+        pointer-events: none;
+    }
+    .input-with-icon-field {
+        padding-left: 34px;
+    }
+
+    .my-maps-input {
+        min-height: 72px;
+        resize: vertical;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        line-height: 17px;
+    }
+
+    /* Coord row */
+    .coord-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-sm);
+    }
+    .coord-field {
+    }
+
+    /* Field label */
+    .field-label {
+        display: block;
+        font-family: var(--font-sans);
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--color-body);
+        margin-bottom: 4px;
+    }
+
+    .field {
+        margin-bottom: var(--spacing-sm);
+    }
+    .field:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Error text */
+    .error-text {
+        display: block;
+        font-size: 12px;
+        color: var(--color-error);
+        margin-top: 4px;
+        min-height: 16px;
+    }
+
+    /* Hint text */
+    .hint-text {
+        font-size: 12px;
+        color: var(--color-mute);
+        margin: 6px 0 0;
+        line-height: 16px;
+    }
+    .hint-link {
+        color: var(--color-link);
+        text-decoration: none;
+    }
+    .hint-link:hover {
+        text-decoration: underline;
+    }
+
+    /* Zoom slider */
+    .slider-row {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+    }
+
+    .zoom-step-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--color-hairline);
+        background: var(--color-canvas-elevated);
+        color: var(--color-ink);
+        font-size: 16px;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: background-color 0.15s ease;
+    }
+    .zoom-step-btn:hover {
+        background-color: var(--color-hairline-soft);
+    }
+    .zoom-step-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    .slider {
+        flex: 1;
+        appearance: none;
+        -webkit-appearance: none;
+        height: 4px;
+        background: var(--color-hairline);
+        border-radius: 2px;
+        outline: none;
+        cursor: pointer;
+    }
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--color-map-green);
+        border: 2px solid var(--color-canvas-elevated);
+        box-shadow: 0 0 0 1px var(--color-hairline);
+        cursor: pointer;
+        transition: transform 0.1s ease;
+    }
+    .slider::-webkit-slider-thumb:hover {
+        transform: scale(1.1);
+    }
+    .slider::-moz-range-thumb {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--color-map-green);
+        border: 2px solid var(--color-canvas-elevated);
+        box-shadow: 0 0 0 1px var(--color-hairline);
+        cursor: pointer;
+    }
+
+    .zoom-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--color-mute);
+        margin-top: 4px;
+        padding: 0 4px;
+    }
+
+    /* Preset buttons */
+    .preset-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .preset-btn {
+        padding: 4px 10px;
+        border-radius: var(--radius-pill-cat, 64px);
+        border: 1px solid var(--color-hairline);
+        background: var(--color-canvas-elevated);
+        color: var(--color-body);
+        font-family: var(--font-sans);
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition:
+            border-color 0.15s ease,
+            color 0.15s ease,
+            background-color 0.15s ease;
+    }
+    .preset-btn.active {
+        border-color: var(--color-map-green);
+        color: var(--color-map-green-deep);
+        background-color: var(--color-map-green-soft);
+    }
+    .preset-btn:hover:not(.active) {
+        color: var(--color-ink);
+        border-color: var(--color-body);
+    }
+
+    /* Dimension inputs */
+    .dim-inputs {
+        display: flex;
+        align-items: flex-end;
+        gap: var(--spacing-xs);
+    }
+    .dim-field {
+        flex: 1;
+    }
+    .dim-x {
+        font-size: 14px;
+        color: var(--color-mute);
+        padding-bottom: 8px;
+        flex-shrink: 0;
+    }
+
+    .dim-input-wrap {
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--color-hairline);
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+    }
+    .dim-input-wrap .input {
+        border: none;
+        border-radius: 0;
+        flex: 1;
+        min-width: 0;
+    }
+    .dim-input-wrap .input:focus {
+        outline: none;
+    }
+    .dim-input-wrap:focus-within {
+        border-color: var(--color-ink);
+    }
+
+    .unit-select {
+        border: none;
+        border-left: 1px solid var(--color-hairline);
+        background: var(--color-hairline-soft);
+        font-family: var(--font-sans);
+        font-size: 12px;
+        color: var(--color-body);
+        padding: 0 6px;
+        height: 36px;
+        cursor: pointer;
+        outline: none;
+    }
+
+    .unit-label {
+        padding: 0 8px;
+        font-size: 12px;
+        color: var(--color-mute);
+        background: var(--color-hairline-soft);
+        border-left: 1px solid var(--color-hairline);
+        height: 36px;
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    /* Toggle switch */
+    .toggle-row {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        cursor: pointer;
+        margin-bottom: var(--spacing-xs);
+    }
+    .toggle-row:last-of-type {
+        margin-bottom: 0;
+    }
+    .toggle-input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-track {
+        position: relative;
+        width: 34px;
+        height: 20px;
+        background-color: var(--color-hairline);
+        border-radius: 10px;
+        flex-shrink: 0;
+        transition: background-color 0.2s ease;
+    }
+    .toggle-input:checked + .toggle-track {
+        background-color: var(--color-map-green);
+    }
+    .toggle-thumb {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 14px;
+        height: 14px;
+        background: white;
+        border-radius: 50%;
+        transition: transform 0.2s ease;
+    }
+    .toggle-input:checked + .toggle-track .toggle-thumb {
+        transform: translateX(14px);
+    }
+
+    .toggle-label {
+        font-size: 14px;
+        color: var(--color-body);
+        font-weight: 400;
+    }
+
+    /* Directions group */
+    .directions-group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-xs);
+        margin-top: var(--spacing-xs);
+    }
+
+    /* Advanced */
+    .advanced-details {
+    }
+
+    .advanced-summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        list-style: none;
+        padding: 0;
+        margin-bottom: 0;
+    }
+    .advanced-summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .advanced-details[open] .advanced-summary {
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .chevron {
+        transition: transform 0.2s ease;
+    }
+    .advanced-details[open] .chevron {
+        transform: rotate(180deg);
+    }
+
+    .advanced-body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .settings-footer {
+        position: sticky;
+        bottom: calc(var(--spacing-md) * -1);
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+        margin: 0 calc(var(--spacing-md) * -1) calc(var(--spacing-md) * -1);
+        padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md);
+        border-top: 1px solid var(--color-hairline);
+        border-bottom: 0;
+        background: var(--color-canvas-elevated);
+    }
+
+    .generate-code-btn {
+        flex: 1;
+    }
+
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+    }
+
+    /* Directions group show */
+    #directions-group {
+        margin-top: var(--spacing-sm);
+    }
+</style>

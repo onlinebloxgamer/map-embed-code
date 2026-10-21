@@ -1,0 +1,140 @@
+---
+import { localizedPath, type Locale } from "../../i18n/config";
+import { getHomeContent } from "../../i18n/home";
+
+interface Props { lang?: Locale; }
+const { lang = "en" } = Astro.props;
+const copy = getHomeContent(lang).platforms;
+const englishLinks = [
+    "/guides/",
+    "/guides/embed-google-maps-wordpress/",
+    "/guides/embed-google-maps-shopify/",
+    "/guides/",
+    "/guides/",
+    "/guides/",
+];
+const platforms = copy.items.map(([name, desc], index) => ({
+    name,
+    desc,
+    link: localizedPath(englishLinks[index], lang),
+}));
+---
+
+<section
+    class="section platform-support"
+    id="platform-support"
+    aria-labelledby="platform-heading"
+>
+    <div class="container">
+        <div class="section-header">
+            <span class="text-mono-eyebrow" style="color:var(--color-mute);"
+                >{copy.eyebrow}</span
+            >
+            <h2 class="text-heading-lg section-title" id="platform-heading">
+                {copy.title}
+            </h2>
+            <p
+                class="text-body-lg section-sub"
+                style="color:var(--color-body);"
+            >
+                {copy.description}
+            </p>
+        </div>
+
+        <div class="platform-grid">
+            {
+                platforms.map((p) => (
+                    <a
+                        href={p.link}
+                        class="platform-card card platform-card-link"
+                    >
+                        <h3 class="text-label-sm platform-name">{p.name}</h3>
+                        <p
+                            class="text-body-sm platform-desc"
+                            style="color:var(--color-body);"
+                        >
+                            {p.desc}
+                        </p>
+                        <span
+                            class="platform-guide"
+                            aria-label={`${copy.aria} ${p.name}`}
+                        >
+                            {copy.viewGuide} →
+                        </span>
+                    </a>
+                ))
+            }
+        </div>
+    </div>
+</section>
+
+<style>
+    .platform-support {
+        background-color: var(--color-canvas);
+        border-top: 1px solid var(--color-hairline);
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .section-title {
+        margin: var(--spacing-sm) 0 var(--spacing-sm);
+        color: var(--color-ink);
+    }
+
+    .section-sub {
+        margin: 0;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .platform-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-md);
+    }
+
+    .platform-card-link {
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        color: inherit;
+        transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease;
+    }
+    .platform-card-link:hover {
+        border-color: var(--color-body);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .platform-name {
+        color: var(--color-ink);
+        margin: 0 0 4px;
+    }
+
+    .platform-desc {
+        margin: 0 0 var(--spacing-sm);
+        flex: 1;
+    }
+
+    .platform-guide {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--color-link);
+    }
+
+    @media (max-width: 768px) {
+        .platform-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .platform-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

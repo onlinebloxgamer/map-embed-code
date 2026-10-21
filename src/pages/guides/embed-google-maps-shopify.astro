@@ -1,0 +1,183 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/layout/Header.astro';
+import Footer from '../../components/layout/Footer.astro';
+---
+
+<BaseLayout
+  title="How to Embed Google Maps in Shopify – Free Guide"
+  description="Step-by-step guide to embed Google Maps in your Shopify store. Add a location map to any page, product description, or theme section — no API key required."
+  canonical="https://map-embed-code.com/guides/embed-google-maps-shopify/"
+  lang="en"
+  alternatePath="/guides/embed-google-maps-shopify/"
+>
+  <Header lang="en" translationPath="/guides/embed-google-maps-shopify/" />
+  <main id="main-content">
+    <div class="page-hero">
+      <div class="container readable-surface">
+        <a href="/guides/" class="breadcrumb">← Guides</a>
+        <span class="text-mono-eyebrow" style="color:var(--color-mute);">Shopify</span>
+        <h1 class="text-heading-lg page-h1">How to Embed Google Maps in Shopify</h1>
+        <p class="text-body-lg" style="color:var(--color-body);">
+          Add an interactive Google Map to your Shopify store's contact page, product pages, or theme sections — free and no API key needed.
+        </p>
+      </div>
+    </div>
+
+    <div class="prose-section">
+      <div class="container prose-container readable-surface">
+
+        <div class="toc card">
+          <h2 class="toc-heading">Contents</h2>
+          <ol class="toc-list">
+            <li><a href="#step1">Step 1 – Generate your embed code</a></li>
+            <li><a href="#step2">Step 2 – Add the map to a Shopify page</a></li>
+            <li><a href="#step3">Step 3 – Add the map to your theme (Online Store Editor)</a></li>
+            <li><a href="#product">Embed a map on a product page</a></li>
+            <li><a href="#tips">Tips and troubleshooting</a></li>
+          </ol>
+        </div>
+
+        <section class="prose-block" id="step1">
+          <h2>Step 1 – Generate your Google Maps embed code</h2>
+          <ol class="styled-list">
+            <li>Visit the <a href="/#generator">Map Embed Code generator</a>.</li>
+            <li>Search for your store address or enter its latitude/longitude coordinates.</li>
+            <li>Select your desired zoom level and map type.</li>
+            <li>Choose <strong>Full Width (100%)</strong> and keep <strong>Responsive mode</strong> enabled for best results on mobile.</li>
+            <li>Click <strong>Copy Code</strong> to copy the iframe HTML.</li>
+          </ol>
+        </section>
+
+        <section class="prose-block" id="step2">
+          <h2>Step 2 – Add the map to a Shopify page (e.g. Contact page)</h2>
+          <ol class="styled-list">
+            <li>In your Shopify admin, go to <strong>Online Store → Pages</strong>.</li>
+            <li>Open (or create) the page where you want to add the map, such as your Contact page.</li>
+            <li>In the page editor, click the <strong>&lt;&gt;</strong> (Show HTML) button in the toolbar.</li>
+            <li>Paste the copied iframe code at the position where you want the map to appear.</li>
+            <li>Click <strong>Save</strong>.</li>
+          </ol>
+          <div class="callout">
+            <strong>Important:</strong> Always switch to the HTML source view before pasting the iframe code. If you paste in the visual editor, Shopify may strip the iframe tag for security reasons.
+          </div>
+        </section>
+
+        <section class="prose-block" id="step3">
+          <h2>Step 3 – Add the map via the Online Store Editor (Theme Customizer)</h2>
+          <p>Some Shopify themes include a built-in "Custom HTML" or "Custom Content" section that you can add via the theme editor.</p>
+          <ol class="styled-list">
+            <li>Go to <strong>Online Store → Themes</strong> and click <strong>Customize</strong>.</li>
+            <li>Navigate to the page where you want to add the map (e.g., your homepage or contact page).</li>
+            <li>Click <strong>Add section</strong> and look for a <strong>Custom HTML</strong>, <strong>Rich text</strong>, or <strong>Embed</strong> section.</li>
+            <li>If your theme has a Custom HTML section, add it and paste your iframe code.</li>
+            <li>Click <strong>Save</strong>.</li>
+          </ol>
+          <p>Note: Available sections vary by theme. If your theme doesn't have a Custom HTML section, use the Page HTML method in Step 2 or consider adding a custom section to your theme's Liquid code.</p>
+        </section>
+
+        <section class="prose-block" id="product">
+          <h2>Embed a Google Map on a Shopify product page</h2>
+          <p>To add a map to a product description:</p>
+          <ol class="styled-list">
+            <li>Go to <strong>Products</strong> in your Shopify admin.</li>
+            <li>Open the product you want to edit.</li>
+            <li>In the product description editor, click the <strong>&lt;&gt;</strong> (Show HTML) icon.</li>
+            <li>Scroll to where you want the map and paste the iframe code.</li>
+            <li>Click <strong>Save</strong>.</li>
+          </ol>
+          <p>This is useful for products tied to a physical pickup location or appointment-based services.</p>
+        </section>
+
+        <section class="prose-block" id="tips">
+          <h2>Tips and troubleshooting</h2>
+          <ul class="styled-list">
+            <li><strong>Map not showing?</strong> Shopify's editor occasionally strips iframe elements for security. If this happens, the map won't appear in preview — but saving and visiting the live page should display it correctly.</li>
+            <li><strong>Responsive map recommended:</strong> Responsive mode is enabled by default. Keep it enabled so the map adapts to mobile storefronts.</li>
+            <li><strong>Wrong zoom level?</strong> Zoom levels 14–16 work best for a single business location. Use the zoom slider in the generator to fine-tune.</li>
+            <li><strong>Store not found by address?</strong> Use Coordinate mode and enter the exact latitude/longitude for pinpoint accuracy.</li>
+          </ul>
+        </section>
+
+        <div class="guide-cta-card card">
+          <h2 class="text-heading-md" style="margin:0 0 0.5rem;">Generate your map embed code</h2>
+          <p class="text-body-md" style="color:var(--color-body);margin:0 0 1rem;">Free, instant, no API key required.</p>
+          <a href="/#generator" class="btn-primary">Open the Generator</a>
+        </div>
+
+      </div>
+    </div>
+  </main>
+  <Footer lang="en" />
+</BaseLayout>
+
+<script type="application/ld+json">{JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "How to Embed Google Maps in Shopify",
+  "description": "Embed a Google Maps iframe in a Shopify store without an API key",
+  "step": [
+    { "@type": "HowToStep", "name": "Generate embed code", "text": "Use Map Embed Code to generate your Google Maps iframe HTML." },
+    { "@type": "HowToStep", "name": "Open Shopify page in HTML view", "text": "In Shopify admin, open a page and switch to HTML source view." },
+    { "@type": "HowToStep", "name": "Paste and save", "text": "Paste the iframe code and click Save." }
+  ]
+})}</script>
+
+<style>
+  .breadcrumb { font-size: 13px; color: var(--color-mute); text-decoration: none; display: inline-block; margin-bottom: var(--spacing-sm); }
+  .breadcrumb:hover { color: var(--color-ink); }
+
+  .page-hero {
+    padding: var(--spacing-3xl) 0 var(--spacing-xl);
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .page-h1 { margin: var(--spacing-sm) 0 var(--spacing-sm); color: var(--color-ink); }
+
+  .prose-section { padding: var(--spacing-3xl) 0; }
+  .prose-container { max-width: 760px; }
+
+  .toc { margin-bottom: var(--spacing-2xl); }
+  .toc-heading { font-size: 14px; font-weight: 600; color: var(--color-ink); margin: 0 0 var(--spacing-sm); }
+  .toc-list { margin: 0; padding-left: var(--spacing-lg); display: flex; flex-direction: column; gap: 6px; }
+  .toc-list li { font-size: 14px; }
+  .toc-list a { color: var(--color-link); text-decoration: none; }
+  .toc-list a:hover { text-decoration: underline; }
+
+  .prose-block { margin-bottom: var(--spacing-2xl); }
+  .prose-block h2 {
+    font-family: var(--font-sans);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--color-ink);
+    margin: 0 0 var(--spacing-sm);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-hairline);
+  }
+  .prose-block p { font-size: 15px; line-height: 24px; color: var(--color-body); margin: 0 0 var(--spacing-sm); }
+  .prose-block a { color: var(--color-link); text-decoration: none; }
+  .prose-block a:hover { text-decoration: underline; }
+
+  .styled-list {
+    font-size: 15px;
+    line-height: 24px;
+    color: var(--color-body);
+    margin: 0 0 var(--spacing-sm);
+    padding-left: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .callout {
+    background-color: var(--color-hairline-soft);
+    border: 1px solid var(--color-hairline);
+    border-left: 3px solid var(--color-ink);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 14px;
+    color: var(--color-body);
+    margin: var(--spacing-sm) 0;
+  }
+
+  .guide-cta-card { margin-top: var(--spacing-2xl); }
+</style>

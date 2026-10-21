@@ -1,0 +1,864 @@
+---
+// MapGenerator.astro – Root generator component; assembles settings + preview + code
+import MapSettings from "./MapSettings.astro";
+import MapPreview from "./MapPreview.astro";
+import EmbedCode from "./EmbedCode.astro";
+import { getHomeContent } from "../../i18n/home";
+import type { Locale } from "../../i18n/config";
+
+interface Props {
+    lang?: Locale;
+}
+
+const { lang = "en" } = Astro.props;
+const copy = getHomeContent(lang).generator;
+const clientCopy = {
+    defaultAddress: copy.defaultAddress,
+    invalidMyMaps: copy.invalidMyMaps,
+    missingMyMaps: copy.missingMyMaps,
+    latitudeError: copy.latitudeError,
+    longitudeError: copy.longitudeError,
+    dimensionError: copy.dimensionError,
+    simulated: copy.simulated,
+    simulatedTablet:
+        lang === "es"
+            ? "Simulación: tableta de 768 px"
+            : lang === "de"
+              ? "Simulation: Tablet mit 768 px"
+              : "Simulated: 768px tablet",
+    simulatedMobile:
+        lang === "es"
+            ? "Simulación: móvil de 375 px"
+            : lang === "de"
+              ? "Simulation: Mobilgerät mit 375 px"
+              : "Simulated: 375px mobile",
+};
+---
+
+<section
+    class="generator"
+    id="generator"
+    aria-label={copy.aria}
+    data-generator-copy={JSON.stringify(clientCopy)}
+>
+    <div class="container">
+        <div class="generator-workspace">
+            <!-- Left: Settings -->
+            <div class="generator-settings card">
+                <MapSettings lang={lang} />
+            </div>
+
+            <!-- Right: Preview -->
+            <div class="generator-preview card">
+                <MapPreview lang={lang} />
+            </div>
+        </div>
+
+        <!-- Below: Embed Code -->
+        <div class="generator-code">
+            <EmbedCode lang={lang} />
+        </div>
+    </div>
+</section>
+
+<style>
+    .generator {
+        padding: var(--spacing-lg) 0 var(--spacing-2xl);
+    }
+
+    .generator-workspace {
+        display: grid;
+        grid-template-columns: 360px 1fr;
+        gap: var(--spacing-md);
+        margin-bottom: var(--spacing-sm);
+        align-items: start;
+    }
+
+    .generator-settings {
+        padding: var(--spacing-md);
+        position: sticky;
+        top: 72px;
+        max-height: calc(100vh - 88px);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-hairline) transparent;
+    }
+
+    .generator-preview {
+        padding: var(--spacing-md);
+        min-height: 500px;
+    }
+
+    .generator-code {
+        margin-top: var(--spacing-xxs);
+    }
+
+    @media (max-width: 900px) {
+        .generator-workspace {
+            grid-template-columns: 1fr;
+        }
+        .generator-settings {
+            position: static;
+            max-height: none;
+            overflow-y: visible;
+        }
+    }
+</style>
+
+<script>
+    import { generateEmbedCode } from "../../lib/maps/generate-embed.js";
+    import {
+        generateGoogleMapsLink,
+        generateMapUrl,
+        normalizeMyMapsEmbedUrl,
+    } from "../../lib/maps/generate-url.js";
+
+    interface ClientCopy {
+        defaultAddress: string;
+        invalidMyMaps: string;
+        missingMyMaps: string;
+        latitudeError: string;
+        longitudeError: string;
+        dimensionError: string;
+        simulated: string;
+        simulatedTablet: string;
+        simulatedMobile: string;
+    }
+
+    const generatorRoot = document.getElementById("generator");
+    const clientCopy = JSON.parse(
+        generatorRoot?.getAttribute("data-generator-copy") ?? "{}",
+    ) as Partial<ClientCopy>;
+
+    // ================================================================
+    // MapGenerator – Client-side state management
+    // ================================================================
+
+    // ---- Types (inline for browser) ----
+    type LocationMode = "address" | "coordinates" | "mymaps";
+    type MapType = "roadmap" | "satellite";
+
+    interface Config {
+        locationMode: LocationMode;
+        address: string;
+        latitude: number | null;
+        longitude: number | null;
+        myMapsUrl: string;
+        mapType: MapType;
+        zoom: number;
+        width: number;
+        widthUnit: "px" | "%";
+        height: number;
+        responsive: boolean;
+        lazyLoading: boolean;
+        allowFullscreen: boolean;
+        borderRadius: number;
+        iframeTitle: string;
+        directionsMode: boolean;
+        directionsFrom: string;
+        directionsTo: string;
+    }
+
+    const DEFAULT: Config = {
+        locationMode: "address",
+        address: clientCopy.defaultAddress ?? "New York City, NY, USA",
+        latitude: null,
+        longitude: null,
+        myMapsUrl: "",
+        mapType: "roadmap",
+        zoom: 7,
+        width: 600,
+        widthUnit: "px",
+        height: 450,
+        responsive: true,
+        lazyLoading: true,
+        allowFullscreen: true,
+        borderRadius: 0,
+        iframeTitle: "Google Maps",
+        directionsMode: false,
+        directionsFrom: "",
+        directionsTo: "",
+    };
+
+    // ---- State ----
+    let config: Config = { ...DEFAULT };
+    let addressDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+    let mapUpdateTimer: ReturnType<typeof setTimeout> | null = null;
+    const DEBOUNCE_MS = 600;
+
+    // ---- DOM refs ----
+    const $ = <T extends Element = Element>(id: string) =>
+        document.getElementById(id) as T | null;
+
+    const iframe = $<HTMLIFrameElement>("map-preview-iframe");
+    const codeOutput = $("embed-code-output");
+    const previewWrapper = $("preview-frame-wrapper");
+    const loadingEl = $("preview-loading");
+    const previewDims = $("preview-dims");
+    const previewNote = $("preview-device-note");
+    const zoomDisplay = $("zoom-display");
+    const openGmaps = $<HTMLAnchorElement>("open-gmaps-external");
+    const openGmapsCoords = $<HTMLAnchorElement>("open-gmaps-link");
+
+    // ---- URL generation ----
+    function buildMapUrl(): string {
+        return generateMapUrl(config);
+    }
+
+    function buildGoogleMapsLink(): string {
+        return generateGoogleMapsLink(config);
+    }
+
+    // ---- Render ----
+    function updateEmbedCode(): void {
+        const code = generateEmbedCode(config);
+        if (codeOutput) codeOutput.textContent = code;
+    }
+
+    function updateMap(): void {
+        if (!iframe) return;
+        const url = buildMapUrl();
+        if (url === "about:blank") {
+            loadingEl?.classList.remove("active");
+            iframe.src = "about:blank";
+            if (openGmaps) openGmaps.href = buildGoogleMapsLink();
+            return;
+        }
+        if (iframe.src !== url) {
+            if (loadingEl) loadingEl.classList.add("active");
+            iframe.onload = () => {
+                loadingEl?.classList.remove("active");
+            };
+            iframe.src = url;
+        }
+        if (openGmaps) openGmaps.href = buildGoogleMapsLink();
+        if (openGmapsCoords) openGmapsCoords.href = buildGoogleMapsLink();
+    }
+
+    function updatePreviewSize(): void {
+        if (!previewWrapper) return;
+        const hStr = `${config.height}px`;
+        previewWrapper.style.height = hStr;
+
+        if (previewDims) {
+            const wLabel = config.responsive
+                ? "100%"
+                : config.widthUnit === "%"
+                  ? `${config.width}%`
+                  : `${config.width}px`;
+            previewDims.textContent = `${wLabel} × ${config.height}px`;
+        }
+    }
+
+    function scheduleMapUpdate(immediate = false): void {
+        if (mapUpdateTimer) clearTimeout(mapUpdateTimer);
+        mapUpdateTimer = setTimeout(
+            () => {
+                updateMap();
+            },
+            immediate ? 0 : DEBOUNCE_MS,
+        );
+    }
+
+    function updateURL(): void {
+        const params = new URLSearchParams();
+        params.set("mode", config.locationMode);
+        if (config.locationMode === "address" && config.address)
+            params.set("q", config.address);
+        if (
+            config.locationMode === "coordinates" &&
+            config.latitude !== null &&
+            config.longitude !== null
+        ) {
+            params.set("lat", String(config.latitude));
+            params.set("lng", String(config.longitude));
+        }
+        if (config.locationMode === "mymaps") {
+            const myMapsUrl = normalizeMyMapsEmbedUrl(config.myMapsUrl);
+            if (myMapsUrl) params.set("mymaps", myMapsUrl);
+        }
+        params.set("zoom", String(config.zoom));
+        params.set("type", config.mapType);
+        params.set(
+            "w",
+            config.widthUnit === "%"
+                ? `${config.width}%`
+                : String(config.width),
+        );
+        params.set("h", String(config.height));
+        if (!config.responsive) params.set("responsive", "0");
+        if (!config.lazyLoading) params.set("lazy", "0");
+        if (!config.allowFullscreen) params.set("fs", "0");
+        if (config.borderRadius > 0)
+            params.set("br", String(config.borderRadius));
+        if (config.directionsMode && config.locationMode !== "mymaps") {
+            params.set("dmode", "1");
+            if (config.directionsFrom)
+                params.set("from", config.directionsFrom);
+            if (config.directionsTo) params.set("to", config.directionsTo);
+        }
+        const newUrl = `${window.location.pathname}?${params.toString()}`;
+        window.history.replaceState(null, "", newUrl);
+    }
+
+    function syncAll(updateMapNow = false): void {
+        updateEmbedCode();
+        updatePreviewSize();
+        updateURL();
+        scheduleMapUpdate(updateMapNow);
+    }
+
+    // ---- Load from URL params ----
+    function loadFromParams(): void {
+        const sp = new URLSearchParams(window.location.search);
+        const mode = sp.get("mode");
+        if (mode === "address" || mode === "coordinates" || mode === "mymaps")
+            config.locationMode = mode;
+        const q = sp.get("q");
+        if (q) config.address = q.slice(0, 500);
+        const myMapsUrl = sp.get("mymaps");
+        if (myMapsUrl) config.myMapsUrl = myMapsUrl.slice(0, 4000);
+        const lat = sp.get("lat"),
+            lng = sp.get("lng");
+        if (lat && lng) {
+            const ln = parseFloat(lat),
+                lnn = parseFloat(lng);
+            if (!isNaN(ln) && ln >= -90 && ln <= 90) config.latitude = ln;
+            if (!isNaN(lnn) && lnn >= -180 && lnn <= 180)
+                config.longitude = lnn;
+        }
+        const zoom = sp.get("zoom");
+        if (zoom) {
+            const z = parseInt(zoom);
+            if (z >= 1 && z <= 21) config.zoom = z;
+        }
+        const type = sp.get("type");
+        if (type === "roadmap" || type === "satellite") config.mapType = type;
+        const w = sp.get("w");
+        if (w) {
+            if (w.endsWith("%")) {
+                const n = parseFloat(w);
+                if (n > 0 && n <= 100) {
+                    config.width = n;
+                    config.widthUnit = "%";
+                }
+            } else {
+                const n = parseInt(w);
+                if (n >= 50 && n <= 4000) {
+                    config.width = n;
+                    config.widthUnit = "px";
+                }
+            }
+        }
+        const h = sp.get("h");
+        if (h) {
+            const n = parseInt(h);
+            if (n >= 50 && n <= 4000) config.height = n;
+        }
+        const responsive = sp.get("responsive");
+        if (responsive === "0") config.responsive = false;
+        if (responsive === "1") config.responsive = true;
+        if (sp.get("lazy") === "0") config.lazyLoading = false;
+        if (sp.get("fs") === "0") config.allowFullscreen = false;
+        const br = sp.get("br");
+        if (br) {
+            const n = parseInt(br);
+            if (n >= 0 && n <= 50) config.borderRadius = n;
+        }
+        if (sp.get("dmode") === "1") {
+            config.directionsMode = true;
+            const from = sp.get("from"),
+                to = sp.get("to");
+            if (from) config.directionsFrom = from.slice(0, 500);
+            if (to) config.directionsTo = to.slice(0, 500);
+        }
+    }
+
+    // ---- Sync DOM to config ----
+    function syncFormToConfig(): void {
+        const addrInput = $<HTMLInputElement>("address-input");
+        const latInput = $<HTMLInputElement>("lat-input");
+        const lngInput = $<HTMLInputElement>("lng-input");
+        const myMapsInput = $<HTMLTextAreaElement>("my-maps-input");
+        const zoomSlider = $<HTMLInputElement>("zoom-slider");
+        const zoomDisp = $("zoom-display");
+        const widthInput = $<HTMLInputElement>("width-input");
+        const heightInput = $<HTMLInputElement>("height-input");
+        const widthUnit = $<HTMLSelectElement>("width-unit");
+        const responsiveToggle = $<HTMLInputElement>("responsive-toggle");
+        const lazyToggle = $<HTMLInputElement>("lazy-toggle");
+        const fullscreenToggle = $<HTMLInputElement>("fullscreen-toggle");
+        const brInput = $<HTMLInputElement>("border-radius-input");
+        const titleInput = $<HTMLInputElement>("iframe-title-input");
+        const dirToggle = $<HTMLInputElement>("directions-toggle");
+        const dirFrom = $<HTMLInputElement>("directions-from");
+        const dirTo = $<HTMLInputElement>("directions-to");
+
+        if (addrInput) addrInput.value = config.address;
+        if (latInput)
+            latInput.value =
+                config.latitude !== null ? String(config.latitude) : "";
+        if (lngInput)
+            lngInput.value =
+                config.longitude !== null ? String(config.longitude) : "";
+        if (myMapsInput) myMapsInput.value = config.myMapsUrl;
+        if (zoomSlider) {
+            zoomSlider.value = String(config.zoom);
+            zoomSlider.setAttribute("aria-valuenow", String(config.zoom));
+        }
+        if (zoomDisp) zoomDisp.textContent = String(config.zoom);
+        if (zoomDisplay) zoomDisplay.textContent = String(config.zoom);
+        if (widthInput) widthInput.value = String(config.width);
+        if (heightInput) heightInput.value = String(config.height);
+        if (widthUnit) widthUnit.value = config.widthUnit;
+        if (responsiveToggle) responsiveToggle.checked = config.responsive;
+        if (lazyToggle) lazyToggle.checked = config.lazyLoading;
+        if (fullscreenToggle) fullscreenToggle.checked = config.allowFullscreen;
+        if (brInput) brInput.value = String(config.borderRadius);
+        if (titleInput) titleInput.value = config.iframeTitle;
+        if (dirToggle) dirToggle.checked = config.directionsMode;
+        if (dirFrom) dirFrom.value = config.directionsFrom;
+        if (dirTo) dirTo.value = config.directionsTo;
+
+        // Show/hide groups
+        const addrGroup = $("address-input-group");
+        const coordsGroup = $("coords-input-group");
+        const myMapsGroup = $("my-maps-input-group");
+        const dirGroup = $("directions-group");
+        const directionsSection = $("directions-section");
+        const mapTypeSection = $("map-type-section");
+        const zoomSection = $("zoom-section");
+        if (addrGroup)
+            addrGroup.style.display =
+                config.locationMode === "address" ? "" : "none";
+        if (coordsGroup)
+            coordsGroup.style.display =
+                config.locationMode === "coordinates" ? "" : "none";
+        if (myMapsGroup)
+            myMapsGroup.style.display =
+                config.locationMode === "mymaps" ? "" : "none";
+        const isMyMaps = config.locationMode === "mymaps";
+        if (directionsSection)
+            directionsSection.style.display = isMyMaps ? "none" : "";
+        if (mapTypeSection)
+            mapTypeSection.style.display = isMyMaps ? "none" : "";
+        if (zoomSection) zoomSection.style.display = isMyMaps ? "none" : "";
+        if (dirGroup)
+            dirGroup.style.display =
+                config.directionsMode && !isMyMaps ? "" : "none";
+        syncMyMapsValidation();
+
+        // Mode buttons
+        document
+            .querySelectorAll<HTMLButtonElement>(".mode-btn")
+            .forEach((btn) => {
+                const active = btn.dataset.mode === config.locationMode;
+                btn.classList.toggle("active", active);
+                btn.setAttribute("aria-pressed", String(active));
+            });
+
+        // Map type buttons
+        document
+            .querySelectorAll<HTMLButtonElement>(".type-btn")
+            .forEach((btn) => {
+                const active = btn.dataset.type === config.mapType;
+                btn.classList.toggle("active", active);
+                btn.setAttribute("aria-pressed", String(active));
+            });
+
+        // Preset active
+        document
+            .querySelectorAll<HTMLButtonElement>(".preset-btn")
+            .forEach((btn) => {
+                btn.classList.remove("active");
+            });
+        detectActivePreset();
+    }
+
+    function syncMyMapsValidation(): boolean {
+        const input = $<HTMLTextAreaElement>("my-maps-input");
+        const error = $("my-maps-error");
+        const generateBtn = $<HTMLButtonElement>("generate-code-btn");
+
+        if (config.locationMode !== "mymaps") {
+            input?.classList.remove("error");
+            if (error) error.textContent = "";
+            if (generateBtn) generateBtn.disabled = false;
+            return true;
+        }
+
+        const valid = normalizeMyMapsEmbedUrl(config.myMapsUrl) !== null;
+        const hasValue = config.myMapsUrl.trim().length > 0;
+        input?.classList.toggle("error", hasValue && !valid);
+        if (error) {
+            error.textContent = valid
+                ? ""
+                : hasValue
+                  ? (clientCopy.invalidMyMaps ??
+                    "Paste a valid Google My Maps embed URL or iframe code.")
+                  : (clientCopy.missingMyMaps ??
+                    "Paste your public Google My Maps embed code to continue.");
+        }
+        if (generateBtn) generateBtn.disabled = !valid;
+        return valid;
+    }
+
+    function detectActivePreset() {
+        const presets: Record<
+            string,
+            { width: number; widthUnit: string; height: number }
+        > = {
+            small: { width: 300, widthUnit: "px", height: 200 },
+            standard: { width: 600, widthUnit: "px", height: 450 },
+            large: { width: 800, widthUnit: "px", height: 600 },
+            fullwidth: { width: 100, widthUnit: "%", height: 450 },
+        };
+        for (const [name, p] of Object.entries(presets)) {
+            if (
+                config.width === p.width &&
+                config.widthUnit === p.widthUnit &&
+                config.height === p.height
+            ) {
+                document
+                    .querySelector<HTMLButtonElement>(
+                        `.preset-btn[data-preset="${name}"]`,
+                    )
+                    ?.classList.add("active");
+                return;
+            }
+        }
+        document
+            .querySelector<HTMLButtonElement>(
+                '.preset-btn[data-preset="custom"]',
+            )
+            ?.classList.add("active");
+    }
+
+    // ---- Event wiring ----
+    function wire(): void {
+        // Mode buttons
+        document
+            .querySelectorAll<HTMLButtonElement>(".mode-btn")
+            .forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    config.locationMode =
+                        (btn.dataset.mode as LocationMode) || "address";
+                    syncFormToConfig();
+                    syncAll(true);
+                });
+            });
+
+        // Address input
+        const addrInput = $<HTMLInputElement>("address-input");
+        addrInput?.addEventListener("input", () => {
+            config.address = addrInput.value;
+            if (addressDebounceTimer) clearTimeout(addressDebounceTimer);
+            addressDebounceTimer = setTimeout(() => syncAll(true), DEBOUNCE_MS);
+            updateEmbedCode();
+        });
+
+        // Google My Maps embed
+        const myMapsInput = $<HTMLTextAreaElement>("my-maps-input");
+        myMapsInput?.addEventListener("input", () => {
+            config.myMapsUrl = myMapsInput.value;
+            const valid = syncMyMapsValidation();
+            updateEmbedCode();
+            updateURL();
+            if (valid) scheduleMapUpdate(true);
+            else updateMap();
+        });
+
+        // Lat/Lng
+        const latInput = $<HTMLInputElement>("lat-input");
+        const lngInput = $<HTMLInputElement>("lng-input");
+        const latError = $("lat-error");
+        const lngError = $("lng-error");
+
+        latInput?.addEventListener("input", () => {
+            const v = parseFloat(latInput.value);
+            if (isNaN(v) || v < -90 || v > 90) {
+                if (latError)
+                    latError.textContent =
+                        clientCopy.latitudeError ??
+                        "Latitude must be between –90 and +90.";
+                latInput.classList.add("error");
+                config.latitude = null;
+            } else {
+                if (latError) latError.textContent = "";
+                latInput.classList.remove("error");
+                config.latitude = v;
+                scheduleMapUpdate();
+            }
+            updateEmbedCode();
+            updateURL();
+        });
+
+        lngInput?.addEventListener("input", () => {
+            const v = parseFloat(lngInput.value);
+            if (isNaN(v) || v < -180 || v > 180) {
+                if (lngError)
+                    lngError.textContent =
+                        clientCopy.longitudeError ??
+                        "Longitude must be between –180 and +180.";
+                lngInput.classList.add("error");
+                config.longitude = null;
+            } else {
+                if (lngError) lngError.textContent = "";
+                lngInput.classList.remove("error");
+                config.longitude = v;
+                scheduleMapUpdate();
+            }
+            updateEmbedCode();
+            updateURL();
+        });
+
+        // Map type buttons
+        document
+            .querySelectorAll<HTMLButtonElement>(".type-btn")
+            .forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    config.mapType = (btn.dataset.type as MapType) || "roadmap";
+                    document
+                        .querySelectorAll<HTMLButtonElement>(".type-btn")
+                        .forEach((b) => {
+                            b.classList.toggle("active", b === btn);
+                            b.setAttribute("aria-pressed", String(b === btn));
+                        });
+                    syncAll(true);
+                });
+            });
+
+        // Zoom slider
+        const zoomSlider = $<HTMLInputElement>("zoom-slider");
+        zoomSlider?.addEventListener("input", () => {
+            config.zoom = parseInt(zoomSlider.value);
+            if (zoomDisplay) zoomDisplay.textContent = String(config.zoom);
+            zoomSlider.setAttribute("aria-valuenow", String(config.zoom));
+            scheduleMapUpdate();
+            updateEmbedCode();
+            updateURL();
+        });
+
+        // Zoom +/−
+        $("zoom-dec")?.addEventListener("click", () => {
+            if (config.zoom > 1) {
+                config.zoom--;
+                if (zoomSlider) zoomSlider.value = String(config.zoom);
+                if (zoomDisplay) zoomDisplay.textContent = String(config.zoom);
+                syncAll(true);
+            }
+        });
+        $("zoom-inc")?.addEventListener("click", () => {
+            if (config.zoom < 21) {
+                config.zoom++;
+                if (zoomSlider) zoomSlider.value = String(config.zoom);
+                if (zoomDisplay) zoomDisplay.textContent = String(config.zoom);
+                syncAll(true);
+            }
+        });
+
+        // Presets
+        document
+            .querySelectorAll<HTMLButtonElement>(".preset-btn")
+            .forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    const preset = btn.dataset.preset;
+                    const presets: Record<
+                        string,
+                        { width: number; widthUnit: "px" | "%"; height: number }
+                    > = {
+                        small: { width: 300, widthUnit: "px", height: 200 },
+                        standard: { width: 600, widthUnit: "px", height: 450 },
+                        large: { width: 800, widthUnit: "px", height: 600 },
+                        fullwidth: { width: 100, widthUnit: "%", height: 450 },
+                    };
+                    if (preset && presets[preset]) {
+                        const p = presets[preset];
+                        config.width = p.width;
+                        config.widthUnit = p.widthUnit;
+                        config.height = p.height;
+                        syncFormToConfig();
+                        syncAll(false);
+                    }
+                    document
+                        .querySelectorAll<HTMLButtonElement>(".preset-btn")
+                        .forEach((b) =>
+                            b.classList.toggle("active", b === btn),
+                        );
+                });
+            });
+
+        // Width/Height inputs
+        const widthInput = $<HTMLInputElement>("width-input");
+        const heightInput = $<HTMLInputElement>("height-input");
+        const widthUnit = $<HTMLSelectElement>("width-unit");
+        const widthError = $("width-error");
+        const heightError = $("height-error");
+
+        widthInput?.addEventListener("input", () => {
+            const v = parseInt(widthInput.value);
+            if (isNaN(v) || v < 50 || v > 4000) {
+                if (widthError)
+                    widthError.textContent =
+                        clientCopy.dimensionError ??
+                        "Enter a value between 50 and 4000.";
+                widthInput.classList.add("error");
+            } else {
+                if (widthError) widthError.textContent = "";
+                widthInput.classList.remove("error");
+                config.width = v;
+                syncAll(false);
+            }
+        });
+
+        heightInput?.addEventListener("input", () => {
+            const v = parseInt(heightInput.value);
+            if (isNaN(v) || v < 50 || v > 4000) {
+                if (heightError)
+                    heightError.textContent =
+                        clientCopy.dimensionError ??
+                        "Enter a value between 50 and 4000.";
+                heightInput.classList.add("error");
+            } else {
+                if (heightError) heightError.textContent = "";
+                heightInput.classList.remove("error");
+                config.height = v;
+                const pw = previewWrapper;
+                if (pw) pw.style.height = `${config.height}px`;
+                syncAll(false);
+            }
+        });
+
+        widthUnit?.addEventListener("change", () => {
+            config.widthUnit = widthUnit.value as "px" | "%";
+            syncAll(false);
+        });
+
+        // Responsive toggle
+        const responsiveToggle = $<HTMLInputElement>("responsive-toggle");
+        responsiveToggle?.addEventListener("change", () => {
+            config.responsive = responsiveToggle.checked;
+            updateEmbedCode();
+            updateURL();
+        });
+
+        // Lazy loading toggle
+        const lazyToggle = $<HTMLInputElement>("lazy-toggle");
+        lazyToggle?.addEventListener("change", () => {
+            config.lazyLoading = lazyToggle.checked;
+            updateEmbedCode();
+            updateURL();
+        });
+
+        // Fullscreen toggle
+        const fullscreenToggle = $<HTMLInputElement>("fullscreen-toggle");
+        fullscreenToggle?.addEventListener("change", () => {
+            config.allowFullscreen = fullscreenToggle.checked;
+            updateEmbedCode();
+            updateURL();
+        });
+
+        // Border radius
+        const brInput = $<HTMLInputElement>("border-radius-input");
+        brInput?.addEventListener("input", () => {
+            const v = parseInt(brInput.value);
+            config.borderRadius = !isNaN(v) && v >= 0 && v <= 50 ? v : 0;
+            updateEmbedCode();
+            updateURL();
+        });
+
+        // iframe Title
+        const titleInput = $<HTMLInputElement>("iframe-title-input");
+        titleInput?.addEventListener("input", () => {
+            config.iframeTitle = titleInput.value.slice(0, 100);
+            updateEmbedCode();
+            updateURL();
+        });
+
+        // Directions toggle
+        const dirToggle = $<HTMLInputElement>("directions-toggle");
+        const dirGroup = $("directions-group");
+        dirToggle?.addEventListener("change", () => {
+            config.directionsMode = dirToggle.checked;
+            if (dirGroup)
+                dirGroup.style.display = config.directionsMode ? "" : "none";
+            syncAll(true);
+        });
+
+        const dirFrom = $<HTMLInputElement>("directions-from");
+        const dirTo = $<HTMLInputElement>("directions-to");
+        dirFrom?.addEventListener("input", () => {
+            config.directionsFrom = dirFrom.value;
+            if (addressDebounceTimer) clearTimeout(addressDebounceTimer);
+            addressDebounceTimer = setTimeout(() => syncAll(true), DEBOUNCE_MS);
+            updateEmbedCode();
+        });
+        dirTo?.addEventListener("input", () => {
+            config.directionsTo = dirTo.value;
+            if (addressDebounceTimer) clearTimeout(addressDebounceTimer);
+            addressDebounceTimer = setTimeout(() => syncAll(true), DEBOUNCE_MS);
+            updateEmbedCode();
+        });
+
+        // Reset
+        $("reset-btn")?.addEventListener("click", () => {
+            config = { ...DEFAULT };
+            syncFormToConfig();
+            syncAll(true);
+        });
+
+        // Device preview
+        document
+            .querySelectorAll<HTMLButtonElement>(".device-btn")
+            .forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    document
+                        .querySelectorAll<HTMLButtonElement>(".device-btn")
+                        .forEach((b) => {
+                            b.classList.toggle("active", b === btn);
+                            b.setAttribute("aria-pressed", String(b === btn));
+                        });
+                    const device = btn.dataset.device;
+                    const vp = $("preview-viewport");
+                    const fw = $("preview-frame-wrapper");
+                    const note = $("preview-device-note");
+                    if (!vp || !fw) return;
+                    switch (device) {
+                        case "tablet":
+                            fw.style.maxWidth = "768px";
+                            fw.style.margin = "0 auto";
+                            if (note)
+                                note.textContent =
+                                    clientCopy.simulatedTablet ??
+                                    "Simulated: 768px tablet";
+                            break;
+                        case "mobile":
+                            fw.style.maxWidth = "375px";
+                            fw.style.margin = "0 auto";
+                            if (note)
+                                note.textContent =
+                                    clientCopy.simulatedMobile ??
+                                    "Simulated: 375px mobile";
+                            break;
+                        default:
+                            fw.style.maxWidth = "";
+                            fw.style.margin = "";
+                            if (note)
+                                note.textContent =
+                                    clientCopy.simulated ??
+                                    "Simulated: full width";
+                    }
+                });
+            });
+    }
+
+    // ---- Init ----
+    document.addEventListener("DOMContentLoaded", () => {
+        loadFromParams();
+        syncFormToConfig();
+        wire();
+        updateEmbedCode();
+        updatePreviewSize();
+        updateMap();
+    });
+</script>

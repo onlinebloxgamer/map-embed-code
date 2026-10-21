@@ -1,0 +1,70 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../layout/Header.astro";
+import Footer from "../layout/Footer.astro";
+import Hero from "../sections/Hero.astro";
+import MapGenerator from "../generator/MapGenerator.astro";
+import HowItWorks from "../sections/HowItWorks.astro";
+import PlatformSupport from "../sections/PlatformSupport.astro";
+import Features from "../sections/Features.astro";
+import EducationalContent from "../sections/EducationalContent.astro";
+import FAQ from "../sections/FAQ.astro";
+import { getHomeContent } from "../../i18n/home";
+import { localizedUrl, type Locale } from "../../i18n/config";
+
+interface Props {
+    lang: Locale;
+}
+
+const { lang } = Astro.props;
+const content = getHomeContent(lang);
+const pageUrl = localizedUrl("/", lang, Astro.site!);
+
+const structuredData = [
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        name: "Map Embed Code",
+        url: pageUrl,
+        description: content.seo.description,
+        inLanguage: lang,
+        applicationCategory: "DeveloperApplication",
+        operatingSystem: "Any",
+        offers: {
+            "@type": "Offer",
+            price: "0",
+            priceCurrency: "USD",
+        },
+        featureList: content.features.items.map(([, title]) => title),
+    },
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "Map Embed Code",
+        url: pageUrl,
+        description: content.seo.description,
+        inLanguage: lang,
+    },
+];
+---
+
+<BaseLayout
+    title={content.seo.title}
+    description={content.seo.description}
+    canonical={pageUrl}
+    structuredData={structuredData}
+    lang={lang}
+    alternatePath="/"
+>
+    <Header lang={lang} translationPath="/" />
+    <main id="main-content">
+        <Hero lang={lang} />
+        <MapGenerator lang={lang} />
+        <HowItWorks lang={lang} />
+        <Features lang={lang} />
+        <PlatformSupport lang={lang} />
+        <EducationalContent lang={lang} />
+        <FAQ lang={lang} />
+    </main>
+    <Footer lang={lang} />
+</BaseLayout>

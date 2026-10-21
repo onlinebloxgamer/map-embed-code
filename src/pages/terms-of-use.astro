@@ -1,0 +1,179 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/layout/Header.astro";
+import Footer from "../components/layout/Footer.astro";
+
+const lastUpdated = "October 2026";
+---
+
+<BaseLayout
+    title="Terms of Use – Map Embed Code"
+    description="Terms of Use for Map Embed Code. Understand your rights and responsibilities when using our free Google Maps embed code generator."
+    canonical="https://map-embed-code.com/terms-of-use/"
+>
+    <Header />
+    <main id="main-content">
+        <div class="page-hero">
+            <div class="container readable-surface">
+                <span class="text-mono-eyebrow" style="color:var(--color-mute);"
+                    >Legal</span
+                >
+                <h1 class="text-heading-lg page-h1">Terms of Use</h1>
+                <p class="text-body-sm" style="color:var(--color-mute);">
+                    Last updated: {lastUpdated}
+                </p>
+            </div>
+        </div>
+
+        <div class="prose-section">
+            <div class="container prose-container readable-surface">
+                <section class="prose-block">
+                    <h2>Acceptance of Terms</h2>
+                    <p>
+                        By using Map Embed Code ("the Service") at <a
+                            href="https://map-embed-code.com"
+                            >map-embed-code.com</a
+                        >, you agree to these Terms of Use. If you do not agree,
+                        do not use the Service.
+                    </p>
+                </section>
+
+                <section class="prose-block">
+                    <h2>Description of Service</h2>
+                    <p>
+                        Map Embed Code is a free tool that helps users generate
+                        HTML iframe embed code for displaying Google Maps on
+                        websites. The Service generates code based on user
+                        inputs processed in the user's browser.
+                    </p>
+                </section>
+
+                <section class="prose-block">
+                    <h2>Third-Party Services</h2>
+                    <p>
+                        The Service uses Google Maps via a public iframe
+                        embedding approach. Map Embed Code is an <strong
+                            >independent utility and is not affiliated with,
+                            endorsed by, or sponsored by Google LLC</strong
+                        >. Google Maps is a trademark of Google LLC.
+                    </p>
+                    <p>
+                        Your use of Google Maps through this Service is subject
+                        to Google's own <a
+                            href="https://policies.google.com/terms"
+                            target="_blank"
+                            rel="noopener noreferrer">Terms of Service</a
+                        >. Map Embed Code cannot guarantee the continued
+                        availability, stability, or behavior of Google Maps
+                        embeds, as this is determined by Google independently.
+                    </p>
+                </section>
+
+                <section class="prose-block">
+                    <h2>Your Responsibilities</h2>
+                    <p>You are responsible for:</p>
+                    <ul>
+                        <li>
+                            Ensuring your use of embedded Google Maps complies
+                            with Google's Terms of Service and usage policies.
+                        </li>
+                        <li>
+                            The accuracy of location information you embed on
+                            your own websites.
+                        </li>
+                        <li>
+                            Complying with applicable laws and regulations in
+                            your jurisdiction regarding mapping services.
+                        </li>
+                    </ul>
+                </section>
+
+                <section class="prose-block">
+                    <h2>No Warranty</h2>
+                    <p>
+                        The Service is provided "as is" without warranties of
+                        any kind, express or implied. We do not guarantee
+                        uninterrupted access, accuracy of map data, or that the
+                        iframe embed approach will remain functional
+                        indefinitely. Google may change its services at any
+                        time.
+                    </p>
+                </section>
+
+                <section class="prose-block">
+                    <h2>Limitation of Liability</h2>
+                    <p>
+                        To the fullest extent permitted by law, Map Embed Code
+                        shall not be liable for any indirect, incidental, or
+                        consequential damages arising from your use of the
+                        Service or from maps embedded on your website using code
+                        generated by this tool.
+                    </p>
+                </section>
+
+                <section class="prose-block">
+                    <h2>Changes to Terms</h2>
+                    <p>
+                        We may update these Terms from time to time. Continued
+                        use of the Service after posting updated Terms
+                        constitutes acceptance of the changes.
+                    </p>
+                </section>
+            </div>
+        </div>
+    </main>
+    <Footer />
+</BaseLayout>
+
+<style>
+    .page-hero {
+        padding: var(--spacing-3xl) 0 var(--spacing-xl);
+        border-bottom: 1px solid var(--color-hairline);
+    }
+    .page-h1 {
+        margin: var(--spacing-sm) 0 var(--spacing-xs);
+        color: var(--color-ink);
+    }
+
+    .prose-section {
+        padding: var(--spacing-3xl) 0;
+    }
+    .prose-container {
+        max-width: 720px;
+    }
+
+    .prose-block {
+        margin-bottom: var(--spacing-2xl);
+    }
+
+    .prose-block h2 {
+        font-family: var(--font-sans);
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--color-ink);
+        margin: 0 0 var(--spacing-sm);
+        padding-top: var(--spacing-md);
+        border-top: 1px solid var(--color-hairline);
+    }
+
+    .prose-block p,
+    .prose-block li {
+        font-size: 15px;
+        line-height: 24px;
+        color: var(--color-body);
+        margin: 0 0 var(--spacing-sm);
+    }
+
+    .prose-block ul {
+        padding-left: var(--spacing-lg);
+        margin: 0 0 var(--spacing-sm);
+    }
+
+    .prose-block a {
+        color: var(--color-link);
+        text-decoration: none;
+    }
+    .prose-block a:hover {
+        text-decoration: underline;
+    }
+</style>

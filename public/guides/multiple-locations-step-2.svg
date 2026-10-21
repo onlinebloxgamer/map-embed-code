@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Search for and add multiple locations</title>
+  <desc id="desc">Illustration of the My Maps editor with a place search field, Add to map button, and several markers.</desc>
+  <rect width="1200" height="675" fill="#edf4ed"/>
+  <rect x="48" y="42" width="1104" height="591" rx="22" fill="#dcebdc" stroke="#d0ddd0" stroke-width="3"/>
+  <path d="M330 43l90 590M570 43l-55 590M755 43l160 590M1000 43l-115 590" stroke="#fff" stroke-width="8" opacity=".9"/>
+  <path d="M50 490c250-95 410 85 620-20 185-92 285-80 480-35" fill="none" stroke="#9dc9cf" stroke-width="34" opacity=".8"/>
+  <rect x="74" y="68" width="468" height="72" rx="10" fill="#fff" filter="url(#s)"/>
+  <text x="105" y="112" font-family="Arial,sans-serif" font-size="21" fill="#5f6368">Search for a place or address</text>
+  <circle cx="503" cy="104" r="20" fill="#2f7d4a"/><path d="M494 104h18M503 95v18" stroke="#fff" stroke-width="3"/>
+  <rect x="74" y="158" width="362" height="322" rx="12" fill="#fff"/>
+  <text x="101" y="205" font-family="Arial,sans-serif" font-size="25" font-weight="700" fill="#202124">New York store</text>
+  <text x="101" y="239" font-family="Arial,sans-serif" font-size="17" fill="#5f6368">2880 Broadway, New York</text>
+  <rect x="101" y="273" width="151" height="49" rx="8" fill="#2f7d4a"/>
+  <text x="176" y="305" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#fff">ADD TO MAP</text>
+  <text x="101" y="382" font-family="Arial,sans-serif" font-size="18" fill="#5f6368">Repeat the search for every</text><text x="101" y="410" font-family="Arial,sans-serif" font-size="18" fill="#5f6368">location you want to show.</text>
+  <g fill="#d93025"><path d="M692 192c-18 0-32 14-32 32 0 27 32 59 32 59s32-32 32-59c0-18-14-32-32-32z"/><circle cx="692" cy="224" r="10" fill="#fff"/></g>
+  <g fill="#2f7d4a"><path d="M867 346c-18 0-32 14-32 32 0 27 32 59 32 59s32-32 32-59c0-18-14-32-32-32z"/><circle cx="867" cy="378" r="10" fill="#fff"/></g>
+  <g fill="#5f9fa6"><path d="M1020 158c-18 0-32 14-32 32 0 27 32 59 32 59s32-32 32-59c0-18-14-32-32-32z"/><circle cx="1020" cy="190" r="10" fill="#fff"/></g>
+  <circle cx="248" cy="269" r="24" fill="#c8a85a"/><text x="248" y="277" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#fff">2</text>
+  <defs><filter id="s"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-opacity=".15"/></filter></defs>
+</svg>

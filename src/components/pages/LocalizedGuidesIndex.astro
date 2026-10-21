@@ -1,0 +1,74 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../layout/Header.astro";
+import Footer from "../layout/Footer.astro";
+import { localizedPath, localizedUrl } from "../../i18n/config";
+import { guidePaths, guidesIndexContent, type TranslatedLocale } from "../../i18n/guides";
+
+interface Props {
+    lang: TranslatedLocale;
+}
+
+const { lang } = Astro.props;
+const content = guidesIndexContent[lang];
+const pageUrl = localizedUrl("/guides/", lang, Astro.site!);
+const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: content.title,
+    description: content.description,
+    url: pageUrl,
+    inLanguage: lang,
+};
+---
+
+<BaseLayout
+    title={content.seoTitle}
+    description={content.description}
+    canonical={pageUrl}
+    structuredData={structuredData}
+    lang={lang}
+    alternatePath="/guides/"
+>
+    <Header lang={lang} translationPath="/guides/" />
+    <main id="main-content">
+        <div class="page-hero">
+            <div class="container readable-surface">
+                <span class="text-mono-eyebrow">{content.eyebrow}</span>
+                <h1 class="text-heading-lg page-h1">{content.title}</h1>
+                <p class="text-body-lg page-intro">{content.intro}</p>
+            </div>
+        </div>
+
+        <section class="section" aria-label={content.aria}>
+            <div class="container">
+                <div class="guides-grid">
+                    {content.cards.map((card) => (
+                        <a href={localizedPath(guidePaths[card.key], lang)} class="guide-card card">
+                            <span class="platform-tag">{card.platform}</span>
+                            <h2 class="text-heading-md guide-title">{card.title}</h2>
+                            <p class="text-body-md guide-desc">{card.description}</p>
+                            <span class="guide-cta">{content.read}</span>
+                        </a>
+                    ))}
+                </div>
+            </div>
+        </section>
+    </main>
+    <Footer lang={lang} />
+</BaseLayout>
+
+<style>
+    .page-hero { padding: var(--spacing-3xl) 0 var(--spacing-xl); border-bottom: 1px solid var(--color-hairline); }
+    .text-mono-eyebrow { color: var(--color-mute); }
+    .page-h1 { margin: var(--spacing-sm) 0; color: var(--color-ink); }
+    .page-intro { max-width: 760px; margin: 0; color: var(--color-body); }
+    .guides-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--spacing-md); }
+    .guide-card { display: flex; flex-direction: column; gap: var(--spacing-xs); color: inherit; text-decoration: none; transition: border-color .15s ease, box-shadow .15s ease; }
+    .guide-card:hover { border-color: var(--color-body); box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .platform-tag { color: var(--color-mute); font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; }
+    .guide-title { margin: 0; color: var(--color-ink); }
+    .guide-desc { flex: 1; margin: 0; color: var(--color-body); }
+    .guide-cta { color: var(--color-link); font-size: 13px; font-weight: 500; }
+    @media (max-width: 640px) { .guides-grid { grid-template-columns: 1fr; } }
+</style>

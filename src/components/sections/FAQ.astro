@@ -1,0 +1,122 @@
+---
+import type { Locale } from "../../i18n/config";
+import { getHomeContent } from "../../i18n/home";
+
+interface Props { lang?: Locale; }
+const { lang = "en" } = Astro.props;
+const copy = getHomeContent(lang).faq;
+
+type Faq = { q: string; a: string; link?: { href: string; label: string } };
+
+const englishFaqs: Faq[] = [
+    {
+        q: "How to embed a Google Map?",
+        a: "Enter an address, place name, or coordinates in the generator above. Adjust the map type, zoom, width, and height, then select Generate Code. Copy the complete HTML and paste it into an HTML or embed block on your website. Keep responsive mode enabled so the map fits mobile screens.",
+    },
+    {
+        q: "How to embed Google Map in WordPress?",
+        a: "Generate the map code, open the WordPress page or post, and add a Custom HTML block in the Block Editor. Paste the complete code into that block and preview the page before publishing. The same code can be placed in a Custom HTML widget where the theme supports widgets. Our WordPress guide includes the full process.",
+        link: { href: "/guides/embed-google-maps-wordpress/", label: "Read the WordPress guide" },
+    },
+    {
+        q: "How to embed Google Map in email?",
+        a: "Most email clients remove or block iframe elements, so a live interactive Google Map is not reliable inside an email. Use a map screenshot or a clearly labeled button and link it to the location or directions in Google Maps. Add the street address as normal text so recipients can still copy it.",
+    },
+    {
+        q: "How to create a Google Maps custom map embed link?",
+        a: "Create the map in Google My Maps, add and style the required locations, and allow visitors with the link to view it. Open the map menu, choose Embed on my site, and copy the iframe. You can paste either that iframe or its Google My Maps embed URL into the My Maps tab of this generator.",
+    },
+    {
+        q: "How to embed a Google Map with multiple locations?",
+        a: "Create a public Google My Map and add every location as a marker. Choose Embed on my site, copy the iframe, then paste it into the generator's My Maps tab to create responsive code. Multiple markers represent independent locations; they do not automatically create a route.",
+        link: { href: "/guides/embed-google-map-multiple-locations/", label: "View the multiple-locations guide" },
+    },
+    {
+        q: "How to embed a Google Map with saved places?",
+        a: "Personal Saved lists in Google Maps are intended for use inside Google Maps and do not provide the same website iframe workflow as My Maps. Recreate or import the places into Google My Maps, set the map's viewing access, and use Embed on my site. Paste that iframe into the My Maps tab here.",
+    },
+    {
+        q: "How to embed a Google Map in Word?",
+        a: "Microsoft Word documents do not reliably render a live Google Maps iframe. Insert a screenshot of the map, select the image, and add a hyperlink to the Google Maps location or directions. If you meant WordPress, use a Custom HTML block and paste the generated iframe code there.",
+    },
+    {
+        q: "How to embed a Google Map in Dreamweaver?",
+        a: "Generate the iframe, open the target HTML page in Dreamweaver, and switch to Code or Split view. Paste the complete generated code inside the body element where the map should appear. Save the file and use Live View or a browser preview to check the responsive width.",
+    },
+    {
+        q: "How to embed Google Map in HTML without an API key?",
+        a: "Use the address or coordinate mode in this generator, preview the map, and copy the generated iframe HTML. Paste it inside the body of your HTML document. This basic iframe method does not require a Google Cloud project, billing account, or API key. Advanced Google Maps API products are separate and require their own setup.",
+    },
+];
+
+const faqs: Faq[] = lang === "en"
+    ? englishFaqs
+    : copy.items.map(([q, a]) => ({ q, a }));
+---
+
+<section class="section faq-section" id="faq" aria-labelledby="faq-heading">
+    <div class="container faq-surface readable-surface">
+        <div class="section-header">
+            <span class="text-mono-eyebrow" style="color:var(--color-mute);">{copy.eyebrow}</span>
+            <h2 class="text-heading-lg section-title" id="faq-heading">
+                {copy.title}
+            </h2>
+        </div>
+
+        <div class="faq-list" role="list">
+            {
+                faqs.map((faq, i) => (
+                    <details class="faq-item" role="listitem">
+                        <summary class="faq-question" id={`faq-q-${i}`}>
+                            <span class="faq-q-text">{faq.q}</span>
+                            <svg class="faq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                                <path d="M3.5 5.25L7 8.75L10.5 5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </summary>
+                        <div class="faq-answer" role="region" aria-labelledby={`faq-q-${i}`}>
+                            <p class="text-body-md" style="color:var(--color-body);">{faq.a}</p>
+                            {faq.link && <a class="faq-link" href={faq.link.href}>{faq.link.label} →</a>}
+                        </div>
+                    </details>
+                ))
+            }
+        </div>
+    </div>
+</section>
+
+<script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+        "@type": "Question",
+        name: faq.q,
+        acceptedAnswer: { "@type": "Answer", text: faq.a },
+    })),
+})} />
+
+<style>
+    .faq-section { border-top: 1px solid var(--color-hairline); }
+    .faq-surface { max-width: 960px; padding-top: var(--spacing-xl); padding-bottom: var(--spacing-xl); }
+    .section-header { margin-bottom: var(--spacing-xl); text-align: center; }
+    .section-title { margin: var(--spacing-sm) 0 0; color: var(--color-ink); }
+    .faq-list { max-width: 800px; margin: 0 auto; }
+    .faq-item { border-bottom: 1px solid var(--color-hairline); }
+    .faq-item:first-child { border-top: 1px solid var(--color-hairline); }
+    .faq-question { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); padding: var(--spacing-md) 0; cursor: pointer; list-style: none; font-family: var(--font-sans); font-size: 15px; font-weight: 600; color: var(--color-ink); }
+    .faq-question::-webkit-details-marker { display: none; }
+    .faq-question:hover { color: var(--color-map-green-deep); }
+    .faq-q-text { flex: 1; }
+    .faq-chevron { flex-shrink: 0; color: var(--color-mute); transition: transform .2s ease; }
+    details[open] .faq-chevron { transform: rotate(180deg); }
+    .faq-answer { padding: 0 0 var(--spacing-md); }
+    .faq-answer p { margin: 0; line-height: 22px; }
+    .faq-link { display: inline-block; margin-top: 7px; color: var(--color-link); font-size: 13px; font-weight: 500; text-decoration: none; }
+    .faq-link:hover { text-decoration: underline; }
+
+    @media (max-width: 640px) {
+        .faq-surface { padding: var(--spacing-lg) var(--spacing-md); }
+        .section-header { text-align: left; }
+    }
+
+    @media (prefers-reduced-motion: reduce) { .faq-chevron { transition: none; } }
+</style>

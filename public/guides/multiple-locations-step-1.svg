@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Create a new map in Google My Maps</title>
+  <desc id="desc">Illustration of the My Maps dashboard with the Create a new map button highlighted.</desc>
+  <rect width="1200" height="675" fill="#f5f7f4"/>
+  <rect x="54" y="48" width="1092" height="579" rx="24" fill="#fff" stroke="#dfe7df" stroke-width="3"/>
+  <rect x="54" y="48" width="1092" height="76" rx="24" fill="#fff"/>
+  <circle cx="100" cy="86" r="17" fill="#2f7d4a"/><path d="M100 70c-8 0-14 6-14 14 0 11 14 25 14 25s14-14 14-25c0-8-6-14-14-14zm0 19a5 5 0 1 1 0-10 5 5 0 0 1 0 10z" fill="#fff"/>
+  <text x="132" y="95" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#202124">My Maps</text>
+  <rect x="88" y="163" width="326" height="72" rx="12" fill="#2f7d4a"/>
+  <text x="251" y="207" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#fff">+ CREATE A NEW MAP</text>
+  <text x="88" y="302" font-family="Arial,sans-serif" font-size="24" font-weight="700" fill="#202124">Your maps</text>
+  <rect x="88" y="331" width="300" height="214" rx="14" fill="#e9f0e8" stroke="#d4ddd4"/>
+  <path d="M89 450l70-61 81 49 70-62 78 42v127H89z" fill="#cfe8d4"/><path d="M111 331l49 214M235 331l-22 214M333 331l-40 214" stroke="#fff" stroke-width="7"/>
+  <circle cx="247" cy="416" r="18" fill="#d93025"/><path d="M247 397c-10 0-18 8-18 18 0 15 18 33 18 33s18-18 18-33c0-10-8-18-18-18z" fill="#d93025"/><circle cx="247" cy="415" r="6" fill="#fff"/>
+  <rect x="428" y="331" width="300" height="214" rx="14" fill="#f3f4f3" stroke="#d4ddd4"/>
+  <rect x="768" y="331" width="300" height="214" rx="14" fill="#f3f4f3" stroke="#d4ddd4"/>
+  <rect x="80" y="155" width="342" height="88" rx="17" fill="none" stroke="#c8a85a" stroke-width="5"/>
+  <circle cx="420" cy="157" r="24" fill="#c8a85a"/><text x="420" y="165" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#fff">1</text>
+</svg>

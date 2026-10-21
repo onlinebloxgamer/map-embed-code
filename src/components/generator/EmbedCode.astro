@@ -1,0 +1,437 @@
+---
+import type { Locale } from "../../i18n/config";
+import { getHomeContent } from "../../i18n/home";
+
+interface Props { lang?: Locale; }
+const { lang = "en" } = Astro.props;
+const copy = getHomeContent(lang).generator;
+---
+
+<dialog
+    class="code-dialog"
+    id="embed-code-dialog"
+    aria-labelledby="code-dialog-title"
+    aria-describedby="code-dialog-description"
+    data-copied={copy.copied}
+    data-copy={copy.copy}
+    data-link-copied={copy.linkCopied}
+>
+    <div class="code-modal">
+        <header class="code-modal-header">
+            <div>
+                <span class="text-mono-eyebrow code-eyebrow">{copy.embedCode}</span>
+                <h2 id="code-dialog-title">{copy.codeTitle}</h2>
+            </div>
+            <button
+                class="dialog-close-icon"
+                id="close-code-dialog"
+                type="button"
+                aria-label={copy.closeDialog}
+            >
+                <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 18 18"
+                    fill="none"
+                    aria-hidden="true"
+                >
+                    <path
+                        d="M4 4L14 14M14 4L4 14"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"></path>
+                </svg>
+            </button>
+        </header>
+
+        <div class="code-modal-body">
+            <p id="code-dialog-description">
+                {copy.codeDescription}
+            </p>
+            <div
+                class="code-wrapper"
+                role="region"
+                aria-label={copy.generatedCode}
+                tabindex="0"
+            >
+                <pre
+                    class="code-block"
+                    id="code-block"
+                    aria-label={copy.generatedHtml}><code id="embed-code-output">&lt;div class="mapouter"&gt;
+  &lt;div class="gmap_canvas"&gt;
+    &lt;iframe
+      class="gmap_iframe"
+      frameborder="0"
+      scrolling="no"
+      marginheight="0"
+      marginwidth="0"
+      src="https://maps.google.com/maps?q=New+York+City%2C+NY%2C+USA&amp;z=7&amp;output=embed"
+      title="Google Maps"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen=""
+      loading="lazy"
+    &gt;&lt;/iframe&gt;
+    &lt;a href="https://map-embed-code.com/"&gt;map-embed-code.com&lt;/a&gt;
+  &lt;/div&gt;
+  &lt;style&gt;
+    .mapouter&#123;position:relative;text-align:right;width:100%;aspect-ratio:600/450;&#125;
+    .gmap_canvas&#123;overflow:hidden;background:none!important;width:100%;height:100%;&#125;
+    .gmap_iframe&#123;display:block;width:100%!important;height:100%!important;&#125;
+  &lt;/style&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+        </div>
+
+        <footer class="code-modal-footer">
+            <div
+                class="share-status"
+                id="share-status"
+                role="status"
+                aria-live="polite"
+            ></div>
+            <div class="code-actions">
+                <button
+                    class="btn-ghost-sm"
+                    id="share-btn"
+                    type="button"
+                    aria-label={copy.shareAria}
+                >
+                    {copy.share}
+                </button>
+                <button
+                    class="btn-primary"
+                    id="copy-btn"
+                    type="button"
+                    aria-label={copy.copyAria}
+                >
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        aria-hidden="true"
+                        id="copy-icon"
+                    >
+                        <rect
+                            x="4.5"
+                            y="1.5"
+                            width="8"
+                            height="10"
+                            rx="1.5"
+                            stroke="currentColor"
+                            stroke-width="1.2"></rect>
+                        <path
+                            d="M2.5 3.5H2a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7"
+                            stroke="currentColor"
+                            stroke-width="1.2"
+                            stroke-linecap="round"></path>
+                    </svg>
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        aria-hidden="true"
+                        id="copied-icon"
+                        hidden
+                    >
+                        <path
+                            d="M2 7L5.25 10.25L12 3.5"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                    </svg>
+                    <span id="copy-btn-label">{copy.copy}</span>
+                </button>
+                <button
+                    class="btn-secondary"
+                    id="close-code-dialog-footer"
+                    type="button"
+                >
+                    {copy.close}
+                </button>
+            </div>
+        </footer>
+    </div>
+</dialog>
+
+<style>
+    .code-dialog {
+        position: fixed;
+        inset: 0;
+        width: min(800px, calc(100vw - 32px));
+        height: fit-content;
+        max-width: none;
+        max-height: calc(100dvh - 32px);
+        margin: auto;
+        padding: 0;
+        color: var(--color-ink);
+        background: var(--color-canvas-elevated);
+        border: 1px solid var(--color-hairline);
+        border-radius: var(--radius-md);
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
+        overflow: hidden;
+    }
+
+    .code-dialog::backdrop {
+        background: rgba(23, 23, 23, 0.62);
+        backdrop-filter: blur(2px);
+    }
+
+    .code-modal {
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100dvh - 24px);
+    }
+
+    .code-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--spacing-md);
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--color-hairline);
+    }
+
+    .code-eyebrow {
+        display: block;
+        margin-bottom: 1px;
+        color: var(--color-mute);
+        font-size: 9px;
+        line-height: 12px;
+    }
+
+    .code-modal-header h2 {
+        margin: 0;
+        font-size: 15px;
+        line-height: 20px;
+        letter-spacing: -0.2px;
+    }
+
+    .dialog-close-icon {
+        display: inline-grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        flex: 0 0 auto;
+        padding: 0;
+        border: 0;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--color-body);
+        cursor: pointer;
+    }
+
+    .dialog-close-icon:hover {
+        background: var(--color-hairline-soft);
+        color: var(--color-ink);
+    }
+
+    .code-modal-body {
+        padding: 8px 12px;
+        overflow-y: auto;
+    }
+
+    .code-modal-body p {
+        margin: 0 0 6px;
+        color: var(--color-body);
+        font-size: 11px;
+        line-height: 16px;
+    }
+
+    .code-wrapper {
+        height: 72px;
+        overflow: auto;
+        border: 1px solid var(--color-hairline);
+        border-radius: var(--radius-sm);
+        background: var(--color-canvas);
+    }
+
+    .code-wrapper:focus-visible {
+        outline-offset: 2px;
+    }
+
+    .code-block {
+        min-width: max-content;
+        min-height: 100%;
+        margin: 0;
+        padding: 8px;
+        background: transparent;
+        color: var(--color-ink);
+        font-family: var(--font-mono);
+        font-size: 10px;
+        line-height: 14px;
+        white-space: pre;
+        tab-size: 2;
+    }
+
+    .code-block code {
+        font: inherit;
+        color: inherit;
+    }
+
+    .code-modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--spacing-md);
+        padding: 8px 12px;
+        border-top: 1px solid var(--color-hairline);
+        background: var(--color-hairline-soft);
+    }
+
+    .code-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: var(--spacing-xs);
+        margin-left: auto;
+    }
+
+    .share-status {
+        min-height: 16px;
+        color: var(--color-success);
+        font-family: var(--font-mono);
+        font-size: 10px;
+        line-height: 16px;
+    }
+
+    .code-actions :global(button) {
+        min-height: 30px;
+        padding: 4px 10px;
+        font-size: 11px;
+        line-height: 18px;
+    }
+
+    @media (max-width: 560px) {
+        .code-dialog {
+            width: calc(100vw - 24px);
+            max-height: calc(100dvh - 24px);
+        }
+
+        .code-modal-header,
+        .code-modal-body,
+        .code-modal-footer {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .code-wrapper {
+            height: 64px;
+        }
+
+        .code-modal-footer {
+            align-items: stretch;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        .code-actions {
+            width: 100%;
+            margin-left: 0;
+        }
+
+        .code-actions > button {
+            flex: 1;
+        }
+
+        .share-status:empty {
+            display: none;
+        }
+    }
+</style>
+
+<script>
+    const generateBtn = document.getElementById("generate-code-btn");
+    const dialog = document.getElementById(
+        "embed-code-dialog",
+    ) as HTMLDialogElement | null;
+    const closeBtn = document.getElementById("close-code-dialog");
+    const closeFooterBtn = document.getElementById(
+        "close-code-dialog-footer",
+    );
+    const copyBtn = document.getElementById("copy-btn");
+    const copyBtnLabel = document.getElementById("copy-btn-label");
+    const copyIcon = document.getElementById("copy-icon");
+    const copiedIcon = document.getElementById("copied-icon");
+    const shareBtn = document.getElementById("share-btn");
+    const shareStatus = document.getElementById("share-status");
+    const copiedText = dialog?.dataset.copied ?? "Copied!";
+    const copyText = dialog?.dataset.copy ?? "Copy Code";
+    const linkCopiedText = dialog?.dataset.linkCopied ?? "Shareable link copied";
+
+    function openDialog(): void {
+        if (!dialog) return;
+        if (typeof dialog.showModal === "function") {
+            if (!dialog.open) dialog.showModal();
+        } else {
+            dialog.setAttribute("open", "");
+        }
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeDialog(): void {
+        if (!dialog) return;
+        if (typeof dialog.close === "function" && dialog.open) {
+            dialog.close();
+        } else {
+            dialog.removeAttribute("open");
+            document.body.style.overflow = "";
+        }
+    }
+
+    function showCopiedFeedback(): void {
+        if (!copyBtnLabel || !copyIcon || !copiedIcon) return;
+        copyBtnLabel.textContent = copiedText;
+        copyIcon.hidden = true;
+        copiedIcon.hidden = false;
+        window.setTimeout(() => {
+            copyBtnLabel.textContent = copyText;
+            copyIcon.hidden = false;
+            copiedIcon.hidden = true;
+        }, 2000);
+    }
+
+    generateBtn?.addEventListener("click", openDialog);
+    closeBtn?.addEventListener("click", closeDialog);
+    closeFooterBtn?.addEventListener("click", closeDialog);
+
+    dialog?.addEventListener("close", () => {
+        document.body.style.overflow = "";
+        generateBtn?.focus();
+    });
+
+    dialog?.addEventListener("click", (event) => {
+        if (event.target === dialog) closeDialog();
+    });
+
+    copyBtn?.addEventListener("click", async () => {
+        const code =
+            document.getElementById("embed-code-output")?.textContent ?? "";
+        try {
+            await navigator.clipboard.writeText(code);
+            showCopiedFeedback();
+        } catch {
+            const pre = document.getElementById("code-block");
+            if (!pre) return;
+            const range = document.createRange();
+            range.selectNodeContents(pre);
+            const selection = window.getSelection();
+            selection?.removeAllRanges();
+            selection?.addRange(range);
+        }
+    });
+
+    shareBtn?.addEventListener("click", async () => {
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+            if (shareStatus) shareStatus.textContent = linkCopiedText;
+        } catch {
+            if (shareStatus) shareStatus.textContent = window.location.href;
+        }
+        window.setTimeout(() => {
+            if (shareStatus) shareStatus.textContent = "";
+        }, 2500);
+    });
+</script>

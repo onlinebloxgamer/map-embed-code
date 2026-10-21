@@ -1,0 +1,246 @@
+---
+// Long-form homepage content for the generator's main search intents.
+import LocalizedEducationalContent from "./LocalizedEducationalContent.astro";
+import type { Locale } from "../../i18n/config";
+
+interface Props {
+    lang?: Locale;
+}
+
+const { lang = "en" } = Astro.props;
+---
+
+{lang === "en" ? (
+<section class="section edu-content" id="about" aria-labelledby="edu-heading">
+    <div class="container edu-inner readable-surface">
+        <header class="section-header">
+            <span class="text-mono-eyebrow" style="color:var(--color-mute);">Google Maps embedding guide</span>
+            <h2 class="text-heading-lg section-title" id="edu-heading">
+                Google Map Embed Code: A Complete Guide for Websites
+            </h2>
+            <p class="section-intro">
+                Use this Google Map embed generator to turn an address, GPS coordinates, directions, or a public Google My Map into responsive iframe code. The generated map can be added to an HTML website, WordPress, Shopify, Wix, Webflow, Squarespace, and most other platforms that accept custom HTML.
+            </p>
+        </header>
+
+        <nav class="article-nav" aria-label="Google Maps embed guide contents">
+            <a href="#what-is-map-embed">Embed code basics</a>
+            <a href="#generate-map-code">Generate an iframe</a>
+            <a href="#responsive-map">Responsive and full width</a>
+            <a href="#api-key-options">API key options</a>
+            <a href="#directions-markers">Directions and markers</a>
+            <a href="#website-platforms">Website platforms</a>
+        </nav>
+
+        <article class="edu-article">
+            <section class="content-block" id="what-is-map-embed">
+                <h3>What is Google Map embed code?</h3>
+                <p>
+                    Google Map embed code is an HTML <code class="inline-code">&lt;iframe&gt;</code> that displays an interactive map inside a web page. Visitors can pan, zoom, open place details, and explore the surrounding area without leaving your website. A map iframe is commonly used on contact pages, store locators, property listings, event pages, travel guides, and local service websites.
+                </p>
+                <p>
+                    An embeddable Google Map is different from a static image. The iframe loads a live map, while the surrounding page remains under your control. This makes it a practical Google Map widget for a website that needs clear location information without custom JavaScript.
+                </p>
+            </section>
+
+            <section class="content-block" id="generate-map-code">
+                <h3>How to use the Google Map embed code generator</h3>
+                <p>
+                    The generator above creates the iframe and its responsive wrapper for you. It works as a Google Maps iframe generator and live preview, so you can check the location before copying any code.
+                </p>
+                <ol class="numbered-steps">
+                    <li><strong>Choose a location mode.</strong> Search by address or place name, enter exact latitude and longitude, or select My Maps for a custom map.</li>
+                    <li><strong>Adjust the map.</strong> Choose roadmap or satellite view, set the zoom distance, and select the required dimensions.</li>
+                    <li><strong>Preview the result.</strong> Confirm that the correct address, marker, route, or custom map appears.</li>
+                    <li><strong>Generate the code.</strong> Select <em>Generate Code</em>, copy the HTML, and paste it into the page where the map should appear.</li>
+                </ol>
+                <div class="content-image-grid" aria-label="Google Map embed generator steps">
+                    <figure class="content-figure">
+                        <img
+                            src="/images/google-map-embed-generator.webp"
+                            alt="Google Map embed generator showing Columbia University with a live preview and Generate Code button"
+                            width="800"
+                            height="450"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <figcaption>Enter the location, adjust the map, confirm the preview, and select “Generate Code.”</figcaption>
+                    </figure>
+                    <figure class="content-figure">
+                        <img
+                            src="/images/google-map-embed-generator-code.webp"
+                            alt="Generated Google Map iframe code popup with the Copy Code button"
+                            width="1280"
+                            height="720"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <figcaption>Review the generated iframe HTML and select “Copy Code.”</figcaption>
+                    </figure>
+                </div>
+                <p>
+                    This workflow can add a Google address map to a website in a few minutes. For a single business or venue, enter its complete address to add a Google Map to the website with a marker. Exact coordinates are useful when an address is incomplete, newly created, or located in a large site such as a park or university campus.
+                </p>
+                <pre class="edu-code"><code>&lt;div class="mapouter"&gt;
+  &lt;div class="gmap_canvas"&gt;
+    &lt;iframe
+      class="gmap_iframe"
+      src="https://maps.google.com/maps?q=New+York&amp;z=7&amp;output=embed"
+      loading="lazy"
+      allowfullscreen
+    &gt;&lt;/iframe&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+                <p>
+                    The generated HTML also includes the required CSS class rules. You can therefore use it as a Google Map generator for a website without writing the iframe or sizing styles manually.
+                </p>
+            </section>
+
+            <section class="content-block" id="responsive-map">
+                <h3>Responsive and full-width Google Map embeds</h3>
+                <p>
+                    A fixed-width iframe can overflow on a phone. A responsive Google Map embed uses a wrapper that follows the available width while preserving the selected map ratio. Responsive mode is enabled by default, making the iframe suitable for narrow mobile layouts and wider desktop content areas.
+                </p>
+                <p>
+                    For a full-width Google Map embed, choose a percentage width or let the responsive wrapper use <code class="inline-code">width:100%</code>. The map then fills its parent section rather than the entire browser window. If it still looks narrow, check whether your theme places the embed inside a limited-width column.
+                </p>
+                <div class="tip-box">
+                    <strong>Recommended setup:</strong> use 100% width, select a height that suits the page, keep lazy loading enabled, and preview the result at phone width before publishing.
+                </div>
+                <div class="content-image-grid" aria-label="Responsive Google Map desktop and mobile previews">
+                    <figure class="content-figure">
+                        <img
+                            src="/images/responsive-google-map-embed-desktop.webp"
+                            alt="Desktop preview of a responsive Google Map embed with responsive mode enabled"
+                            width="1280"
+                            height="720"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <figcaption>Desktop preview: check the selected width, height, and visible map area.</figcaption>
+                    </figure>
+                    <figure class="content-figure">
+                        <img
+                            src="/images/responsive-google-map-embed-mobile.webp"
+                            alt="Mobile preview of a responsive Google Map embed fitting a narrow screen"
+                            width="1280"
+                            height="720"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <figcaption>Mobile preview: responsive mode keeps the iframe inside the available screen width.</figcaption>
+                    </figure>
+                </div>
+            </section>
+
+            <section class="content-block" id="api-key-options">
+                <h3>Google Map Embed API versus an iframe without an API key</h3>
+                <p>
+                    Basic location maps generated on this page use an iframe URL and can be embedded in HTML without an API key. You do not need to create a Google Cloud project or add billing information for this generator's standard address, coordinate, and public My Maps embeds.
+                </p>
+                <p>
+                    The official <a href="https://developers.google.com/maps/documentation/embed/embedding-map" target="_blank" rel="noopener noreferrer">Google Maps Embed API</a> is a separate Google Cloud product. Its documented URLs include an API key and support defined modes such as place, view, directions, street view, and search. The Maps JavaScript API is another option for advanced application features such as programmatic markers, custom controls, event handling, and data-driven interactions.
+                </p>
+                <div class="comparison-wrap" role="region" aria-label="Google Maps embedding options" tabindex="0">
+                    <table class="comparison-table">
+                        <thead><tr><th>Method</th><th>Best for</th><th>API key</th></tr></thead>
+                        <tbody>
+                            <tr><td>Generated iframe</td><td>Addresses, coordinates, responsive maps, and public My Maps</td><td>Not required</td></tr>
+                            <tr><td>Maps Embed API</td><td>Documented Google Cloud embed modes</td><td>Required</td></tr>
+                            <tr><td>Maps JavaScript API</td><td>Custom interactive applications and advanced marker behavior</td><td>Required</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    For a contact page or a straightforward location section, a Google Map embed without an API key is usually the simpler choice. Choose an API product when the project needs behavior that a normal iframe cannot provide.
+                </p>
+            </section>
+
+            <section class="content-block" id="directions-markers">
+                <h3>Embed directions, a marker, or a map with multiple locations</h3>
+                <p>
+                    To embed directions in Google Maps, enable <strong>Directions mode</strong>, enter the starting point and destination, and confirm the route in the preview. This is useful for hotels, offices, event venues, clinics, and any page that needs to show how to reach a destination.
+                </p>
+                <p>
+                    A standard address search adds one Google Map marker. To add a Google Map to a website with multiple locations, first create a public map in Google My Maps. Add and style each place there, choose <strong>Embed on my site</strong>, and paste the iframe or embed URL into the generator's <strong>My Maps</strong> tab. The resulting Google Map embed can display multiple markers while remaining responsive.
+                </p>
+                <p>
+                    Multiple markers and multi-stop directions serve different purposes. Markers show independent branches, properties, or venues. Directions connect locations in travel order. For a detailed marker workflow, read <a href="/guides/embed-google-map-multiple-locations/">how to embed a Google Map with multiple locations</a>.
+                </p>
+            </section>
+
+            <section class="content-block" id="website-platforms">
+                <h3>Embed Google Maps in a website, WordPress, or a page builder</h3>
+                <p>
+                    The generated code works anywhere custom iframe HTML is allowed. In a plain website, paste it inside the page's <code class="inline-code">&lt;body&gt;</code>. In visual site builders, use an HTML, embed, code, or custom-liquid element rather than a normal text block.
+                </p>
+                <ul class="platform-list">
+                    <li><strong>WordPress:</strong> use a Custom HTML block or widget. Follow the <a href="/guides/embed-google-maps-wordpress/">Google Map embed WordPress guide</a>.</li>
+                    <li><strong>Shopify:</strong> paste the code into a Custom Liquid section or an HTML-capable page area. See the <a href="/guides/embed-google-maps-shopify/">Shopify guide</a>.</li>
+                    <li><strong>Wix and Squarespace:</strong> use the platform's HTML embed or code block.</li>
+                    <li><strong>Webflow:</strong> add an Embed component and paste the complete generated code.</li>
+                    <li><strong>Dreamweaver:</strong> switch to Code view and place the iframe where it should appear inside the document body.</li>
+                </ul>
+                <p>
+                    If a platform removes the iframe after saving, confirm that the account role is allowed to publish custom HTML. Some hosted editors restrict iframe code for contributors while allowing it for administrators.
+                </p>
+            </section>
+
+            <section class="content-block" id="embed-best-practices">
+                <h3>Google Map iframe performance and accessibility tips</h3>
+                <ul class="platform-list">
+                    <li>Keep <code class="inline-code">loading="lazy"</code> enabled so the browser can delay an off-screen map.</li>
+                    <li>Use a clear iframe title so screen-reader users know what location the map represents.</li>
+                    <li>Place the street address, phone number, and opening hours in normal page text near the map.</li>
+                    <li>Check the map on mobile and make sure it does not block scrolling or overflow its container.</li>
+                    <li>Use exact coordinates when Google selects the wrong place for an ambiguous address.</li>
+                </ul>
+                <p>
+                    These steps keep the Google Map widget useful even when a visitor cannot interact with the map itself, and they make the surrounding location information easier for search engines and assistive technology to understand.
+                </p>
+            </section>
+        </article>
+    </div>
+</section>
+) : (
+    <LocalizedEducationalContent lang={lang} />
+)}
+
+<style>
+    .edu-content { border-top: 1px solid var(--color-hairline); }
+    .edu-inner { max-width: 960px; padding-top: var(--spacing-xl); padding-bottom: var(--spacing-xl); }
+    .section-header { max-width: 780px; margin: 0 auto var(--spacing-lg); text-align: center; }
+    .section-title { margin: var(--spacing-sm) 0; color: var(--color-ink); }
+    .section-intro { margin: 0; font-size: 16px; line-height: 25px; color: var(--color-body); }
+    .article-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin-bottom: var(--spacing-xl); padding: var(--spacing-sm); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); background: var(--color-hairline-soft); }
+    .article-nav a { padding: 5px 10px; border-radius: var(--radius-pill); background: #fff; color: var(--color-map-green-deep); font-size: 13px; font-weight: 500; text-decoration: none; }
+    .article-nav a:hover { text-decoration: underline; }
+    .edu-article { max-width: 800px; margin: 0 auto; }
+    .content-block { scroll-margin-top: 80px; margin-bottom: var(--spacing-xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--color-hairline); }
+    .content-block:first-child { padding-top: 0; border-top: 0; }
+    .content-block h3 { margin: 0 0 var(--spacing-sm); font-size: 22px; line-height: 30px; font-weight: 600; letter-spacing: -.3px; color: var(--color-ink); }
+    .content-block p, .numbered-steps, .platform-list { margin: 0 0 var(--spacing-sm); font-size: 15px; line-height: 25px; color: var(--color-body); }
+    .content-block a { color: var(--color-link); text-decoration: none; }
+    .content-block a:hover { text-decoration: underline; }
+    .numbered-steps, .platform-list { display: flex; flex-direction: column; gap: 8px; padding-left: var(--spacing-lg); }
+    .edu-code { display: block; width: 100%; max-width: 100%; overflow-x: auto; margin: var(--spacing-md) 0; padding: var(--spacing-md); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm); background: var(--color-hairline-soft); font-family: var(--font-mono); font-size: 12px; line-height: 18px; white-space: pre; }
+    .inline-code { padding: 1px 5px; border: 1px solid var(--color-hairline); border-radius: 4px; background: var(--color-hairline-soft); font-family: var(--font-mono); font-size: 13px; }
+    .tip-box { margin: var(--spacing-md) 0; padding: var(--spacing-sm) var(--spacing-md); border: 1px solid #c9ddce; border-left: 3px solid var(--color-map-green); border-radius: var(--radius-sm); background: #f3f8f4; font-size: 14px; line-height: 22px; color: var(--color-body); }
+    .content-image-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--spacing-md); margin: var(--spacing-lg) 0; }
+    .content-figure { overflow: hidden; margin: 0; border: 1px solid var(--color-hairline); border-radius: var(--radius-md); background: #fff; }
+    .content-figure img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+    .content-figure figcaption { padding: 9px 11px; border-top: 1px solid var(--color-hairline); font-size: 12px; line-height: 18px; color: var(--color-mute); }
+    .comparison-wrap { max-width: 100%; overflow-x: auto; margin: var(--spacing-md) 0; border: 1px solid var(--color-hairline); border-radius: var(--radius-sm); }
+    .comparison-table { width: 100%; min-width: 590px; border-collapse: collapse; background: #fff; font-size: 14px; color: var(--color-body); }
+    .comparison-table th, .comparison-table td { padding: 10px 12px; border-bottom: 1px solid var(--color-hairline); text-align: left; vertical-align: top; }
+    .comparison-table th { background: var(--color-hairline-soft); color: var(--color-ink); }
+    .comparison-table tr:last-child td { border-bottom: 0; }
+
+    @media (max-width: 640px) {
+        .edu-inner { padding: var(--spacing-lg) var(--spacing-md); }
+        .section-header { text-align: left; }
+        .article-nav { justify-content: flex-start; }
+        .content-block h3 { font-size: 20px; line-height: 27px; }
+        .content-image-grid { grid-template-columns: 1fr; gap: var(--spacing-sm); }
+    }
+</style>

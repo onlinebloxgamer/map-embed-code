@@ -1,0 +1,117 @@
+---
+import type { Locale } from "../../i18n/config";
+import { getHomeContent } from "../../i18n/home";
+
+interface Props { lang?: Locale; }
+const { lang = "en" } = Astro.props;
+const copy = getHomeContent(lang).hero;
+---
+
+<section class="hero" aria-labelledby="hero-heading">
+    <div class="container hero-inner">
+        <span class="text-mono-eyebrow hero-eyebrow">{copy.eyebrow}</span>
+        <h1 class="text-display-xl hero-heading" id="hero-heading">
+            {copy.title.split("\n").map((line, index) => <>{index > 0 && <br />}{line}</>)}
+        </h1>
+        <p class="text-body-lg hero-sub">
+            {copy.description}
+        </p>
+        <div class="hero-badges" aria-label={copy.aria}>
+            {copy.badges.map((badge) => <span class="badge">{badge}</span>)}
+        </div>
+        <div class="hero-cta">
+            <a href="#generator" class="btn-primary">{copy.cta}</a>
+        </div>
+    </div>
+</section>
+
+<style>
+    .hero {
+        background: transparent;
+        border-bottom: 1px solid var(--color-hairline);
+        padding: var(--spacing-2xl) 0 var(--spacing-lg);
+        text-align: center;
+    }
+
+    .hero-inner {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 28px 32px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.78);
+        border-radius: var(--radius-lg);
+        box-shadow: 0 16px 48px rgba(32, 94, 56, 0.12);
+        backdrop-filter: blur(10px);
+    }
+
+    .hero-eyebrow {
+        display: inline-block;
+        color: var(--color-map-green-deep);
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .hero-heading {
+        margin: 0 0 var(--spacing-sm);
+        color: var(--color-ink);
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .hero-sub {
+        color: var(--color-body);
+        margin: 0 0 var(--spacing-md);
+        max-width: 520px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-badges {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: var(--spacing-xs);
+        margin-bottom: var(--spacing-md);
+    }
+
+    .badge {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--color-map-green-deep);
+        background-color: color-mix(
+            in srgb,
+            var(--color-map-green-soft) 72%,
+            white
+        );
+        border: 1px solid color-mix(
+            in srgb,
+            var(--color-map-green) 24%,
+            white
+        );
+        border-radius: var(--radius-pill);
+        padding: 4px 12px;
+    }
+
+    .hero-cta {
+        display: flex;
+        justify-content: center;
+    }
+
+    @media (max-width: 640px) {
+        .hero {
+            padding: var(--spacing-lg) 0 20px;
+        }
+        .hero-inner {
+            width: calc(100% - 24px);
+            padding: 20px 16px;
+            border-radius: var(--radius-md);
+        }
+        .text-display-xl.hero-heading {
+            font-size: 36px;
+            line-height: 40px;
+            letter-spacing: -1.5px;
+        }
+        .hero-badges {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+</style>

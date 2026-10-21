@@ -1,0 +1,221 @@
+---
+import type { Locale } from "../../i18n/config";
+
+interface Props {
+    lang: Exclude<Locale, "en">;
+}
+
+type ArticleSection = {
+    id: string;
+    title: string;
+    paragraphs: string[];
+    steps?: string[];
+    tip?: string;
+};
+
+const { lang } = Astro.props;
+
+const translations = {
+    es: {
+        eyebrow: "Guía para insertar Google Maps",
+        title: "Código para insertar Google Maps: guía completa para sitios web",
+        intro: "Usa este generador de mapas de Google para convertir una dirección, coordenadas GPS, una ruta o un mapa público de Google My Maps en código iframe responsive. Puedes añadir el mapa a HTML, WordPress, Shopify, Wix, Webflow, Squarespace y otras plataformas que acepten HTML personalizado.",
+        navLabel: "Contenido de la guía para insertar Google Maps",
+        nav: [
+            ["what-is-map-embed", "Conceptos básicos"],
+            ["generate-map-code", "Generar un iframe"],
+            ["responsive-map", "Mapa responsive"],
+            ["api-key-options", "Opciones de API"],
+            ["directions-markers", "Rutas y marcadores"],
+            ["website-platforms", "Plataformas web"],
+        ],
+        sections: [
+            {
+                id: "what-is-map-embed",
+                title: "¿Qué es el código para insertar Google Maps?",
+                paragraphs: [
+                    "El código para insertar Google Maps es un elemento HTML <code>&lt;iframe&gt;</code> que muestra un mapa interactivo dentro de una página web. Los visitantes pueden desplazarse, ampliar el mapa, consultar un lugar y explorar los alrededores sin salir de tu sitio.",
+                    "A diferencia de una imagen estática, el iframe carga un mapa funcional. Es una solución práctica para páginas de contacto, fichas de negocios locales, inmobiliarias, eventos, hoteles, restaurantes y cualquier web que necesite indicar una ubicación.",
+                ],
+            },
+            {
+                id: "generate-map-code",
+                title: "Cómo generar un iframe de Google Maps",
+                paragraphs: [
+                    "El generador crea el código de inserción sin que tengas que escribir HTML. Introduce una dirección o unas coordenadas, elige el tipo de mapa, ajusta el zoom y define el tamaño. La vista previa se actualiza para que puedas comprobar el resultado antes de copiarlo.",
+                ],
+                steps: [
+                    "Introduce una dirección, un negocio, unas coordenadas o un mapa público de My Maps.",
+                    "Ajusta el zoom, el tipo de mapa, la anchura y la altura.",
+                    "Activa el diseño responsive, la carga diferida y la pantalla completa si los necesitas.",
+                    "Pulsa «Generar código» y pega el iframe en el HTML de tu página.",
+                ],
+                tip: "Consejo: añade un título descriptivo al iframe para mejorar la accesibilidad, por ejemplo «Mapa de nuestra oficina en Madrid».",
+            },
+            {
+                id: "responsive-map",
+                title: "Mapa de Google responsive y de ancho completo",
+                paragraphs: [
+                    "Un mapa responsive se adapta al espacio disponible en ordenadores, tabletas y móviles. La opción responsive del generador envuelve el iframe en un contenedor que conserva la proporción y evita el desplazamiento horizontal.",
+                    "Para un mapa de ancho completo, usa una anchura del 100 %. Comprueba la vista previa para móvil y elige una altura suficiente para que los controles del mapa sean fáciles de utilizar sin ocupar toda la pantalla.",
+                ],
+            },
+            {
+                id: "api-key-options",
+                title: "Insertar Google Maps sin clave API",
+                paragraphs: [
+                    "Un mapa estándar compartido mediante iframe normalmente se puede insertar sin crear una clave de Google Maps Platform. Este método es adecuado cuando solo necesitas mostrar una ubicación, una vista del mapa, una ruta o un mapa público de My Maps.",
+                    "Una clave API es necesaria para integraciones programadas con JavaScript, datos dinámicos, marcadores creados por código o funciones avanzadas de Google Maps Platform. Para una inserción sencilla, el iframe reduce la configuración y evita cargar JavaScript personalizado.",
+                ],
+            },
+            {
+                id: "directions-markers",
+                title: "Rutas, coordenadas y marcadores personalizados",
+                paragraphs: [
+                    "Activa el modo de indicaciones para generar un mapa con origen y destino. También puedes usar latitud y longitud cuando una dirección postal no identifica el lugar con precisión, por ejemplo en miradores, senderos, fincas o puntos de encuentro.",
+                    "Si necesitas varios marcadores, colores o capas, crea un mapa público en Google My Maps y pega su URL de inserción o su iframe en el generador. Así conservas la personalización de My Maps dentro del código final.",
+                ],
+            },
+            {
+                id: "website-platforms",
+                title: "Añadir Google Maps a WordPress, Shopify, Wix y otras plataformas",
+                paragraphs: [
+                    "En WordPress, añade un bloque «HTML personalizado» y pega el código. En Shopify, utiliza una sección Liquid personalizada o el editor HTML de una página. En Wix, Webflow y Squarespace, usa el bloque de código o de inserción correspondiente.",
+                    "Después de publicar, revisa la página en móvil y ordenador. No pegues el iframe en un campo que solo admita texto: debe ser un bloque que permita HTML. La carga diferida ayuda a que el mapa no compita con el contenido visible al abrir la página.",
+                ],
+                tip: "Buenas prácticas SEO local: coloca el mapa cerca de la dirección escrita, mantén los datos del negocio actualizados y acompáñalo de contenido útil. El mapa por sí solo no garantiza una mejor posición en buscadores.",
+            },
+        ] satisfies ArticleSection[],
+    },
+    de: {
+        eyebrow: "Anleitung zum Einbetten von Google Maps",
+        title: "Google Maps einbetten: vollständige Anleitung für Websites",
+        intro: "Mit diesem Google-Maps-Generator verwandelst du eine Adresse, GPS-Koordinaten, eine Route oder eine öffentliche Google-My-Maps-Karte in responsiven Iframe-Code. Die Karte lässt sich in HTML-Websites, WordPress, Shopify, Wix, Webflow, Squarespace und andere Plattformen mit eigenem HTML einfügen.",
+        navLabel: "Inhalt der Anleitung zum Einbetten von Google Maps",
+        nav: [
+            ["what-is-map-embed", "Grundlagen"],
+            ["generate-map-code", "Iframe erstellen"],
+            ["responsive-map", "Responsive Karte"],
+            ["api-key-options", "API-Optionen"],
+            ["directions-markers", "Routen und Marker"],
+            ["website-platforms", "Website-Systeme"],
+        ],
+        sections: [
+            {
+                id: "what-is-map-embed",
+                title: "Was ist ein Google-Maps-Einbettungscode?",
+                paragraphs: [
+                    "Ein Google-Maps-Einbettungscode ist ein HTML-Element vom Typ <code>&lt;iframe&gt;</code>, das eine interaktive Karte direkt auf einer Webseite anzeigt. Besucher können die Karte verschieben, zoomen, Ortsdetails öffnen und die Umgebung erkunden, ohne deine Website zu verlassen.",
+                    "Im Gegensatz zu einem statischen Bild lädt der Iframe eine bedienbare Karte. Das eignet sich für Kontaktseiten, lokale Unternehmen, Immobilienangebote, Veranstaltungen, Hotels, Restaurants und alle Websites, die einen Standort verständlich darstellen möchten.",
+                ],
+            },
+            {
+                id: "generate-map-code",
+                title: "So erstellst du einen Google-Maps-Iframe",
+                paragraphs: [
+                    "Der Generator erzeugt den Einbettungscode, ohne dass du HTML schreiben musst. Gib eine Adresse oder Koordinaten ein, wähle den Kartentyp, stelle den Zoom ein und lege die Größe fest. In der Vorschau kannst du das Ergebnis vor dem Kopieren prüfen.",
+                ],
+                steps: [
+                    "Gib eine Adresse, ein Unternehmen, Koordinaten oder eine öffentliche My-Maps-Karte ein.",
+                    "Passe Zoom, Kartentyp, Breite und Höhe an.",
+                    "Aktiviere bei Bedarf responsive Darstellung, Lazy Loading und Vollbild.",
+                    "Klicke auf „Code erstellen“ und füge den Iframe in das HTML deiner Seite ein.",
+                ],
+                tip: "Tipp: Verwende einen aussagekräftigen Iframe-Titel für die Barrierefreiheit, zum Beispiel „Karte unseres Büros in Berlin“.",
+            },
+            {
+                id: "responsive-map",
+                title: "Responsive Google Maps in voller Breite",
+                paragraphs: [
+                    "Eine responsive Karte passt sich auf Desktop-PCs, Tablets und Smartphones an den verfügbaren Platz an. Die responsive Option des Generators legt den Iframe in einen Container mit festem Seitenverhältnis und verhindert horizontales Scrollen.",
+                    "Für eine Karte über die gesamte Breite wählst du 100 %. Prüfe anschließend die mobile Vorschau und verwende eine Höhe, bei der die Kartensteuerung gut bedienbar bleibt, ohne den gesamten Bildschirm zu belegen.",
+                ],
+            },
+            {
+                id: "api-key-options",
+                title: "Google Maps ohne API-Schlüssel einbetten",
+                paragraphs: [
+                    "Eine über einen Iframe geteilte Standardkarte lässt sich normalerweise ohne eigenen Schlüssel für die Google Maps Platform einbetten. Diese Methode passt, wenn du einen Standort, einen Kartenausschnitt, eine Route oder eine öffentliche My-Maps-Karte anzeigen möchtest.",
+                    "Für programmierte JavaScript-Integrationen, dynamische Daten, per Code erzeugte Marker oder weitere Funktionen der Google Maps Platform ist dagegen ein API-Schlüssel erforderlich. Für eine einfache Einbettung spart der Iframe Konfiguration und zusätzliches JavaScript.",
+                ],
+            },
+            {
+                id: "directions-markers",
+                title: "Routen, Koordinaten und eigene Marker",
+                paragraphs: [
+                    "Im Routenmodus erzeugst du eine Karte mit Start und Ziel. Breiten- und Längengrad sind hilfreich, wenn eine Postadresse den Ort nicht genau beschreibt, etwa bei Aussichtspunkten, Wanderwegen, Grundstücken oder Treffpunkten.",
+                    "Für mehrere Marker, Farben oder Ebenen erstellst du eine öffentliche Karte in Google My Maps und fügst deren Einbettungs-URL oder Iframe in den Generator ein. Die Anpassungen aus My Maps bleiben dabei im fertigen Code erhalten.",
+                ],
+            },
+            {
+                id: "website-platforms",
+                title: "Google Maps in WordPress, Shopify, Wix und andere Systeme einfügen",
+                paragraphs: [
+                    "In WordPress fügst du einen Block „Individuelles HTML“ hinzu. In Shopify verwendest du einen benutzerdefinierten Liquid-Abschnitt oder den HTML-Editor einer Seite. Bei Wix, Webflow und Squarespace eignet sich der jeweilige Code- oder Einbettungsblock.",
+                    "Kontrolliere die veröffentlichte Seite anschließend auf Smartphone und Desktop. Der Iframe gehört in ein Feld, das HTML erlaubt, nicht in ein reines Textfeld. Lazy Loading verhindert, dass die Karte beim ersten Laden mit den sichtbaren Inhalten konkurriert.",
+                ],
+                tip: "Tipp für lokale SEO: Platziere die Karte bei der ausgeschriebenen Adresse, halte Unternehmensdaten aktuell und ergänze hilfreiche Inhalte. Eine Karte allein garantiert keine bessere Platzierung in Suchmaschinen.",
+            },
+        ] satisfies ArticleSection[],
+    },
+} as const;
+
+const content = translations[lang];
+---
+
+<section class="section edu-content" id="about" aria-labelledby="edu-heading">
+    <div class="container edu-inner readable-surface">
+        <header class="section-header">
+            <span class="text-mono-eyebrow">{content.eyebrow}</span>
+            <h2 class="text-heading-lg section-title" id="edu-heading">{content.title}</h2>
+            <p class="section-intro">{content.intro}</p>
+        </header>
+
+        <nav class="article-nav" aria-label={content.navLabel}>
+            {content.nav.map(([id, label]) => <a href={`#${id}`}>{label}</a>)}
+        </nav>
+
+        <article class="edu-article">
+            {content.sections.map((section) => (
+                <section class="content-block" id={section.id}>
+                    <h3>{section.title}</h3>
+                    {section.paragraphs.map((paragraph) => <p set:html={paragraph} />)}
+                    {section.steps && (
+                        <ol class="numbered-steps">
+                            {section.steps.map((step) => <li>{step}</li>)}
+                        </ol>
+                    )}
+                    {section.tip && <aside class="tip-box">{section.tip}</aside>}
+                </section>
+            ))}
+        </article>
+    </div>
+</section>
+
+<style>
+    .edu-content { background: var(--color-bg); }
+    .edu-inner { padding: var(--spacing-2xl); border: 1px solid var(--color-hairline); border-radius: var(--radius-lg); background: #fff; }
+    .section-header { max-width: 780px; margin: 0 auto var(--spacing-lg); text-align: center; }
+    .text-mono-eyebrow { color: var(--color-mute); }
+    .section-title { margin: var(--spacing-sm) 0; color: var(--color-ink); }
+    .section-intro { margin: 0; font-size: 16px; line-height: 25px; color: var(--color-body); }
+    .article-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin-bottom: var(--spacing-xl); padding: var(--spacing-sm); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); background: var(--color-hairline-soft); }
+    .article-nav a { padding: 5px 10px; border-radius: var(--radius-pill); background: #fff; color: var(--color-map-green-deep); font-size: 13px; font-weight: 500; text-decoration: none; }
+    .article-nav a:hover { text-decoration: underline; }
+    .edu-article { max-width: 800px; margin: 0 auto; }
+    .content-block { scroll-margin-top: 80px; margin-bottom: var(--spacing-xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--color-hairline); }
+    .content-block:first-child { padding-top: 0; border-top: 0; }
+    .content-block:last-child { margin-bottom: 0; }
+    .content-block h3 { margin: 0 0 var(--spacing-sm); font-size: 22px; line-height: 30px; font-weight: 600; letter-spacing: -.3px; color: var(--color-ink); }
+    .content-block p, .numbered-steps { margin: 0 0 var(--spacing-sm); font-size: 15px; line-height: 25px; color: var(--color-body); }
+    .numbered-steps { display: flex; flex-direction: column; gap: 8px; padding-left: var(--spacing-lg); }
+    .content-block :global(code) { padding: 1px 5px; border: 1px solid var(--color-hairline); border-radius: 4px; background: var(--color-hairline-soft); font-family: var(--font-mono); font-size: 13px; }
+    .tip-box { margin: var(--spacing-md) 0; padding: var(--spacing-sm) var(--spacing-md); border: 1px solid #c9ddce; border-left: 3px solid var(--color-map-green); border-radius: var(--radius-sm); background: #f3f8f4; font-size: 14px; line-height: 22px; color: var(--color-body); }
+
+    @media (max-width: 640px) {
+        .edu-inner { padding: var(--spacing-lg) var(--spacing-md); }
+        .section-header { text-align: left; }
+        .article-nav { justify-content: flex-start; }
+        .content-block h3 { font-size: 20px; line-height: 27px; }
+    }
+</style>

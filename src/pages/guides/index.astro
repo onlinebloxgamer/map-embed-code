@@ -1,0 +1,138 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/layout/Header.astro";
+import Footer from "../../components/layout/Footer.astro";
+
+const guides = [
+    {
+        title: "How to Embed a Google Map with Multiple Locations",
+        desc: "Create a custom Google My Map with multiple pins, then add it to your website with responsive embed code and no API key.",
+        href: "/guides/embed-google-map-multiple-locations/",
+        platform: "Multiple locations",
+    },
+    {
+        title: "How to Embed Google Maps in WordPress",
+        desc: "Step-by-step instructions for adding a Google Maps iframe to any WordPress page, post, or widget area using the Block Editor or Classic Editor.",
+        href: "/guides/embed-google-maps-wordpress/",
+        platform: "WordPress",
+    },
+    {
+        title: "How to Embed Google Maps in Shopify",
+        desc: "Add a location map to your Shopify store's contact page, product page, or any theme section. Works with any free or paid Shopify theme.",
+        href: "/guides/embed-google-maps-shopify/",
+        platform: "Shopify",
+    },
+];
+---
+
+<BaseLayout
+    title="Google Maps Embed Guides – Map Embed Code"
+    description="Step-by-step guides for embedding Google Maps on WordPress, Shopify, Wix, Webflow, and other platforms. All methods are free and require no API key."
+    canonical="https://map-embed-code.com/guides/"
+    lang="en"
+    alternatePath="/guides/"
+>
+    <Header lang="en" translationPath="/guides/" />
+    <main id="main-content">
+        <div class="page-hero">
+            <div class="container readable-surface">
+                <span class="text-mono-eyebrow" style="color:var(--color-mute);"
+                    >Guides</span
+                >
+                <h1 class="text-heading-lg page-h1">
+                    Google Maps Embed Guides
+                </h1>
+                <p class="text-body-lg" style="color:var(--color-body);">
+                    Platform-specific instructions for embedding Google Maps on
+                    your website — free, no API key required.
+                </p>
+            </div>
+        </div>
+
+        <section class="section" aria-label="Platform guides">
+            <div class="container">
+                <div class="guides-grid">
+                    {
+                        guides.map((g) => (
+                            <a href={g.href} class="guide-card card">
+                                <span class="platform-tag">{g.platform}</span>
+                                <h2 class="text-heading-md guide-title">
+                                    {g.title}
+                                </h2>
+                                <p
+                                    class="text-body-md guide-desc"
+                                    style="color:var(--color-body);"
+                                >
+                                    {g.desc}
+                                </p>
+                                <span class="guide-cta">Read guide →</span>
+                            </a>
+                        ))
+                    }
+                </div>
+            </div>
+        </section>
+    </main>
+    <Footer lang="en" />
+</BaseLayout>
+
+<style>
+    .page-hero {
+        padding: var(--spacing-3xl) 0 var(--spacing-xl);
+        border-bottom: 1px solid var(--color-hairline);
+    }
+    .page-h1 {
+        margin: var(--spacing-sm) 0 var(--spacing-sm);
+        color: var(--color-ink);
+    }
+
+    .guides-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--spacing-md);
+    }
+
+    .guide-card {
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        color: inherit;
+        gap: var(--spacing-xs);
+        transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease;
+    }
+    .guide-card:hover {
+        border-color: var(--color-body);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .platform-tag {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--color-mute);
+    }
+
+    .guide-title {
+        color: var(--color-ink);
+        margin: 0;
+    }
+    .guide-desc {
+        margin: 0;
+        flex: 1;
+    }
+    .guide-cta {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--color-link);
+    }
+
+    @media (max-width: 640px) {
+        .guides-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

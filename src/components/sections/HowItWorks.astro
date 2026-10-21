@@ -1,0 +1,92 @@
+---
+import type { Locale } from "../../i18n/config";
+import { getHomeContent } from "../../i18n/home";
+
+interface Props { lang?: Locale; }
+const { lang = "en" } = Astro.props;
+const copy = getHomeContent(lang).how;
+const steps = copy.steps.map(([number, title, description]) => ({ number, title, description }));
+---
+
+<section
+    class="section how-it-works"
+    id="how-it-works"
+    aria-labelledby="how-heading"
+>
+    <div class="container">
+        <div class="section-header">
+            <span class="text-mono-eyebrow" style="color:var(--color-mute);"
+                >{copy.eyebrow}</span
+            >
+            <h2 class="text-heading-lg section-title" id="how-heading">
+                {copy.title}
+            </h2>
+        </div>
+
+        <div class="steps-grid">
+            {
+                steps.map((step) => (
+                    <div class="step-card card">
+                        <div class="step-number text-mono-eyebrow">
+                            {step.number}
+                        </div>
+                        <h3 class="text-heading-md step-title">{step.title}</h3>
+                        <p
+                            class="text-body-md step-desc"
+                            style="color:var(--color-body);"
+                        >
+                            {step.description}
+                        </p>
+                    </div>
+                ))
+            }
+        </div>
+    </div>
+</section>
+
+<style>
+    .how-it-works {
+        background-color: var(--color-canvas);
+        border-top: 1px solid var(--color-hairline);
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .section-title {
+        margin: var(--spacing-sm) 0 0;
+        color: var(--color-ink);
+    }
+
+    .steps-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-md);
+    }
+
+    .step-card {
+        position: relative;
+    }
+
+    .step-number {
+        color: var(--color-mute);
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .step-title {
+        margin: 0 0 var(--spacing-sm);
+        color: var(--color-ink);
+    }
+
+    .step-desc {
+        margin: 0;
+    }
+
+    @media (max-width: 768px) {
+        .steps-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

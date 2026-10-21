@@ -1,0 +1,741 @@
+---
+import { languageNames, languageCodes, locales, localizedPath, type Locale } from "../../i18n/config";
+import { getHomeContent } from "../../i18n/home";
+
+interface Props {
+    lang?: Locale;
+    translationPath?: string;
+}
+
+const { lang = "en", translationPath } = Astro.props;
+const copy = getHomeContent(lang).nav;
+const home = localizedPath("/", lang);
+const targetPath = translationPath ?? "/";
+
+const navLinks = [
+    { label: copy.generator, href: `${home}#generator` },
+    { label: copy.how, href: `${home}#how-it-works` },
+    { label: copy.guide, href: localizedPath("/guides/", lang) },
+    { label: copy.faq, href: `${home}#faq` },
+];
+---
+
+<header class="header">
+    <div class="container header-inner">
+        <!-- Logo -->
+        <a href={home} class="logo" aria-label="Map Embed Code – Home">
+            <svg
+                class="logo-mark"
+                width="30"
+                height="26"
+                viewBox="0 0 30 26"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+            >
+                <path
+                    d="M1.5 8L9.5 4.5L15.5 7.5L23.5 4L28.5 8V20L20.5 23.5L14.5 20.5L6.5 24L1.5 20V8Z"
+                    fill="var(--color-map-green-soft)"
+                    stroke="var(--color-map-green-deep)"
+                    stroke-width="1.2"
+                    stroke-linejoin="round"></path>
+                <path
+                    d="M9.5 4.5V17L6.5 24M15.5 7.5L14.5 20.5M23.5 4L20.5 23.5"
+                    stroke="var(--color-map-water)"
+                    stroke-width="2"
+                    stroke-linejoin="round"></path>
+                <path
+                    d="M18.5 1.5C15.74 1.5 13.5 3.7 13.5 6.42C13.5 10.08 18.5 15 18.5 15S23.5 10.08 23.5 6.42C23.5 3.7 21.26 1.5 18.5 1.5Z"
+                    fill="#d94b3f"
+                    stroke="#ffffff"
+                    stroke-width="1.2"></path>
+                <circle cx="18.5" cy="6.5" r="1.7" fill="#ffffff"></circle>
+            </svg>
+            <span class="logo-text">Map Embed Code</span>
+        </a>
+
+        <!-- Desktop Nav + Actions -->
+        <div class="header-actions">
+            <nav class="nav-desktop" aria-label={copy.main}>
+                {
+                    navLinks.map((link) => (
+                        <a href={link.href} class="nav-link">
+                            {link.label}
+                        </a>
+                    ))
+                }
+            </nav>
+
+            <!-- Language Dropdown -->
+            <div class="lang-dropdown" id="lang-dropdown">
+                <button
+                    type="button"
+                    class="lang-dropdown-btn"
+                    id="lang-dropdown-btn"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                    aria-controls="lang-dropdown-menu"
+                    aria-label={copy.language}
+                >
+                    <svg
+                        class="globe-icon"
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+                        <path d="M2 12h20"></path>
+                    </svg>
+                    <span class="lang-label-full">{languageNames[lang]}</span>
+                    <span class="lang-label-short">{languageCodes[lang]}</span>
+                    <svg
+                        class="chevron-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path d="m6 9 6 6 6-6"></path>
+                    </svg>
+                </button>
+
+                <div
+                    class="lang-dropdown-menu"
+                    id="lang-dropdown-menu"
+                    role="menu"
+                    aria-label={copy.language}
+                    hidden
+                >
+                    <div class="lang-dropdown-list">
+                        {locales.map((locale) => {
+                            const isCurrent = locale === lang;
+                            return (
+                                <a
+                                    href={localizedPath(targetPath, locale)}
+                                    role="menuitem"
+                                    class:list={["lang-dropdown-item", { active: isCurrent }]}
+                                    lang={locale}
+                                    hreflang={locale}
+                                    aria-current={isCurrent ? "page" : undefined}
+                                >
+                                    <span class="lang-item-content">
+                                        <span class="lang-item-name">{languageNames[locale]}</span>
+                                        <span class="lang-item-code">{languageCodes[locale]}</span>
+                                    </span>
+                                    {isCurrent && (
+                                        <svg
+                                            class="check-icon"
+                                            width="14"
+                                            height="14"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2.5"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            aria-hidden="true"
+                                        >
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    )}
+                                </a>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile menu button -->
+            <button
+                class="btn-ghost-sm mobile-menu-btn"
+                id="mobile-menu-btn"
+                aria-expanded="false"
+                aria-controls="mobile-menu"
+                aria-label={copy.menu}
+            >
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    aria-hidden="true"
+                >
+                    <path
+                        class="menu-icon-open"
+                        d="M2 4h12M2 8h12M2 12h12"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"></path>
+                    <path
+                        class="menu-icon-close"
+                        d="M3 3l10 10M13 3L3 13"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        style="display:none"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div
+        class="mobile-menu"
+        id="mobile-menu"
+        hidden
+        aria-label="Mobile navigation"
+    >
+        <div class="container">
+            {
+                navLinks.map((link) => (
+                    <a href={link.href} class="mobile-nav-link">
+                        {link.label}
+                    </a>
+                ))
+            }
+            <div class="mobile-language-section">
+                <div class="mobile-language-header">
+                    <svg
+                        class="globe-icon"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+                        <path d="M2 12h20"></path>
+                    </svg>
+                    <span>{copy.language}</span>
+                </div>
+                <div class="mobile-language-options">
+                    {locales.map((locale) => {
+                        const isCurrent = locale === lang;
+                        return (
+                            <a
+                                href={localizedPath(targetPath, locale)}
+                                class:list={["mobile-language-option", { active: isCurrent }]}
+                                lang={locale}
+                                hreflang={locale}
+                                aria-current={isCurrent ? "page" : undefined}
+                            >
+                                <span class="mobile-lang-text">
+                                    <span class="mobile-lang-name">{languageNames[locale]}</span>
+                                    <span class="mobile-lang-code">{languageCodes[locale]}</span>
+                                </span>
+                                {isCurrent && (
+                                    <svg
+                                        class="check-icon"
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        aria-hidden="true"
+                                    >
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                )}
+                            </a>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<style>
+    .header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background-color: var(--color-canvas);
+        border-bottom: 1px solid var(--color-hairline);
+        backdrop-filter: blur(8px);
+        background-color: color-mix(
+            in srgb,
+            var(--color-canvas) 90%,
+            transparent
+        );
+    }
+
+    .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--spacing-lg);
+        height: 56px;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+        color: var(--color-map-green-deep);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 15px;
+        line-height: 1;
+        flex-shrink: 0;
+    }
+    .logo:hover {
+        opacity: 0.8;
+    }
+
+    .logo-text {
+        font-family: var(--font-sans);
+        letter-spacing: -0.2px;
+    }
+
+    .logo-mark {
+        flex: 0 0 auto;
+        filter: drop-shadow(0 2px 3px rgba(32, 94, 56, 0.16));
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+    }
+
+    .nav-desktop {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xxs);
+    }
+
+    .nav-link {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px var(--spacing-sm);
+        border-radius: var(--radius-full);
+        color: var(--color-body);
+        font-family: var(--font-sans);
+        font-size: 14px;
+        font-weight: 400;
+        text-decoration: none;
+        transition:
+            color 0.15s ease,
+            background-color 0.15s ease;
+    }
+    .nav-link:hover {
+        color: var(--color-ink);
+        background-color: var(--color-hairline-soft);
+    }
+
+    /* Language Dropdown */
+    .lang-dropdown {
+        position: relative;
+    }
+
+    .lang-dropdown-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 32px;
+        padding: 0 10px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--color-hairline);
+        background-color: var(--color-canvas);
+        color: var(--color-body);
+        font-family: var(--font-sans);
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1;
+        cursor: pointer;
+        user-select: none;
+        transition:
+            background-color 0.15s ease,
+            border-color 0.15s ease,
+            color 0.15s ease;
+    }
+
+    .lang-dropdown-btn:hover {
+        background-color: var(--color-hairline-soft);
+        border-color: var(--color-faint);
+        color: var(--color-ink);
+    }
+
+    .lang-dropdown-btn:focus-visible {
+        outline: 2px solid var(--color-ink);
+        outline-offset: 2px;
+    }
+
+    .lang-dropdown.is-open .lang-dropdown-btn {
+        background-color: var(--color-hairline-soft);
+        border-color: var(--color-ink);
+        color: var(--color-ink);
+    }
+
+    .globe-icon {
+        flex-shrink: 0;
+        color: var(--color-mute);
+        transition: color 0.15s ease;
+    }
+
+    .lang-dropdown-btn:hover .globe-icon,
+    .lang-dropdown.is-open .globe-icon {
+        color: var(--color-ink);
+    }
+
+    .chevron-icon {
+        flex-shrink: 0;
+        color: var(--color-mute);
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.15s ease;
+    }
+
+    .lang-dropdown-btn:hover .chevron-icon,
+    .lang-dropdown.is-open .chevron-icon {
+        color: var(--color-ink);
+    }
+
+    .lang-dropdown.is-open .chevron-icon {
+        transform: rotate(180deg);
+    }
+
+    .lang-label-full {
+        display: inline;
+    }
+
+    .lang-label-short {
+        display: none;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+    }
+
+    .lang-dropdown-menu {
+        position: absolute;
+        top: calc(100% + 6px);
+        right: 0;
+        min-width: 170px;
+        padding: 4px;
+        background-color: var(--color-canvas-elevated);
+        border: 1px solid var(--color-hairline);
+        border-radius: var(--radius-md);
+        box-shadow:
+            0 4px 6px -1px rgba(0, 0, 0, 0.05),
+            0 10px 15px -3px rgba(0, 0, 0, 0.08),
+            0 0 0 1px rgba(0, 0, 0, 0.02);
+        z-index: 120;
+        animation: dropdownFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes dropdownFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-4px) scale(0.97);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .lang-dropdown-list {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .lang-dropdown-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 7px 10px;
+        border-radius: var(--radius-sm);
+        color: var(--color-body);
+        font-family: var(--font-sans);
+        font-size: 13px;
+        font-weight: 400;
+        text-decoration: none;
+        transition:
+            background-color 0.12s ease,
+            color 0.12s ease;
+    }
+
+    .lang-dropdown-item:hover,
+    .lang-dropdown-item:focus-visible {
+        background-color: var(--color-hairline-soft);
+        color: var(--color-ink);
+        outline: none;
+    }
+
+    .lang-dropdown-item.active {
+        color: var(--color-ink);
+        font-weight: 600;
+        background-color: color-mix(in srgb, var(--color-hairline-soft) 75%, transparent);
+    }
+
+    .lang-item-content {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .lang-item-name {
+        line-height: 1.2;
+    }
+
+    .lang-item-code {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        font-weight: 500;
+        color: var(--color-mute);
+        background-color: var(--color-hairline-soft);
+        padding: 1px 4px;
+        border-radius: 4px;
+        line-height: 1.2;
+    }
+
+    .lang-dropdown-item.active .lang-item-code {
+        background-color: var(--color-hairline);
+        color: var(--color-ink);
+    }
+
+    .check-icon {
+        flex-shrink: 0;
+        color: var(--color-ink);
+    }
+
+    /* Mobile Menu Styles */
+    .mobile-menu-btn {
+        display: none;
+    }
+
+    .mobile-menu {
+        border-top: 1px solid var(--color-hairline);
+        background-color: var(--color-canvas);
+        padding: var(--spacing-sm) 0 var(--spacing-md);
+    }
+
+    .mobile-nav-link {
+        display: block;
+        padding: var(--spacing-sm) var(--spacing-lg);
+        color: var(--color-body);
+        font-family: var(--font-sans);
+        font-size: 15px;
+        font-weight: 400;
+        text-decoration: none;
+        border-radius: var(--radius-sm);
+        transition: color 0.15s ease;
+    }
+    .mobile-nav-link:hover {
+        color: var(--color-ink);
+    }
+
+    .mobile-language-section {
+        margin-top: var(--spacing-sm);
+        padding: var(--spacing-sm) var(--spacing-lg) 0;
+        border-top: 1px solid var(--color-hairline);
+    }
+
+    .mobile-language-header {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--color-mute);
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .mobile-language-options {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-xs);
+    }
+
+    .mobile-language-option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 10px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--color-hairline);
+        background-color: var(--color-canvas-elevated);
+        color: var(--color-body);
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 500;
+        transition:
+            background-color 0.15s ease,
+            border-color 0.15s ease,
+            color 0.15s ease;
+    }
+
+    .mobile-language-option:hover {
+        background-color: var(--color-hairline-soft);
+        color: var(--color-ink);
+    }
+
+    .mobile-language-option.active {
+        background-color: var(--color-hairline-soft);
+        border-color: var(--color-ink);
+        color: var(--color-ink);
+        font-weight: 600;
+    }
+
+    .mobile-lang-text {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .mobile-lang-name {
+        line-height: 1;
+    }
+
+    .mobile-lang-code {
+        font-family: var(--font-mono);
+        font-size: 9px;
+        color: var(--color-mute);
+    }
+
+    @media (max-width: 640px) {
+        .nav-desktop {
+            display: none;
+        }
+        .mobile-menu-btn {
+            display: inline-flex;
+        }
+        .lang-label-full {
+            display: none;
+        }
+        .lang-label-short {
+            display: inline;
+        }
+        .lang-dropdown-btn {
+            height: 32px;
+            padding: 0 8px;
+            gap: 4px;
+        }
+        .header-actions {
+            gap: var(--spacing-xs);
+        }
+    }
+</style>
+
+<script>
+    const mobileBtn = document.getElementById("mobile-menu-btn");
+    const mobileMenu = document.getElementById("mobile-menu");
+    const openIcon = mobileBtn?.querySelector(
+        ".menu-icon-open",
+    ) as HTMLElement | null;
+    const closeIcon = mobileBtn?.querySelector(
+        ".menu-icon-close",
+    ) as HTMLElement | null;
+
+    const langDropdown = document.getElementById("lang-dropdown");
+    const langBtn = document.getElementById("lang-dropdown-btn");
+    const langMenu = document.getElementById("lang-dropdown-menu");
+
+    function setLangDropdownOpen(open: boolean) {
+        if (!langDropdown || !langBtn || !langMenu) return;
+        langDropdown.classList.toggle("is-open", open);
+        langBtn.setAttribute("aria-expanded", String(open));
+        langMenu.hidden = !open;
+    }
+
+    function setMobileMenuOpen(open: boolean) {
+        if (!mobileBtn || !mobileMenu) return;
+        mobileMenu.hidden = !open;
+        mobileBtn.setAttribute("aria-expanded", String(open));
+        if (openIcon) openIcon.style.display = open ? "none" : "";
+        if (closeIcon) closeIcon.style.display = open ? "" : "none";
+    }
+
+    langBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isOpen = langDropdown?.classList.contains("is-open") ?? false;
+        if (!isOpen) {
+            setMobileMenuOpen(false);
+        }
+        setLangDropdownOpen(!isOpen);
+    });
+
+    mobileBtn?.addEventListener("click", () => {
+        const isOpen = mobileMenu?.hidden === false;
+        setLangDropdownOpen(false);
+        setMobileMenuOpen(!isOpen);
+    });
+
+    // Close language dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+        if (langDropdown && !langDropdown.contains(e.target as Node)) {
+            setLangDropdownOpen(false);
+        }
+    });
+
+    // Keyboard navigation (Escape key and Arrow keys)
+    langDropdown?.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            setLangDropdownOpen(false);
+            langBtn?.focus();
+            return;
+        }
+
+        const items = Array.from(
+            langMenu?.querySelectorAll<HTMLAnchorElement>(".lang-dropdown-item") ?? []
+        );
+        if (!items.length) return;
+
+        const activeIndex = items.findIndex((item) => item === document.activeElement);
+
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            if (langMenu?.hidden) {
+                setLangDropdownOpen(true);
+                items[0]?.focus();
+            } else {
+                const nextIndex = activeIndex < items.length - 1 ? activeIndex + 1 : 0;
+                items[nextIndex]?.focus();
+            }
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            if (!langMenu?.hidden) {
+                const prevIndex = activeIndex > 0 ? activeIndex - 1 : items.length - 1;
+                items[prevIndex]?.focus();
+            }
+        }
+    });
+
+    // Close menu on link clicks
+    mobileMenu?.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+            setMobileMenuOpen(false);
+        });
+    });
+
+    langMenu?.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+            setLangDropdownOpen(false);
+        });
+    });
+</script>

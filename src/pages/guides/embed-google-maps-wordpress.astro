@@ -1,0 +1,183 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/layout/Header.astro';
+import Footer from '../../components/layout/Footer.astro';
+---
+
+<BaseLayout
+  title="How to Embed Google Maps in WordPress – Free Guide"
+  description="Step-by-step guide to embed Google Maps in WordPress without a plugin or API key. Works with Gutenberg Block Editor, Classic Editor, and all major themes."
+  canonical="https://map-embed-code.com/guides/embed-google-maps-wordpress/"
+  lang="en"
+  alternatePath="/guides/embed-google-maps-wordpress/"
+>
+  <Header lang="en" translationPath="/guides/embed-google-maps-wordpress/" />
+  <main id="main-content">
+    <div class="page-hero">
+      <div class="container readable-surface">
+        <a href="/guides/" class="breadcrumb">← Guides</a>
+        <span class="text-mono-eyebrow" style="color:var(--color-mute);">WordPress</span>
+        <h1 class="text-heading-lg page-h1">How to Embed Google Maps in WordPress</h1>
+        <p class="text-body-lg" style="color:var(--color-body);">
+          Add an interactive Google Map to any WordPress page, post, or sidebar — without a plugin or API key.
+        </p>
+      </div>
+    </div>
+
+    <div class="prose-section">
+      <div class="container prose-container readable-surface">
+
+        <div class="toc card">
+          <h2 class="toc-heading">Contents</h2>
+          <ol class="toc-list">
+            <li><a href="#step1">Step 1 – Generate your embed code</a></li>
+            <li><a href="#step2">Step 2 – Add the code to WordPress (Block Editor)</a></li>
+            <li><a href="#step3">Step 3 – Add the code to WordPress (Classic Editor)</a></li>
+            <li><a href="#widget">Add a map to a sidebar or footer widget</a></li>
+            <li><a href="#tips">Tips and troubleshooting</a></li>
+          </ol>
+        </div>
+
+        <section class="prose-block" id="step1">
+          <h2>Step 1 – Generate your Google Maps embed code</h2>
+          <ol class="styled-list">
+            <li>Go to the <a href="/#generator">Map Embed Code generator</a>.</li>
+            <li>Type your business address, city, or landmark into the location field.</li>
+            <li>Adjust zoom level and map type (roadmap or satellite) as needed.</li>
+            <li>Choose a width — <strong>Full Width (100%)</strong> is recommended for most WordPress themes.</li>
+            <li>Click <strong>Copy Code</strong>.</li>
+          </ol>
+        </section>
+
+        <section class="prose-block" id="step2">
+          <h2>Step 2 – Embed the map using the Block Editor (Gutenberg)</h2>
+          <p>The Block Editor is the default WordPress editor since WordPress 5.0.</p>
+          <ol class="styled-list">
+            <li>Open the page or post where you want to add the map.</li>
+            <li>Click the <strong>+</strong> icon to add a new block.</li>
+            <li>Search for <strong>Custom HTML</strong> and click it.</li>
+            <li>Paste your copied iframe code into the HTML block.</li>
+            <li>Click <strong>Preview</strong> to verify the map appears correctly.</li>
+            <li>Click <strong>Publish</strong> or <strong>Update</strong> to save.</li>
+          </ol>
+          <p><strong>Tip:</strong> If your theme restricts iframes in certain areas, try placing the Custom HTML block at the full-width level outside any group or column block.</p>
+        </section>
+
+        <section class="prose-block" id="step3">
+          <h2>Step 3 – Embed using the Classic Editor</h2>
+          <p>If you are using the Classic Editor plugin or an older WordPress installation:</p>
+          <ol class="styled-list">
+            <li>Open the page or post.</li>
+            <li>Click the <strong>Text</strong> tab (not Visual) in the editor toolbar to switch to HTML view.</li>
+            <li>Paste the iframe code at the position where you want the map.</li>
+            <li>Switch back to the <strong>Visual</strong> tab to confirm the map block is visible.</li>
+            <li>Click <strong>Update</strong>.</li>
+          </ol>
+          <div class="callout">
+            <strong>Important:</strong> Do not paste the iframe code while in Visual mode. WordPress may strip or encode the HTML. Always switch to Text / HTML mode first.
+          </div>
+        </section>
+
+        <section class="prose-block" id="widget">
+          <h2>Add a Google Map to a sidebar or footer widget</h2>
+          <ol class="styled-list">
+            <li>Go to <strong>Appearance → Widgets</strong> in your WordPress dashboard.</li>
+            <li>Find the sidebar, footer, or widget area where you want to add the map.</li>
+            <li>Click the <strong>+</strong> icon and add a <strong>Custom HTML</strong> widget.</li>
+            <li>Paste the iframe code into the widget's content area.</li>
+            <li>Click <strong>Update</strong>.</li>
+          </ol>
+        </section>
+
+        <section class="prose-block" id="tips">
+          <h2>Tips and troubleshooting</h2>
+          <ul class="styled-list">
+            <li><strong>Map not appearing?</strong> Check that your theme or a security plugin isn't stripping iframe tags. Some security plugins have an option to allow iframe embeds — enable it carefully.</li>
+            <li><strong>Map too wide or narrow?</strong> Use the <strong>Full Width (100%)</strong> preset and keep <strong>Responsive mode</strong> enabled so the map scales to your content area.</li>
+            <li><strong>Wrong location?</strong> Try entering the address more specifically. Use the <strong>Coordinates mode</strong> in the generator if the address search is ambiguous.</li>
+            <li><strong>Satellite view not working?</strong> Some browsers or corporate networks may restrict the satellite imagery tiles. This is a browser or network restriction, not a code issue.</li>
+          </ul>
+        </section>
+
+        <div class="guide-cta-card card">
+          <h2 class="text-heading-md" style="margin:0 0 0.5rem;">Ready to embed?</h2>
+          <p class="text-body-md" style="color:var(--color-body);margin:0 0 1rem;">Generate your free Google Maps iframe code in seconds.</p>
+          <a href="/#generator" class="btn-primary">Open the Generator</a>
+        </div>
+
+      </div>
+    </div>
+  </main>
+  <Footer lang="en" />
+</BaseLayout>
+
+<script type="application/ld+json">{JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "How to Embed Google Maps in WordPress",
+  "description": "Embed a Google Maps iframe in WordPress without a plugin or API key",
+  "step": [
+    { "@type": "HowToStep", "name": "Generate embed code", "text": "Use Map Embed Code to generate your Google Maps iframe HTML." },
+    { "@type": "HowToStep", "name": "Add Custom HTML block", "text": "In the Block Editor, add a Custom HTML block to your page or post." },
+    { "@type": "HowToStep", "name": "Paste and publish", "text": "Paste the iframe code into the block and publish the page." }
+  ]
+})}</script>
+
+<style>
+  .breadcrumb { font-size: 13px; color: var(--color-mute); text-decoration: none; display: inline-block; margin-bottom: var(--spacing-sm); }
+  .breadcrumb:hover { color: var(--color-ink); }
+
+  .page-hero {
+    padding: var(--spacing-3xl) 0 var(--spacing-xl);
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .page-h1 { margin: var(--spacing-sm) 0 var(--spacing-sm); color: var(--color-ink); }
+
+  .prose-section { padding: var(--spacing-3xl) 0; }
+  .prose-container { max-width: 760px; }
+
+  .toc { margin-bottom: var(--spacing-2xl); }
+  .toc-heading { font-size: 14px; font-weight: 600; color: var(--color-ink); margin: 0 0 var(--spacing-sm); }
+  .toc-list { margin: 0; padding-left: var(--spacing-lg); display: flex; flex-direction: column; gap: 6px; }
+  .toc-list li { font-size: 14px; }
+  .toc-list a { color: var(--color-link); text-decoration: none; }
+  .toc-list a:hover { text-decoration: underline; }
+
+  .prose-block { margin-bottom: var(--spacing-2xl); }
+  .prose-block h2 {
+    font-family: var(--font-sans);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--color-ink);
+    margin: 0 0 var(--spacing-sm);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-hairline);
+  }
+  .prose-block p { font-size: 15px; line-height: 24px; color: var(--color-body); margin: 0 0 var(--spacing-sm); }
+  .prose-block a { color: var(--color-link); text-decoration: none; }
+  .prose-block a:hover { text-decoration: underline; }
+
+  .styled-list {
+    font-size: 15px;
+    line-height: 24px;
+    color: var(--color-body);
+    margin: 0 0 var(--spacing-sm);
+    padding-left: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .callout {
+    background-color: var(--color-hairline-soft);
+    border: 1px solid var(--color-hairline);
+    border-left: 3px solid var(--color-ink);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 14px;
+    color: var(--color-body);
+    margin: var(--spacing-sm) 0;
+  }
+
+  .guide-cta-card { margin-top: var(--spacing-2xl); }
+</style>

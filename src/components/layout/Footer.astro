@@ -1,0 +1,229 @@
+---
+import { localizedPath, type Locale } from "../../i18n/config";
+import { getHomeContent } from "../../i18n/home";
+
+interface Props {
+    lang?: Locale;
+}
+
+const { lang = "en" } = Astro.props;
+const copy = getHomeContent(lang).footer;
+const home = localizedPath("/", lang);
+const footerLinks = [
+    {
+        group: copy.groups[0],
+        links: [
+            { label: copy.links[0], href: `${home}#generator` },
+            { label: copy.links[1], href: `${home}#how-it-works` },
+            { label: copy.links[2], href: `${home}#features` },
+        ],
+    },
+    {
+        group: copy.groups[1],
+        links: [
+            { label: copy.links[3], href: localizedPath("/guides/", lang) },
+            { label: copy.links[4], href: `${home}#responsive-map` },
+            { label: copy.links[5], href: localizedPath("/guides/embed-google-map-multiple-locations/", lang) },
+        ],
+    },
+    {
+        group: copy.groups[2],
+        links: [
+            { label: copy.links[6], href: `${home}#faq` },
+            { label: copy.links[7], href: "/privacy-policy/" },
+            { label: copy.links[8], href: "/terms-of-use/" },
+        ],
+    },
+];
+---
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <!-- Brand column -->
+            <div class="footer-brand">
+                <a href={home} class="footer-logo" aria-label="Map Embed Code">
+                    <svg
+                        class="footer-logo-mark"
+                        width="30"
+                        height="26"
+                        viewBox="0 0 30 26"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M1.5 8L9.5 4.5L15.5 7.5L23.5 4L28.5 8V20L20.5 23.5L14.5 20.5L6.5 24L1.5 20V8Z"
+                            fill="var(--color-map-green-soft)"
+                            stroke="var(--color-map-green-deep)"
+                            stroke-width="1.2"
+                            stroke-linejoin="round"></path>
+                        <path
+                            d="M9.5 4.5V17L6.5 24M15.5 7.5L14.5 20.5M23.5 4L20.5 23.5"
+                            stroke="var(--color-map-water)"
+                            stroke-width="2"
+                            stroke-linejoin="round"></path>
+                        <path
+                            d="M18.5 1.5C15.74 1.5 13.5 3.7 13.5 6.42C13.5 10.08 18.5 15 18.5 15S23.5 10.08 23.5 6.42C23.5 3.7 21.26 1.5 18.5 1.5Z"
+                            fill="#d94b3f"
+                            stroke="#ffffff"
+                            stroke-width="1.2"></path>
+                        <circle cx="18.5" cy="6.5" r="1.7" fill="#ffffff"
+                        ></circle>
+                    </svg>
+                    <span>Map Embed Code</span>
+                </a>
+                <p class="footer-tagline">
+                    {copy.tagline}
+                </p>
+                <p class="footer-disclaimer">
+                    {copy.disclaimer}
+                </p>
+            </div>
+
+            <!-- Link columns -->
+            {
+                footerLinks.map(({ group, links }) => (
+                    <div class="footer-col">
+                        <h3 class="footer-col-heading">{group}</h3>
+                        <ul class="footer-col-list">
+                            {links.map((link) => (
+                                <li>
+                                    <a href={link.href} class="footer-link">
+                                        {link.label}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ))
+            }
+        </div>
+
+        <hr class="hairline footer-divider" />
+
+        <div class="footer-bottom">
+            <p class="text-body-sm" style="color: var(--color-mute);">
+                &copy; {new Date().getFullYear()} Map Embed Code. {copy.rights}
+            </p>
+            <p class="text-body-sm" style="color: var(--color-mute);">
+                {copy.built}
+            </p>
+        </div>
+    </div>
+</footer>
+
+<style>
+    .footer {
+        background-color: var(--color-canvas);
+        border-top: 1px solid var(--color-hairline);
+        padding: var(--spacing-2xl) 0 var(--spacing-lg);
+    }
+
+    .footer-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .footer-brand {
+    }
+
+    .footer-logo {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+        color: var(--color-map-green-deep);
+        font-weight: 600;
+        font-size: 15px;
+        text-decoration: none;
+        margin-bottom: var(--spacing-sm);
+    }
+    .footer-logo:hover {
+        opacity: 0.8;
+    }
+
+    .footer-logo-mark {
+        flex: 0 0 auto;
+        filter: drop-shadow(0 2px 3px rgba(32, 94, 56, 0.16));
+    }
+
+    .footer-tagline {
+        color: var(--color-body);
+        font-size: 14px;
+        line-height: 20px;
+        margin: 0 0 var(--spacing-sm);
+        max-width: 280px;
+    }
+
+    .footer-disclaimer {
+        color: var(--color-mute);
+        font-size: 11px;
+        line-height: 16px;
+        margin: 0;
+        max-width: 300px;
+    }
+
+    .footer-col {
+    }
+
+    .footer-col-heading {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--color-ink);
+        margin: 0 0 var(--spacing-sm);
+    }
+
+    .footer-col-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-xs);
+    }
+
+    .footer-link {
+        color: var(--color-body);
+        font-size: 14px;
+        text-decoration: none;
+        transition: color 0.15s ease;
+    }
+    .footer-link:hover {
+        color: var(--color-ink);
+    }
+
+    .footer-divider {
+        margin: 0 0 var(--spacing-md);
+    }
+
+    .footer-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--spacing-md);
+    }
+
+    @media (max-width: 768px) {
+        .footer-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+        .footer-brand {
+            grid-column: 1 / -1;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .footer-grid {
+            grid-template-columns: 1fr;
+        }
+        .footer-bottom {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>

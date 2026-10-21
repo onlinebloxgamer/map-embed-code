@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Generate responsive My Maps embed code</title>
+  <desc id="desc">Illustration of Map Embed Code with the My Maps tab, embed code field, live preview, and Generate Code button.</desc>
+  <rect width="1200" height="675" fill="#edf4ed"/>
+  <rect x="50" y="42" width="1100" height="591" rx="24" fill="#fff" stroke="#dce4dc" stroke-width="3"/>
+  <rect x="80" y="74" width="430" height="527" rx="16" fill="#fbfcfb" stroke="#e0e6e0"/>
+  <text x="112" y="126" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#202124">Location</text>
+  <rect x="112" y="151" width="112" height="46" rx="23" fill="#f1f3f1"/><text x="168" y="181" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" fill="#5f6368">Address</text>
+  <rect x="233" y="151" width="118" height="46" rx="23" fill="#f1f3f1"/><text x="292" y="181" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" fill="#5f6368">Coordinates</text>
+  <rect x="360" y="151" width="112" height="46" rx="23" fill="#2f7d4a"/><text x="416" y="181" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#fff">My Maps</text>
+  <text x="112" y="244" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#202124">My Maps embed URL or iframe code</text>
+  <rect x="112" y="263" width="360" height="129" rx="9" fill="#fff" stroke="#aab7aa"/>
+  <text x="132" y="297" font-family="monospace" font-size="13" fill="#5f6368">&lt;iframe src="https://www.google.com/</text><text x="132" y="324" font-family="monospace" font-size="13" fill="#5f6368">maps/d/embed?mid=..." width="640"</text><text x="132" y="351" font-family="monospace" font-size="13" fill="#5f6368">height="480"&gt;&lt;/iframe&gt;</text>
+  <rect x="112" y="507" width="360" height="58" rx="29" fill="#2f7d4a"/><text x="292" y="544" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#fff">Generate Code</text>
+  <text x="558" y="112" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#202124">LIVE PREVIEW</text>
+  <rect x="558" y="134" width="550" height="431" rx="14" fill="#dcebdc"/>
+  <path d="M558 430c112-50 208 24 312-29 90-46 150-43 238-12" fill="none" stroke="#91c0c7" stroke-width="30"/>
+  <path d="M670 134l60 431M880 134l-42 431M1000 134l76 431" stroke="#fff" stroke-width="7"/>
+  <g fill="#d93025"><path d="M744 222c-16 0-29 13-29 29 0 24 29 53 29 53s29-29 29-53c0-16-13-29-29-29z"/><circle cx="744" cy="251" r="9" fill="#fff"/></g>
+  <g fill="#2f7d4a"><path d="M936 350c-16 0-29 13-29 29 0 24 29 53 29 53s29-29 29-53c0-16-13-29-29-29z"/><circle cx="936" cy="379" r="9" fill="#fff"/></g>
+  <g fill="#5f9fa6"><path d="M1036 201c-16 0-29 13-29 29 0 24 29 53 29 53s29-29 29-53c0-16-13-29-29-29z"/><circle cx="1036" cy="230" r="9" fill="#fff"/></g>
+  <circle cx="469" cy="506" r="24" fill="#c8a85a"/><text x="469" y="514" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#fff">6</text>
+</svg>

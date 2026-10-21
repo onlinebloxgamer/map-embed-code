@@ -1,0 +1,200 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/layout/Header.astro";
+import Footer from "../components/layout/Footer.astro";
+
+const lastUpdated = "October 2026";
+---
+
+<BaseLayout
+    title="Privacy Policy – Map Embed Code"
+    description="Privacy Policy for Map Embed Code. Learn how we handle your data when you use our free Google Maps embed code generator."
+    canonical="https://map-embed-code.com/privacy-policy/"
+>
+    <Header />
+    <main id="main-content">
+        <div class="page-hero">
+            <div class="container readable-surface">
+                <span class="text-mono-eyebrow" style="color:var(--color-mute);"
+                    >Legal</span
+                >
+                <h1 class="text-heading-lg page-h1">Privacy Policy</h1>
+                <p class="text-body-sm" style="color:var(--color-mute);">
+                    Last updated: {lastUpdated}
+                </p>
+            </div>
+        </div>
+
+        <div class="prose-section">
+            <div class="container prose-container readable-surface">
+                <section class="prose-block">
+                    <h2>Overview</h2>
+                    <p>
+                        Map Embed Code ("we", "our", or "us") provides a free
+                        Google Maps embed code generator at <a
+                            href="https://map-embed-code.com"
+                            >map-embed-code.com</a
+                        >. This Privacy Policy explains what information we
+                        collect, how we use it, and your rights regarding your
+                        data.
+                    </p>
+                </section>
+
+                <section class="prose-block">
+                    <h2>Information We Collect</h2>
+                    <h3>Information You Provide</h3>
+                    <p>
+                        The generator works entirely in your browser. Location
+                        queries, coordinates, and map settings you enter are
+                        processed client-side to build the embed code. <strong
+                            >We do not transmit your location inputs to our
+                            servers.</strong>
+                    </p>
+
+                    <h3>Automatically Collected Information</h3>
+                    <p>
+                        We may collect standard server logs including IP
+                        addresses, browser type, pages visited, and timestamps.
+                        This data is used for security, performance monitoring,
+                        and aggregate analytics only. It is not sold or shared
+                        with third parties for advertising purposes.
+                    </p>
+                </section>
+
+                <section class="prose-block">
+                    <h2>Google Maps and Third-Party Services</h2>
+                    <p>
+                        This website loads Google Maps inside an <code
+                            >&lt;iframe&gt;</code
+                        > element when you use the generator preview. Loading Google
+                        Maps sends a request to Google's servers. Google may collect
+                        data in accordance with their own privacy policy, including
+                        your IP address and the map query. We have no control over
+                        Google's data practices.
+                    </p>
+                    <p>
+                        Please review <a
+                            href="https://policies.google.com/privacy"
+                            rel="noopener noreferrer"
+                            target="_blank">Google's Privacy Policy</a
+                        > for full details on how they handle map embed requests.
+                    </p>
+                </section>
+
+                <section class="prose-block">
+                    <h2>Cookies and Local Storage</h2>
+                    <p>
+                        This website does not use tracking cookies or
+                        advertising cookies. Map configuration preferences may
+                        be preserved in the URL query string to enable shareable
+                        links. No data is stored on our servers.
+                    </p>
+                </section>
+
+                <section class="prose-block">
+                    <h2>Analytics</h2>
+                    <p>
+                        We may use privacy-respecting analytics to understand
+                        aggregate usage patterns (e.g., which pages are
+                        visited). Any analytics service we use is configured to
+                        anonymize IP addresses and not to build individual user
+                        profiles.
+                    </p>
+                </section>
+
+                <section class="prose-block">
+                    <h2>Children's Privacy</h2>
+                    <p>
+                        This service is not directed at children under 13. We do
+                        not knowingly collect personal information from
+                        children.
+                    </p>
+                </section>
+
+                <section class="prose-block">
+                    <h2>Changes to This Policy</h2>
+                    <p>
+                        We may update this Privacy Policy from time to time.
+                        Changes will be reflected by updating the "Last updated"
+                        date above. Continued use of the service after changes
+                        constitutes acceptance of the updated policy.
+                    </p>
+                </section>
+
+                <section class="prose-block">
+                    <h2>Contact</h2>
+                    <p>
+                        If you have questions about this Privacy Policy, you may
+                        contact us through our website.
+                    </p>
+                </section>
+            </div>
+        </div>
+    </main>
+    <Footer />
+</BaseLayout>
+
+<style>
+    .page-hero {
+        padding: var(--spacing-3xl) 0 var(--spacing-xl);
+        border-bottom: 1px solid var(--color-hairline);
+    }
+    .page-h1 {
+        margin: var(--spacing-sm) 0 var(--spacing-xs);
+        color: var(--color-ink);
+    }
+
+    .prose-section {
+        padding: var(--spacing-3xl) 0;
+    }
+
+    .prose-container {
+        max-width: 720px;
+    }
+
+    .prose-block {
+        margin-bottom: var(--spacing-2xl);
+    }
+
+    .prose-block h2 {
+        font-family: var(--font-sans);
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--color-ink);
+        margin: 0 0 var(--spacing-sm);
+        padding-top: var(--spacing-md);
+        border-top: 1px solid var(--color-hairline);
+    }
+
+    .prose-block h3 {
+        font-family: var(--font-sans);
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--color-ink);
+        margin: var(--spacing-md) 0 var(--spacing-xs);
+    }
+
+    .prose-block p {
+        font-size: 15px;
+        line-height: 24px;
+        color: var(--color-body);
+        margin: 0 0 var(--spacing-sm);
+    }
+
+    .prose-block a {
+        color: var(--color-link);
+        text-decoration: none;
+    }
+    .prose-block a:hover {
+        text-decoration: underline;
+    }
+
+    .prose-block code {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        background-color: var(--color-hairline-soft);
+        border: 1px solid var(--color-hairline);
+        border-radius: 4px;
+        padding: 1px 5px;
+    }
+</style>
