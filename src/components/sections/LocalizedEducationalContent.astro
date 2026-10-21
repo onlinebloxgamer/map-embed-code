@@ -11,6 +11,14 @@ type ArticleSection = {
     paragraphs: string[];
     steps?: string[];
     tip?: string;
+    imagesLabel?: string;
+    images?: Array<{
+        src: string;
+        alt: string;
+        caption: string;
+        width: number;
+        height: number;
+    }>;
 };
 
 const { lang } = Astro.props;
@@ -50,6 +58,23 @@ const translations = {
                     "Activa el diseño responsive, la carga diferida y la pantalla completa si los necesitas.",
                     "Pulsa «Generar código» y pega el iframe en el HTML de tu página.",
                 ],
+                imagesLabel: "Pasos del generador de código para insertar Google Maps",
+                images: [
+                    {
+                        src: "/images/google-map-embed-generator.webp",
+                        alt: "Generador de Google Maps con una ubicación, vista previa y botón Generar código",
+                        caption: "Introduce la ubicación, ajusta el mapa, revisa la vista previa y pulsa «Generar código».",
+                        width: 800,
+                        height: 450,
+                    },
+                    {
+                        src: "/images/google-map-embed-generator-code.webp",
+                        alt: "Ventana con el código iframe generado y el botón Copiar código",
+                        caption: "Copia el código iframe generado y pégalo en un bloque HTML de tu web.",
+                        width: 1280,
+                        height: 720,
+                    },
+                ],
                 tip: "Consejo: añade un título descriptivo al iframe para mejorar la accesibilidad, por ejemplo «Mapa de nuestra oficina en Madrid».",
             },
             {
@@ -58,6 +83,23 @@ const translations = {
                 paragraphs: [
                     "Un mapa responsive se adapta al espacio disponible en ordenadores, tabletas y móviles. La opción responsive del generador envuelve el iframe en un contenedor que conserva la proporción y evita el desplazamiento horizontal.",
                     "Para un mapa de ancho completo, usa una anchura del 100 %. Comprueba la vista previa para móvil y elige una altura suficiente para que los controles del mapa sean fáciles de utilizar sin ocupar toda la pantalla.",
+                ],
+                imagesLabel: "Vistas previas responsive de Google Maps en ordenador y móvil",
+                images: [
+                    {
+                        src: "/images/responsive-google-map-embed-desktop.webp",
+                        alt: "Vista previa en ordenador de un mapa de Google responsive",
+                        caption: "Vista de ordenador: comprueba la anchura, la altura y el área visible del mapa.",
+                        width: 1280,
+                        height: 720,
+                    },
+                    {
+                        src: "/images/responsive-google-map-embed-mobile.webp",
+                        alt: "Vista previa móvil de un mapa de Google adaptado a una pantalla estrecha",
+                        caption: "Vista móvil: confirma que el iframe cabe en la pantalla sin desplazamiento horizontal.",
+                        width: 1280,
+                        height: 720,
+                    },
                 ],
             },
             {
@@ -121,6 +163,23 @@ const translations = {
                     "Aktiviere bei Bedarf responsive Darstellung, Lazy Loading und Vollbild.",
                     "Klicke auf „Code erstellen“ und füge den Iframe in das HTML deiner Seite ein.",
                 ],
+                imagesLabel: "Schritte im Google-Maps-Einbettungscode-Generator",
+                images: [
+                    {
+                        src: "/images/google-map-embed-generator.webp",
+                        alt: "Google-Maps-Generator mit Standort, Live-Vorschau und Schaltfläche Code erstellen",
+                        caption: "Standort eingeben, Karte anpassen, Vorschau prüfen und „Code erstellen“ wählen.",
+                        width: 800,
+                        height: 450,
+                    },
+                    {
+                        src: "/images/google-map-embed-generator-code.webp",
+                        alt: "Fenster mit erzeugtem Iframe-Code und Schaltfläche Code kopieren",
+                        caption: "Kopiere den erzeugten Iframe-Code in einen HTML-Block deiner Website.",
+                        width: 1280,
+                        height: 720,
+                    },
+                ],
                 tip: "Tipp: Verwende einen aussagekräftigen Iframe-Titel für die Barrierefreiheit, zum Beispiel „Karte unseres Büros in Berlin“.",
             },
             {
@@ -129,6 +188,23 @@ const translations = {
                 paragraphs: [
                     "Eine responsive Karte passt sich auf Desktop-PCs, Tablets und Smartphones an den verfügbaren Platz an. Die responsive Option des Generators legt den Iframe in einen Container mit festem Seitenverhältnis und verhindert horizontales Scrollen.",
                     "Für eine Karte über die gesamte Breite wählst du 100 %. Prüfe anschließend die mobile Vorschau und verwende eine Höhe, bei der die Kartensteuerung gut bedienbar bleibt, ohne den gesamten Bildschirm zu belegen.",
+                ],
+                imagesLabel: "Responsive Google-Maps-Vorschau auf Desktop und Smartphone",
+                images: [
+                    {
+                        src: "/images/responsive-google-map-embed-desktop.webp",
+                        alt: "Desktop-Vorschau einer responsiv eingebetteten Google-Karte",
+                        caption: "Desktop-Vorschau: kontrolliere Breite, Höhe und sichtbaren Kartenausschnitt.",
+                        width: 1280,
+                        height: 720,
+                    },
+                    {
+                        src: "/images/responsive-google-map-embed-mobile.webp",
+                        alt: "Mobile Vorschau einer Google-Karte auf einem schmalen Bildschirm",
+                        caption: "Mobil-Vorschau: prüfe, dass der Iframe ohne horizontales Scrollen in den Bildschirm passt.",
+                        width: 1280,
+                        height: 720,
+                    },
                 ],
             },
             {
@@ -185,6 +261,23 @@ const content = translations[lang];
                             {section.steps.map((step) => <li>{step}</li>)}
                         </ol>
                     )}
+                    {section.images && (
+                        <div class="content-image-grid" aria-label={section.imagesLabel}>
+                            {section.images.map((image) => (
+                                <figure class="content-figure">
+                                    <img
+                                        src={image.src}
+                                        alt={image.alt}
+                                        width={image.width}
+                                        height={image.height}
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                    <figcaption>{image.caption}</figcaption>
+                                </figure>
+                            ))}
+                        </div>
+                    )}
                     {section.tip && <aside class="tip-box">{section.tip}</aside>}
                 </section>
             ))}
@@ -211,11 +304,16 @@ const content = translations[lang];
     .numbered-steps { display: flex; flex-direction: column; gap: 8px; padding-left: var(--spacing-lg); }
     .content-block :global(code) { padding: 1px 5px; border: 1px solid var(--color-hairline); border-radius: 4px; background: var(--color-hairline-soft); font-family: var(--font-mono); font-size: 13px; }
     .tip-box { margin: var(--spacing-md) 0; padding: var(--spacing-sm) var(--spacing-md); border: 1px solid #c9ddce; border-left: 3px solid var(--color-map-green); border-radius: var(--radius-sm); background: #f3f8f4; font-size: 14px; line-height: 22px; color: var(--color-body); }
+    .content-image-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--spacing-md); margin: var(--spacing-lg) 0; }
+    .content-figure { overflow: hidden; margin: 0; border: 1px solid var(--color-hairline); border-radius: var(--radius-md); background: #fff; }
+    .content-figure img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+    .content-figure figcaption { padding: 9px 11px; border-top: 1px solid var(--color-hairline); font-size: 12px; line-height: 18px; color: var(--color-mute); }
 
     @media (max-width: 640px) {
         .edu-inner { padding: var(--spacing-lg) var(--spacing-md); }
         .section-header { text-align: left; }
         .article-nav { justify-content: flex-start; }
         .content-block h3 { font-size: 20px; line-height: 27px; }
+        .content-image-grid { grid-template-columns: 1fr; gap: var(--spacing-sm); }
     }
 </style>
