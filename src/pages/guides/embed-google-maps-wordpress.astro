@@ -2,6 +2,30 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/layout/Header.astro';
 import Footer from '../../components/layout/Footer.astro';
+
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to Embed Google Maps in WordPress',
+  description: 'Embed a Google Maps iframe in WordPress without a plugin or API key',
+  step: [
+    {
+      '@type': 'HowToStep',
+      name: 'Generate embed code',
+      text: 'Use Map Embed Code to generate your Google Maps iframe HTML.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Add Custom HTML block',
+      text: 'In the Block Editor, add a Custom HTML block to your page or post.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Paste and publish',
+      text: 'Paste the iframe code into the block and publish the page.',
+    },
+  ],
+};
 ---
 
 <BaseLayout
@@ -10,6 +34,7 @@ import Footer from '../../components/layout/Footer.astro';
   canonical="https://map-embed-code.com/guides/embed-google-maps-wordpress/"
   lang="en"
   alternatePath="/guides/embed-google-maps-wordpress/"
+  structuredData={howToSchema}
 >
   <Header lang="en" translationPath="/guides/embed-google-maps-wordpress/" />
   <main id="main-content">
@@ -110,18 +135,6 @@ import Footer from '../../components/layout/Footer.astro';
   </main>
   <Footer lang="en" />
 </BaseLayout>
-
-<script type="application/ld+json">{JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "HowTo",
-  "name": "How to Embed Google Maps in WordPress",
-  "description": "Embed a Google Maps iframe in WordPress without a plugin or API key",
-  "step": [
-    { "@type": "HowToStep", "name": "Generate embed code", "text": "Use Map Embed Code to generate your Google Maps iframe HTML." },
-    { "@type": "HowToStep", "name": "Add Custom HTML block", "text": "In the Block Editor, add a Custom HTML block to your page or post." },
-    { "@type": "HowToStep", "name": "Paste and publish", "text": "Paste the iframe code into the block and publish the page." }
-  ]
-})}</script>
 
 <style>
   .breadcrumb { font-size: 13px; color: var(--color-mute); text-decoration: none; display: inline-block; margin-bottom: var(--spacing-sm); }

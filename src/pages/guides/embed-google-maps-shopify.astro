@@ -2,6 +2,30 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/layout/Header.astro';
 import Footer from '../../components/layout/Footer.astro';
+
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to Embed Google Maps in Shopify',
+  description: 'Embed a Google Maps iframe in a Shopify store without an API key',
+  step: [
+    {
+      '@type': 'HowToStep',
+      name: 'Generate embed code',
+      text: 'Use Map Embed Code to generate your Google Maps iframe HTML.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Open Shopify page in HTML view',
+      text: 'In Shopify admin, open a page and switch to HTML source view.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Paste and save',
+      text: 'Paste the iframe code and click Save.',
+    },
+  ],
+};
 ---
 
 <BaseLayout
@@ -10,6 +34,7 @@ import Footer from '../../components/layout/Footer.astro';
   canonical="https://map-embed-code.com/guides/embed-google-maps-shopify/"
   lang="en"
   alternatePath="/guides/embed-google-maps-shopify/"
+  structuredData={howToSchema}
 >
   <Header lang="en" translationPath="/guides/embed-google-maps-shopify/" />
   <main id="main-content">
@@ -110,18 +135,6 @@ import Footer from '../../components/layout/Footer.astro';
   </main>
   <Footer lang="en" />
 </BaseLayout>
-
-<script type="application/ld+json">{JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "HowTo",
-  "name": "How to Embed Google Maps in Shopify",
-  "description": "Embed a Google Maps iframe in a Shopify store without an API key",
-  "step": [
-    { "@type": "HowToStep", "name": "Generate embed code", "text": "Use Map Embed Code to generate your Google Maps iframe HTML." },
-    { "@type": "HowToStep", "name": "Open Shopify page in HTML view", "text": "In Shopify admin, open a page and switch to HTML source view." },
-    { "@type": "HowToStep", "name": "Paste and save", "text": "Paste the iframe code and click Save." }
-  ]
-})}</script>
 
 <style>
   .breadcrumb { font-size: 13px; color: var(--color-mute); text-decoration: none; display: inline-block; margin-bottom: var(--spacing-sm); }
