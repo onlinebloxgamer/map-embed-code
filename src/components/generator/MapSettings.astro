@@ -5,6 +5,32 @@ import { getHomeContent } from "../../i18n/home";
 interface Props { lang?: Locale; }
 const { lang = "en" } = Astro.props;
 const copy = getHomeContent(lang).generator;
+const simpleLabels = {
+    en: {
+        sectionTitle: "Embed Google Map",
+        address: "By Address",
+        coordinates: "By Coordinates",
+        multipleMarkers: "Multiple Map Markers",
+        addressPrompt: "Type your address",
+        responsive: "Make map responsive",
+    },
+    es: {
+        sectionTitle: "Insertar Google Maps",
+        address: "Por dirección",
+        coordinates: "Por coordenadas",
+        multipleMarkers: "Varios marcadores",
+        addressPrompt: "Escribe tu dirección",
+        responsive: "Hacer el mapa responsive",
+    },
+    de: {
+        sectionTitle: "Google Maps einbetten",
+        address: "Per Adresse",
+        coordinates: "Per Koordinaten",
+        multipleMarkers: "Mehrere Kartenmarker",
+        addressPrompt: "Adresse eingeben",
+        responsive: "Karte responsiv machen",
+    },
+}[lang];
 ---
 
 <div class="settings-panel" id="settings-panel">
@@ -12,7 +38,7 @@ const copy = getHomeContent(lang).generator;
     <section class="settings-section">
         <div class="section-label-row">
             <span class="text-mono-eyebrow" style="color:var(--color-mute);"
-                >{copy.location}</span
+                >{simpleLabels.sectionTitle}</span
             >
         </div>
         <div class="mode-toggle" role="group" aria-label={copy.locationMode}>
@@ -22,7 +48,7 @@ const copy = getHomeContent(lang).generator;
                 data-mode="address"
                 aria-pressed="true"
             >
-                {copy.address}
+                {simpleLabels.address}
             </button>
             <button
                 class="mode-btn"
@@ -30,7 +56,7 @@ const copy = getHomeContent(lang).generator;
                 data-mode="coordinates"
                 aria-pressed="false"
             >
-                {copy.coordinates}
+                {simpleLabels.coordinates}
             </button>
             <button
                 class="mode-btn"
@@ -38,14 +64,14 @@ const copy = getHomeContent(lang).generator;
                 data-mode="mymaps"
                 aria-pressed="false"
             >
-                {copy.myMaps}
+                {simpleLabels.multipleMarkers}
             </button>
         </div>
 
         <!-- Address input -->
         <div id="address-input-group">
-            <label for="address-input" class="sr-only"
-                >{copy.searchLabel}</label
+            <label for="address-input" class="field-label address-prompt"
+                >{simpleLabels.addressPrompt}</label
             >
             <div class="input-with-icon">
                 <svg
@@ -78,9 +104,6 @@ const copy = getHomeContent(lang).generator;
                     maxlength="500"
                 />
             </div>
-            <p class="hint-text">
-                {copy.searchHint}
-            </p>
         </div>
 
         <!-- Coordinate inputs -->
@@ -169,121 +192,15 @@ const copy = getHomeContent(lang).generator;
         </div>
     </section>
 
-    <!-- Directions Mode -->
-    <section class="settings-section" id="directions-section">
-        <div class="section-label-row">
-            <span class="text-mono-eyebrow" style="color:var(--color-mute);"
-                >{copy.mode}</span
-            >
-        </div>
-        <label class="toggle-row">
-            <input
-                type="checkbox"
-                id="directions-toggle"
-                class="toggle-input"
-                aria-label={copy.directions}
-            />
-            <span class="toggle-track" aria-hidden="true">
-                <span class="toggle-thumb"></span>
-            </span>
-            <span class="toggle-label">{copy.directions}</span>
-        </label>
-
-        <div
-            id="directions-group"
-            style="display:none;"
-            class="directions-group"
-        >
-            <div class="field">
-                <label for="directions-from" class="field-label">{copy.from}</label>
-                <input
-                    type="text"
-                    id="directions-from"
-                    class="input"
-                    placeholder={copy.fromPlaceholder}
-                    maxlength="500"
-                />
-            </div>
-            <div class="field">
-                <label for="directions-to" class="field-label">{copy.to}</label>
-                <input
-                    type="text"
-                    id="directions-to"
-                    class="input"
-                    placeholder={copy.toPlaceholder}
-                    maxlength="500"
-                />
-            </div>
-        </div>
-    </section>
-
     <!-- Map Type -->
     <section class="settings-section" id="map-type-section">
-        <div class="section-label-row">
-            <span class="text-mono-eyebrow" style="color:var(--color-mute);"
-                >{copy.mapType}</span
-            >
-        </div>
-        <div class="type-toggle" role="group" aria-label={copy.mapType}>
-            <button
-                class="type-btn active"
-                data-type="roadmap"
-                aria-pressed="true"
-            >
-                <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                    aria-hidden="true"
-                >
-                    <rect
-                        x="1"
-                        y="1"
-                        width="12"
-                        height="12"
-                        rx="2"
-                        stroke="currentColor"
-                        stroke-width="1.2"></rect>
-                    <path
-                        d="M1 5h12M1 9h12M5 1v12"
-                        stroke="currentColor"
-                        stroke-width="1"
-                        opacity="0.5"></path>
-                </svg>
-                {copy.roadmap}
-            </button>
-            <button class="type-btn" data-type="satellite" aria-pressed="false">
-                <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                    aria-hidden="true"
-                >
-                    <circle
-                        cx="7"
-                        cy="7"
-                        r="5.5"
-                        stroke="currentColor"
-                        stroke-width="1.2"></circle>
-                    <ellipse
-                        cx="7"
-                        cy="7"
-                        rx="2.5"
-                        ry="5.5"
-                        stroke="currentColor"
-                        stroke-width="1"
-                        opacity="0.5"></ellipse>
-                    <path
-                        d="M1.5 7h11"
-                        stroke="currentColor"
-                        stroke-width="1"
-                        opacity="0.5"></path>
-                </svg>
-                {copy.satellite}
-            </button>
-        </div>
+        <label for="map-type-select" class="field-label control-heading"
+            >{copy.mapType}</label
+        >
+        <select id="map-type-select" class="input map-type-select">
+            <option value="roadmap">{copy.roadmap}</option>
+            <option value="satellite">{copy.satellite}</option>
+        </select>
     </section>
 
     <!-- Zoom -->
@@ -319,11 +236,6 @@ const copy = getHomeContent(lang).generator;
                 aria-label={copy.increaseZoom}>+</button
             >
         </div>
-        <div class="zoom-labels">
-            <span>{copy.world}</span>
-            <span>{copy.street}</span>
-            <span>{copy.building}</span>
-        </div>
     </section>
 
     <!-- Dimensions -->
@@ -332,17 +244,6 @@ const copy = getHomeContent(lang).generator;
             <span class="text-mono-eyebrow" style="color:var(--color-mute);"
                 >{copy.dimensions}</span
             >
-        </div>
-        <div class="preset-group" role="group" aria-label={copy.dimensionPresets}>
-            <button class="preset-btn" data-preset="small">{copy.small}</button>
-            <button class="preset-btn active" data-preset="standard"
-                >{copy.standard}</button
-            >
-            <button class="preset-btn" data-preset="large">{copy.large}</button>
-            <button class="preset-btn" data-preset="fullwidth"
-                >{copy.fullWidth}</button
-            >
-            <button class="preset-btn" data-preset="custom">{copy.custom}</button>
         </div>
         <div class="dim-inputs">
             <div class="dim-field">
@@ -396,6 +297,23 @@ const copy = getHomeContent(lang).generator;
         </div>
     </section>
 
+    <!-- Responsive is a common setting, so keep it visible. -->
+    <section class="settings-section responsive-section">
+        <label class="toggle-row compact-toggle-row">
+            <input
+                type="checkbox"
+                id="responsive-toggle"
+                class="toggle-input"
+                checked
+                aria-label={simpleLabels.responsive}
+            />
+            <span class="toggle-track" aria-hidden="true"
+                ><span class="toggle-thumb"></span></span
+            >
+            <span class="toggle-label">{simpleLabels.responsive}</span>
+        </label>
+    </section>
+
     <!-- Advanced Options -->
     <section class="settings-section">
         <details class="advanced-details">
@@ -420,22 +338,77 @@ const copy = getHomeContent(lang).generator;
                 </svg>
             </summary>
             <div class="advanced-body">
-                <label class="toggle-row">
-                    <input
-                        type="checkbox"
-                        id="responsive-toggle"
-                        class="toggle-input"
-                        checked
-                        aria-label={copy.responsive}
-                    />
-                    <span class="toggle-track" aria-hidden="true"
-                        ><span class="toggle-thumb"></span></span
+                <div class="advanced-group" id="directions-section">
+                    <label class="toggle-row">
+                        <input
+                            type="checkbox"
+                            id="directions-toggle"
+                            class="toggle-input"
+                            aria-label={copy.directions}
+                        />
+                        <span class="toggle-track" aria-hidden="true">
+                            <span class="toggle-thumb"></span>
+                        </span>
+                        <span class="toggle-label">{copy.directions}</span>
+                    </label>
+
+                    <div
+                        id="directions-group"
+                        style="display:none;"
+                        class="directions-group"
                     >
-                    <span class="toggle-label">{copy.responsive}</span>
-                </label>
-                <p class="hint-text">
-                    {copy.responsiveHint}
-                </p>
+                        <div class="field">
+                            <label for="directions-from" class="field-label"
+                                >{copy.from}</label
+                            >
+                            <input
+                                type="text"
+                                id="directions-from"
+                                class="input"
+                                placeholder={copy.fromPlaceholder}
+                                maxlength="500"
+                            />
+                        </div>
+                        <div class="field">
+                            <label for="directions-to" class="field-label"
+                                >{copy.to}</label
+                            >
+                            <input
+                                type="text"
+                                id="directions-to"
+                                class="input"
+                                placeholder={copy.toPlaceholder}
+                                maxlength="500"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="advanced-group">
+                    <span class="field-label">{copy.dimensionPresets}</span>
+                    <div
+                        class="preset-group"
+                        role="group"
+                        aria-label={copy.dimensionPresets}
+                    >
+                        <button class="preset-btn" data-preset="small"
+                            >{copy.small}</button
+                        >
+                        <button
+                            class="preset-btn active"
+                            data-preset="standard">{copy.standard}</button
+                        >
+                        <button class="preset-btn" data-preset="large"
+                            >{copy.large}</button
+                        >
+                        <button class="preset-btn" data-preset="fullwidth"
+                            >{copy.fullWidth}</button
+                        >
+                        <button class="preset-btn" data-preset="custom"
+                            >{copy.custom}</button
+                        >
+                    </div>
+                </div>
 
                 <label class="toggle-row">
                     <input
@@ -542,7 +515,7 @@ const copy = getHomeContent(lang).generator;
     }
 
     .settings-section {
-        padding: var(--spacing-sm) 0;
+        padding: 10px 0;
         border-bottom: 1px solid var(--color-hairline);
     }
     .settings-section:last-child {
@@ -570,9 +543,9 @@ const copy = getHomeContent(lang).generator;
     }
 
     /* Mode Toggle */
-    .mode-toggle,
-    .type-toggle {
-        display: flex;
+    .mode-toggle {
+        display: grid;
+        grid-template-columns: 0.9fr 1.05fr 1.35fr;
         background-color: var(--color-hairline-soft);
         border: 1px solid var(--color-hairline);
         border-radius: var(--radius-sm);
@@ -581,21 +554,21 @@ const copy = getHomeContent(lang).generator;
         margin-bottom: var(--spacing-xs);
     }
 
-    .mode-btn,
-    .type-btn {
-        flex: 1;
+    .mode-btn {
+        width: 100%;
         min-width: 0;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 6px;
-        padding: 6px 8px;
+        padding: 7px 5px;
         border-radius: 4px;
         border: none;
         background: transparent;
         color: var(--color-mute);
         font-family: var(--font-sans);
-        font-size: 13px;
+        font-size: 12px;
+        line-height: 15px;
         font-weight: 500;
         cursor: pointer;
         transition:
@@ -603,16 +576,28 @@ const copy = getHomeContent(lang).generator;
             color 0.15s ease;
     }
 
-    .mode-btn.active,
-    .type-btn.active {
+    .mode-btn.active {
         background-color: var(--color-canvas-elevated);
         color: var(--color-ink);
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
     }
 
-    .mode-btn:hover:not(.active),
-    .type-btn:hover:not(.active) {
+    .mode-btn:hover:not(.active) {
         color: var(--color-ink);
+    }
+
+    .address-prompt,
+    .control-heading {
+        color: var(--color-ink);
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    .map-type-select {
+        width: 100%;
+        cursor: pointer;
+        background-color: var(--color-canvas-elevated);
     }
 
     /* Input with icon */
@@ -672,6 +657,9 @@ const copy = getHomeContent(lang).generator;
         color: var(--color-error);
         margin-top: 4px;
         min-height: 16px;
+    }
+    .error-text:empty {
+        display: none;
     }
 
     /* Hint text */
@@ -754,21 +742,12 @@ const copy = getHomeContent(lang).generator;
         cursor: pointer;
     }
 
-    .zoom-labels {
-        display: flex;
-        justify-content: space-between;
-        font-size: 11px;
-        color: var(--color-mute);
-        margin-top: 4px;
-        padding: 0 4px;
-    }
-
     /* Preset buttons */
     .preset-group {
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        margin-bottom: var(--spacing-sm);
+        margin-bottom: 0;
     }
 
     .preset-btn {
@@ -907,6 +886,13 @@ const copy = getHomeContent(lang).generator;
         font-weight: 400;
     }
 
+    .responsive-section {
+        padding: 9px 0;
+    }
+    .compact-toggle-row {
+        margin-bottom: 0;
+    }
+
     /* Directions group */
     .directions-group {
         display: flex;
@@ -946,12 +932,15 @@ const copy = getHomeContent(lang).generator;
     .advanced-body {
         display: flex;
         flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .advanced-group {
+        padding-bottom: var(--spacing-sm);
+        border-bottom: 1px solid var(--color-hairline);
     }
 
     .settings-footer {
-        position: sticky;
-        bottom: calc(var(--spacing-md) * -1);
-        z-index: 2;
         display: flex;
         align-items: center;
         gap: var(--spacing-xs);

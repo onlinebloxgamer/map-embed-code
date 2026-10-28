@@ -76,12 +76,6 @@ const clientCopy = {
 
     .generator-settings {
         padding: var(--spacing-md);
-        position: sticky;
-        top: 72px;
-        max-height: calc(100vh - 88px);
-        overflow-y: auto;
-        scrollbar-width: thin;
-        scrollbar-color: var(--color-hairline) transparent;
     }
 
     .generator-preview {
@@ -380,6 +374,7 @@ const clientCopy = {
         const latInput = $<HTMLInputElement>("lat-input");
         const lngInput = $<HTMLInputElement>("lng-input");
         const myMapsInput = $<HTMLTextAreaElement>("my-maps-input");
+        const mapTypeSelect = $<HTMLSelectElement>("map-type-select");
         const zoomSlider = $<HTMLInputElement>("zoom-slider");
         const zoomDisp = $("zoom-display");
         const widthInput = $<HTMLInputElement>("width-input");
@@ -402,6 +397,7 @@ const clientCopy = {
             lngInput.value =
                 config.longitude !== null ? String(config.longitude) : "";
         if (myMapsInput) myMapsInput.value = config.myMapsUrl;
+        if (mapTypeSelect) mapTypeSelect.value = config.mapType;
         if (zoomSlider) {
             zoomSlider.value = String(config.zoom);
             zoomSlider.setAttribute("aria-valuenow", String(config.zoom));
@@ -426,6 +422,9 @@ const clientCopy = {
         const myMapsGroup = $("my-maps-input-group");
         const dirGroup = $("directions-group");
         const directionsSection = $("directions-section");
+        const advancedDetails = document.querySelector<HTMLDetailsElement>(
+            ".advanced-details",
+        );
         const mapTypeSection = $("map-type-section");
         const zoomSection = $("zoom-section");
         if (addrGroup)
@@ -446,6 +445,7 @@ const clientCopy = {
         if (dirGroup)
             dirGroup.style.display =
                 config.directionsMode && !isMyMaps ? "" : "none";
+        if (advancedDetails && config.directionsMode) advancedDetails.open = true;
         syncMyMapsValidation();
 
         // Mode buttons
@@ -453,15 +453,6 @@ const clientCopy = {
             .querySelectorAll<HTMLButtonElement>(".mode-btn")
             .forEach((btn) => {
                 const active = btn.dataset.mode === config.locationMode;
-                btn.classList.toggle("active", active);
-                btn.setAttribute("aria-pressed", String(active));
-            });
-
-        // Map type buttons
-        document
-            .querySelectorAll<HTMLButtonElement>(".type-btn")
-            .forEach((btn) => {
-                const active = btn.dataset.type === config.mapType;
                 btn.classList.toggle("active", active);
                 btn.setAttribute("aria-pressed", String(active));
             });
@@ -612,21 +603,12 @@ const clientCopy = {
             updateURL();
         });
 
-        // Map type buttons
-        document
-            .querySelectorAll<HTMLButtonElement>(".type-btn")
-            .forEach((btn) => {
-                btn.addEventListener("click", () => {
-                    config.mapType = (btn.dataset.type as MapType) || "roadmap";
-                    document
-                        .querySelectorAll<HTMLButtonElement>(".type-btn")
-                        .forEach((b) => {
-                            b.classList.toggle("active", b === btn);
-                            b.setAttribute("aria-pressed", String(b === btn));
-                        });
-                    syncAll(true);
-                });
-            });
+        // Map type dropdown
+        const mapTypeSelect = $<HTMLSelectElement>("map-type-select");
+        mapTypeSelect?.addEventListener("change", () => {
+            config.mapType = mapTypeSelect.value as MapType;
+            syncAll(true);
+        });
 
         // Zoom slider
         const zoomSlider = $<HTMLInputElement>("zoom-slider");
