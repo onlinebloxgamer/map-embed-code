@@ -4,14 +4,15 @@
 .mm-editor h2, .mm-editor h3 { margin: 0; font-size: 1.16rem; letter-spacing: -.025em; }
 .mm-editor p { margin: 0; }
 .mm-workspace { display: grid; grid-template-columns: minmax(18rem, .82fr) minmax(0, 1.5fr); gap: 1rem; align-items: start; }
-.mm-sidebar { display: grid; gap: 1rem; padding: 1.2rem; min-width: 0; }
+.mm-sidebar { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; padding: 1.2rem; min-width: 0; }
+#mm-search { grid-template-columns: minmax(0, 1fr); min-width: 0; }
 .mm-panel-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .65rem; }
 #mm-count { border-radius: 2rem; color: var(--color-map-green-deep); background: var(--color-map-green-soft); font: 500 .82rem var(--font-mono); padding: .2rem .55rem; }
 .mm-editor label { display: grid; gap: .35rem; font-size: .9rem; font-weight: 600; color: var(--color-ink); }
 .mm-editor label span { font-weight: 400; color: var(--color-body); }
 .mm-editor .input { min-width: 0; width: 100%; min-height: 2.55rem; font: inherit; }
 .mm-editor textarea.input { resize: vertical; }
-.mm-input-row { display: flex; gap: .35rem; }
+.mm-input-row { display: flex; gap: .35rem; min-width: 0; }
 .mm-editor .mm-input-row button { white-space: nowrap; }
 .mm-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; }
 .mm-actions button, .mm-actions a, .mm-editor .btn-ghost-sm { min-height: 2.4rem; text-decoration: none; }
@@ -27,8 +28,29 @@
 .mm-locations .mm-row-title { display: flex; align-items: flex-start; gap: .5rem; overflow-wrap: anywhere; }
 .mm-row-number { display: inline-grid; place-items: center; flex: 0 0 auto; min-width: 1.55rem; height: 1.55rem; border-radius: 50%; color: #fff; font-weight: 600; }
 .mm-locations .mm-actions button { min-height: 2rem; }
-.mm-suggestions button { width: 100%; text-align: left; border: 1px solid var(--mm-border); background: #fff; border-radius: .4rem; padding: .55rem; font: inherit; cursor: pointer; overflow-wrap: anywhere; }
-.mm-suggestions button:hover { background-color: #f0f6f1; }
+.mm-suggestions {
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  max-width: 100%;
+  max-height: 280px;
+  overflow: hidden auto;
+}
+.mm-suggestions > li { min-width: 0; }
+.mm-suggestions > li > .btn-ghost-sm {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--mm-border);
+  background: #fff;
+  border-radius: .4rem;
+  padding: .55rem .65rem;
+  font: inherit;
+}
+.mm-suggestions > li > .btn-ghost-sm:hover { background-color: #f0f6f1; }
+.mm-suggestions > li > .btn-ghost-sm:focus-visible { outline-offset: -3px; }
 .mm-map-card { overflow: clip; padding: 0; }
 .mm-map-heading { padding: .8rem .9rem; }
 .mm-map-wrap { border-block: 1px solid var(--mm-border); }
