@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "include": ["/api/maps", "/api/maps/*", "/api/geocode", "/api/map-tool/*", "/embed/*", "/map/*"],
+  "exclude": []
+}

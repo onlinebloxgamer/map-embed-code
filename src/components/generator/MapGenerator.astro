@@ -181,7 +181,7 @@ const clientCopy = {
     const DEBOUNCE_MS = 600;
 
     // ---- DOM refs ----
-    const $ = <T extends Element = Element>(id: string) =>
+    const $ = <T extends Element = HTMLElement>(id: string) =>
         document.getElementById(id) as T | null;
 
     const iframe = $<HTMLIFrameElement>("map-preview-iframe");
@@ -189,7 +189,6 @@ const clientCopy = {
     const previewWrapper = $("preview-frame-wrapper");
     const loadingEl = $("preview-loading");
     const previewDims = $("preview-dims");
-    const previewNote = $("preview-device-note");
     const zoomDisplay = $("zoom-display");
     const openGmaps = $<HTMLAnchorElement>("open-gmaps-external");
     const openGmapsCoords = $<HTMLAnchorElement>("open-gmaps-link");

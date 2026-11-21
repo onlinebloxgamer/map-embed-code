@@ -1,0 +1,38 @@
+---
+import MapContentLayout from '../components/multiple-maps/MapContentLayout.astro';
+import MapEditor from '../components/multiple-maps/MapEditor.astro';
+---
+
+<MapContentLayout
+  title="Free Multiple Location Map Generator | Add Multiple Pins"
+  heading="Free Multiple Location Map Generator"
+  description="Create a free map with multiple locations and custom pins. Add addresses, customize markers, and generate an interactive map embed code."
+  intro="Create an interactive map for your branch locations, event venues, or favorite places. Enter coordinates, drop a pin directly on the map, or import a CSV of locations. Address search and bulk address lookup are available when a search provider is enabled. Give each pin a title, color, and description, then check the result in the live preview. Save your map to get a public link and responsive iframe code you can paste into a website that supports custom HTML. You don’t need an account or a Google Maps API key."
+  kind="tool"
+>
+  <MapEditor />
+  <div class="mm-reading">
+    <h2>How to Create a Map with Multiple Locations</h2>
+    <p>Add your first location, then repeat for the remaining places. Select <strong>Fit All Locations</strong> to check the coverage and open a few pins to review their details. Enter a map title, then select <strong>Generate Map &amp; Embed Code</strong>. Download the recovery file if you want to make changes later.</p>
+    <h2>Add Multiple Pins to One Map</h2>
+    <p>Drop pins on the map or enter exact coordinates. Use <strong>Import CSV</strong> when titles, descriptions, or coordinates are already in a spreadsheet. When bulk address lookup is available, use <strong>Add Multiple Locations</strong> and paste one address per line. If a row stays unresolved, you can enter its coordinates in the preview.</p>
+    <h2>Customize Your Map Markers</h2>
+    <p>Give each pin a descriptive title, then choose a standard pin, numbered pin, or circle. Use color to group related places and a description or website link to tell visitors what to do next. In <strong>Customize Your Map</strong>, you can show labels or cluster nearby markers.</p>
+    <h2>Generate a Map Embed Code</h2>
+    <p>Copy the generated iframe into the part of your website that accepts custom HTML. WordPress offers a Custom HTML block, and Shopify themes may offer a Custom Liquid section. Wix, Webflow, and Squarespace can accept iframe code through their embed controls where supported by the editor or plan. Use the shareable URL wherever an iframe is unavailable.</p>
+    <h2>Who Can Use a Multiple Location Map?</h2>
+    <ul><li>A retailer showing branches, pickup points, or pop-up shops.</li><li>An event organizer marking venues, entrances, and parking.</li><li>A community group sharing community gardens or public resources.</li><li>A travel writer plotting walks, stops, and nearby landmarks.</li></ul>
+    <h2>Frequently Asked Questions</h2>
+    <details><summary>Do I need an account or an API key?</summary><p>No. The map editor works without registration and handles map-provider access for you.</p></details>
+    <details><summary>Can I edit a map after embedding it?</summary><p>Yes. Open the recovery file in the editor, make your changes, and save. The same public link and iframe will show the updated map once the cache expires.</p></details>
+    <details><summary>Who can see my saved map?</summary><p>Anyone with the public link can view the markers and details. Keep the recovery file private because it grants permission to change or delete the map.</p></details>
+    <details><summary>Can I use a Google My Maps embed?</summary><p>Yes. Follow the existing <a href="/guides/embed-google-map-multiple-locations/">Google My Maps embedding guide</a> for that workflow.</p></details>
+    <h2>Multiple-location map guides</h2>
+    <div class="mm-link-grid">
+      <a href="/guides/how-to-create-map-with-multiple-pins/">First map walkthrough</a>
+      <a href="/custom-map-with-multiple-pins/">Marker styles and map appearance</a>
+      <a href="/guides/how-to-map-multiple-locations/">Bulk addresses and CSV imports</a>
+      <a href="/create-map-with-multiple-pins/">Try a three-pin example</a>
+    </div>
+  </div>
+</MapContentLayout>

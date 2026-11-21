@@ -15,7 +15,7 @@ export default defineConfig({
     },
     integrations: [
         sitemap({
-            filter: (page) => !page.includes('?'),
+            filter: (page) => !page.includes('?') && !new URL(page).pathname.startsWith('/map-viewer'),
         }),
     ],
     vite: {

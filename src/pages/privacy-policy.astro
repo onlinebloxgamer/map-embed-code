@@ -44,7 +44,7 @@ const lastUpdated = "October 2026";
                     <h2>Information We Collect</h2>
                     <h3>Information You Provide</h3>
                     <p>
-                        The generator works entirely in your browser. Location
+                        The Google Maps iframe generator works entirely in your browser. Location
                         queries, coordinates, and map settings you enter are
                         processed client-side to build the embed code. <strong
                             >We do not transmit your location inputs to our
@@ -87,8 +87,15 @@ const lastUpdated = "October 2026";
                         This website does not use tracking cookies or
                         advertising cookies. Map configuration preferences may
                         be preserved in the URL query string to enable shareable
-                        links. No data is stored on our servers.
+                        links. The Google Maps iframe generator does not save this configuration on our servers.
                     </p>
+                </section>
+
+                <section class="prose-block" id="multiple-location-maps">
+                    <h2>Multiple Location Maps</h2>
+                    <p>When you save a multiple-location map, we store its title, description, locations, and settings in Cloudflare. Anyone with its public link or iframe can view this information. Only add locations and details you have permission to share.</p>
+                    <p>We store a hash of your edit credential. The recovery file contains the original credential and lets its holder edit or delete the map. Keep this file private. We cannot recover lost edit credentials. Saved maps have no automatic expiration. A map you delete becomes unavailable after public caches expire.</p>
+                    <p>When address search is available, we send the query to our configured <a href="https://github.com/komoot/photon">Photon</a> instance. Search matches may be reused for up to 30 days. Browsers request basemap tiles directly from <a href="https://openfreemap.org/">OpenFreeMap</a>. <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare</a> processes verification and request information for security and rate limiting.</p>
                 </section>
 
                 <section class="prose-block">

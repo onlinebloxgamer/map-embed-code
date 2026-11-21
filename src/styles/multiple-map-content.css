@@ -1,0 +1,29 @@
+.mm-page { padding-top: 1.35rem; padding-bottom: 4rem; }
+.mm-page.mm-article { max-width: 52rem; }
+.mm-crumbs { color: var(--color-body); font-size: .85rem; }
+.mm-crumbs ol { display: flex; flex-wrap: wrap; gap: .55rem; list-style: none; padding: 0; margin: 0; }
+.mm-crumbs li + li::before { content: '/'; margin-right: .55rem; color: var(--color-mute); }
+.mm-content a:not([class]) { color: var(--color-map-green-deep); text-underline-offset: .18em; }
+.mm-intro { padding: 1.25rem 0 1.35rem; max-width: 50rem; }
+.mm-intro h1 { font-size: clamp(2rem, 4vw, 3.1rem); line-height: 1.06; font-weight: 600; margin: 0 0 .7rem; letter-spacing: -.05em; }
+.mm-intro p { line-height: 1.62; color: var(--color-body); margin: 0; }
+.mm-reading { max-width: 48rem; line-height: 1.65; color: var(--color-body); }
+.mm-reading h2, .mm-reading h3 { color: var(--color-ink); line-height: 1.25; font-weight: 600; letter-spacing: -.025em; }
+.mm-reading h2 { font-size: clamp(1.35rem, 3vw, 1.8rem); margin: 2.3rem 0 .7rem; }
+.mm-reading h3 { font-size: 1.12rem; margin: 1.35rem 0 .45rem; }
+.mm-reading p, .mm-reading ul, .mm-reading ol { margin: 0 0 .9rem; }
+.mm-reading li + li { margin-top: .3rem; }
+.mm-reading pre { overflow-x: auto; background: #f2f6f2; padding: .75rem; border: 1px solid #dce4de; border-radius: .5rem; }
+.mm-reading code { font-family: var(--font-mono); font-size: .91em; }
+.mm-reading details { border-top: 1px solid #dce4de; padding: .65rem 0; }
+.mm-reading summary { cursor: pointer; color: var(--color-ink); font-weight: 600; }
+.mm-reading details p { margin: .4rem 0 0; }
+.mm-link-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr)); gap: .65rem; }
+.mm-link-grid a { border: 1px solid #dce4de; border-radius: .5rem; padding: .6rem; }
+.mm-reading figure { margin: 1rem 0; }
+.mm-reading figure img { display: block; width: auto; max-width: 100%; height: auto; border: 1px solid #dce4de; border-radius: .6rem; }
+.mm-reading figcaption { margin-top: .35rem; font-size: .9rem; }
+.mm-reading .btn-primary { text-decoration: none; }
+.mm-style-examples { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr)); gap: .65rem; }
+.mm-style-examples div { padding: .8rem; border: 1px solid #dce4de; border-radius: .55rem; background: white; }
+.mm-style-examples span { display: inline-grid; vertical-align: middle; place-items: center; width: 1.65rem; height: 1.65rem; color: white; margin-right: .35rem; }

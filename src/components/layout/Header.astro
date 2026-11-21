@@ -14,6 +14,7 @@ const targetPath = translationPath ?? "/";
 
 const navLinks = [
     { label: copy.generator, href: `${home}#generator` },
+    { label: lang === "es" ? "Mapa con varios lugares" : lang === "de" ? "Karte mit mehreren Orten" : "Multiple Location Map", href: "/multiple-location-map-generator/", destinationLanguage: "en" },
     { label: copy.how, href: `${home}#how-it-works` },
     { label: copy.guide, href: localizedPath("/guides/", lang) },
     { label: copy.faq, href: `${home}#faq` },
@@ -59,7 +60,7 @@ const navLinks = [
             <nav class="nav-desktop" aria-label={copy.main}>
                 {
                     navLinks.map((link) => (
-                        <a href={link.href} class="nav-link">
+                        <a href={link.href} hreflang={link.destinationLanguage} class="nav-link">
                             {link.label}
                         </a>
                     ))
@@ -200,7 +201,7 @@ const navLinks = [
         <div class="container">
             {
                 navLinks.map((link) => (
-                    <a href={link.href} class="mobile-nav-link">
+                    <a href={link.href} hreflang={link.destinationLanguage} class="mobile-nav-link">
                         {link.label}
                     </a>
                 ))
@@ -618,7 +619,7 @@ const navLinks = [
         color: var(--color-mute);
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 760px) {
         .nav-desktop {
             display: none;
         }

@@ -1,2 +1,10 @@
 map-embed-code.pages.dev/*
   X-Robots-Tag: noindex
+
+/multiple-location-map-generator/
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://www.googletagmanager.com; worker-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://tiles.openfreemap.org https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com; connect-src 'self' https://tiles.openfreemap.org https://challenges.cloudflare.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; frame-src https://challenges.cloudflare.com; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; form-action 'self'
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Content-Type-Options: nosniff
+
+/map-viewer/
+  X-Robots-Tag: noindex, follow

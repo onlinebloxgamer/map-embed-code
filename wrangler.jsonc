@@ -1,0 +1,26 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "map-embed-code",
+  "pages_build_output_dir": "./dist",
+  "compatibility_date": "2025-09-01",
+  "d1_databases": [
+    {
+      "binding": "MAPS_DB",
+      "database_name": "multiple-location-maps",
+      "database_id": "4bccb6a2-131a-424a-9ddb-8773129f24cf",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  "vars": {
+    "TURNSTILE_SITE_KEY": "0x4AAAAAAGKR5WFQIwHx1vv",
+    "TURNSTILE_HOSTNAME": "map-embed-code.com",
+    "MAP_MARKER_LIMIT": "20",
+    "PHOTON_BASE_URL": "https://photon.komoot.io",
+    "PHOTON_ALLOW_AUTOCOMPLETE": "false",
+    "PHOTON_ALLOW_BULK": "false",
+    "PHOTON_DAILY_LIMIT": "100",
+    "PHOTON_REQUESTS_PER_SECOND": "1",
+    "PHOTON_PER_CLIENT_PER_MINUTE": "5"
+  }
+}

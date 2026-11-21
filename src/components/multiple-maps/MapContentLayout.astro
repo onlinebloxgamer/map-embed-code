@@ -1,0 +1,48 @@
+---
+import Header from '../layout/Header.astro';
+import Footer from '../layout/Footer.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/multiple-map-content.css';
+
+interface Props {
+  title: string;
+  description: string;
+  heading: string;
+  intro: string;
+  kind?: 'tool' | 'article' | 'page';
+  guide?: boolean;
+}
+
+const { title, description, heading, intro, kind = 'page', guide = false } = Astro.props;
+const path = `${Astro.url.pathname.replace(/\/$/, '')}/`;
+const canonical = new URL(path, Astro.site!).href;
+const crumbs = [ { name: 'Home', path: '/' }, ...(guide ? [{ name: 'Guides', path: '/guides/' }] : []), { name: heading, path } ];
+const breadcrumbs = {
+  '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+  itemListElement: crumbs.map((item, index) => ({ '@type': 'ListItem', position: index + 1, name: item.name, item: new URL(item.path, Astro.site!).href })),
+};
+const page = {
+  '@context': 'https://schema.org',
+  '@type': kind === 'tool' ? 'SoftwareApplication' : kind === 'article' ? 'Article' : 'WebPage',
+  name: heading, description, url: canonical, inLanguage: 'en',
+  ...(kind === 'tool' ? { applicationCategory: 'UtilitiesApplication', operatingSystem: 'Web browser', offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' } } : {}),
+  ...(kind === 'article' ? { headline: heading, author: { '@type': 'Organization', name: 'Map Embed Code', url: new URL('/', Astro.site!).href } } : {}),
+};
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} ogType={kind === 'article' ? 'article' : 'website'} ogImage="/images/google-map-embed-generator.webp" structuredData={[breadcrumbs, page]}>
+  <Header />
+  <main id="main-content" class="mm-content">
+    <div class:list={['container', 'mm-page', { 'mm-article': kind !== 'tool' }]}>
+      <nav aria-label="Breadcrumb" class="mm-crumbs">
+        <ol>{crumbs.map((item, index) => <li>{index === crumbs.length - 1 ? <span aria-current="page">{item.name}</span> : <a href={item.path}>{item.name}</a>}</li>)}</ol>
+      </nav>
+      <header class="mm-intro">
+        <h1>{heading}</h1>
+        <p>{intro}</p>
+      </header>
+      <slot />
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
