@@ -13,7 +13,7 @@
   ],
 
   "vars": {
-    "TURNSTILE_SITE_KEY": "0x4AAAAAAGKR5WFQIwHx1vv",
+    "TURNSTILE_SITE_KEY": "0x4AAAAAAGKR5WFQIwHx1vv-",
     "TURNSTILE_HOSTNAME": "map-embed-code.com",
     "MAP_MARKER_LIMIT": "20",
     "PHOTON_BASE_URL": "https://photon.komoot.io",
