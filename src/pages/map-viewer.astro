@@ -11,20 +11,34 @@
     <main>
       <header id="shared-description" hidden><h1 id="shared-title"></h1><p id="map-description" hidden></p></header>
       <p id="viewer-status" role="status">Loading map…</p>
-      <div id="viewer" class="mm-canvas" aria-label="Interactive location map" hidden></div>
+      <div id="viewer-frame" hidden>
+        <div id="viewer" class="mm-canvas" aria-label="Interactive location map"></div>
+        <div id="viewer-controls" hidden>
+          <select id="embedded-locations" aria-label="Go to a location" hidden><option value="">Go to a location</option></select>
+          <button id="fit-locations" type="button">Fit All Locations</button>
+        </div>
+        <p id="basemap-status" role="status" hidden>The basemap is unavailable. You can still open the location markers.</p>
+      </div>
       <ul id="shared-locations" aria-label="Map locations" hidden></ul>
       <noscript>Enable JavaScript to view this interactive location map.</noscript>
     </main>
     <script is:inline id="saved-map-data" type="application/json">null</script>
     <script>
-      import { mapSchema } from '../lib/multiple-maps/schema';
+      import { mapSchema, markerSchema, MAX_MARKER_LIMIT } from '../lib/multiple-maps/schema';
       const status = document.querySelector<HTMLParagraphElement>('#viewer-status')!;
+      const frame = document.querySelector<HTMLDivElement>('#viewer-frame')!;
       const canvas = document.querySelector<HTMLDivElement>('#viewer')!;
+      const controls = document.querySelector<HTMLDivElement>('#viewer-controls')!;
+      const fit = document.querySelector<HTMLButtonElement>('#fit-locations')!;
+      const picker = document.querySelector<HTMLSelectElement>('#embedded-locations')!;
+      const basemapStatus = document.querySelector<HTMLParagraphElement>('#basemap-status')!;
+      const list = document.querySelector<HTMLUListElement>('#shared-locations')!;
       const [kind] = location.pathname.split('/').filter(Boolean);
+      const viewerSchema = mapSchema.extend({ markers: markerSchema.array().max(MAX_MARKER_LIMIT) });
       async function load() {
         const snapshot = JSON.parse(document.querySelector('#saved-map-data')?.textContent ?? 'null');
         if (!snapshot) throw new Error('This map is unavailable. Check the link or ask the map creator for a current URL.');
-        const mapData = mapSchema.parse(snapshot.configuration);
+        const mapData = viewerSchema.parse(snapshot.configuration);
         document.title = `${mapData.title} | Map Embed Code`;
         if (kind === 'map') {
           const summary = document.querySelector<HTMLElement>('#shared-description')!;
@@ -35,27 +49,9 @@
           description.hidden = !mapData.description;
         }
         let map: ReturnType<typeof import('../lib/multiple-maps/maplibre').mountMap> | undefined;
-        try {
-          const { mountMap } = await import('../lib/multiple-maps/maplibre');
-          canvas.hidden = false;
-          map = mountMap(canvas, mapData.markers, mapData.settings, { tileStatus(available) {
-            status.textContent = 'The basemap is unavailable. You can still open the location markers.';
-            status.hidden = available;
-          } });
-        } catch {
-          canvas.hidden = true;
-          status.hidden = false;
-          status.textContent = 'The interactive map could not load. The saved locations are listed below.';
-        }
-        if (kind === 'map' || !map) {
-          const list = document.querySelector<HTMLUListElement>('#shared-locations')!;
+        if (kind === 'map' && mapData.markers.length) {
           mapData.markers.forEach((marker, index) => {
             const row = document.createElement('li');
-            if (!map) {
-              row.textContent = [marker.title, marker.address, `${marker.lat}, ${marker.lng}`].filter(Boolean).join(' · ');
-              list.append(row);
-              return;
-            }
             const button = document.createElement('button');
             button.type = 'button';
             button.textContent = marker.title;
@@ -64,6 +60,37 @@
             list.append(row);
           });
           list.hidden = false;
+        }
+        try {
+          const { mountMap } = await import('../lib/multiple-maps/maplibre');
+          status.textContent = 'This map has no saved locations.';
+          status.hidden = mapData.markers.length > 0;
+          frame.hidden = false;
+          map = mountMap(canvas, mapData.markers, mapData.settings, {
+            savedView: true,
+            tileStatus(available) { basemapStatus.hidden = available; },
+          });
+          controls.hidden = mapData.markers.length === 0;
+          fit.addEventListener('click', () => map?.fit());
+          if (kind === 'embed' && mapData.markers.length > 1) {
+            mapData.markers.forEach((marker, index) => picker.add(new Option(marker.title, String(index))));
+            picker.hidden = false;
+            picker.addEventListener('change', () => {
+              if (picker.value !== '') map?.show(Number(picker.value));
+              picker.selectedIndex = 0;
+            });
+          }
+        } catch {
+          frame.hidden = true;
+          status.hidden = false;
+          status.textContent = 'The interactive map could not load. The saved locations are listed below.';
+          list.replaceChildren();
+          for (const marker of mapData.markers) {
+            const row = document.createElement('li');
+            row.textContent = [marker.title, marker.address, `${marker.lat}, ${marker.lng}`].filter(Boolean).join(' · ');
+            list.append(row);
+          }
+          list.hidden = mapData.markers.length === 0;
         }
       }
       void load().catch((error: unknown) => {
@@ -77,11 +104,16 @@
 <style>
   :global(html), :global(body) { margin: 0; min-height: 100%; font-family: system-ui, sans-serif; color: #171717; }
   main { display: flex; flex-direction: column; min-height: 100dvh; }
-  #viewer { width: 100%; flex: 1; min-height: 150px; }
+  #viewer-frame { position: relative; flex: 1 0 150px; min-width: 0; }
+  #viewer { position: absolute; inset: 0; }
+  #viewer-controls { position: absolute; z-index: 1; top: .5rem; right: .5rem; max-width: calc(100% - 3.5rem); display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .35rem; }
+  #embedded-locations { width: 9rem; max-width: 100%; text-overflow: ellipsis; }
+  #basemap-status { position: absolute; z-index: 1; bottom: 1.5rem; left: .5rem; max-width: calc(100% - 1rem); margin: 0; padding: .35rem .5rem; background: white; border-radius: .35rem; font-size: .8rem; }
   header, #viewer-status, noscript { padding: .75rem 1rem; margin: 0; }
   h1 { margin: 0; font-size: clamp(1.1rem, 3vw, 1.6rem); overflow-wrap: anywhere; }
   #map-description { margin: .25rem 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
   ul { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; margin: 0; padding: .65rem 1rem; }
-  button { padding: .35rem .55rem; border: 1px solid #bacfc4; border-radius: .35rem; color: #205e38; background: white; font: inherit; cursor: pointer; }
+  button, select, #shared-locations :global(button) { padding: .35rem .55rem; border: 1px solid #bacfc4; border-radius: .35rem; color: #205e38; background: white; font: inherit; cursor: pointer; }
+  #viewer-controls button, #viewer-controls select { box-sizing: border-box; font-size: .85rem; }
   [hidden] { display: none !important; }
 </style>

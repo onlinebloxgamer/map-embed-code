@@ -76,6 +76,15 @@ async function mockTiles(page) {
   });
 }
 
+async function browserForMaps() {
+  if (!browser) {
+    const installedChrome = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
+    const chrome = process.env.MAP_TEST_CHROME || (process.platform === 'win32' && existsSync(installedChrome) ? installedChrome : undefined);
+    browser = await chromium.launch({ executablePath: chrome, headless: true, args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader'] });
+  }
+  return browser;
+}
+
 before(async () => {
   mkdirSync('.wrangler', { recursive: true });
   const result = spawnSync(process.execPath, ['node_modules/wrangler/bin/wrangler.js', 'pages', 'functions', 'build', '--outdir', workerDir], {
@@ -212,8 +221,7 @@ test('static SEO routes are unique, indexed, internally linked, and preserve the
 });
 
 test('editor and viewer work in a browser, including mobile layout and a cross-origin iframe', async () => {
-  const chrome = process.env.MAP_TEST_CHROME || (process.platform === 'win32' && existsSync('C:/Program Files/Google/Chrome/Application/chrome.exe') ? 'C:/Program Files/Google/Chrome/Application/chrome.exe' : undefined);
-  browser = await chromium.launch({ executablePath: chrome, headless: true, args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader'] });
+  await browserForMaps();
   const page = await browser.newPage({ viewport: { width: 1360, height: 900 }, acceptDownloads: true });
   page.setDefaultTimeout(15000);
   await page.route('https://challenges.cloudflare.com/turnstile/v0/api.js?*', (route) => route.fulfill({
@@ -378,4 +386,88 @@ test('editor and viewer work in a browser, including mobile layout and a cross-o
   await shared.goto(new URL('/', base).href);
   await shared.getByRole('button', { name: 'Generate Code', exact: true }).click();
   assert.match(await shared.locator('#embed-code-output').textContent(), /<iframe[\s\S]*maps\.google\.com/);
+});
+
+test('saved Delhi map fits all four locations and lets viewers open the nearby Noida pins', async () => {
+  const id = 'bf42a30a15a684b5ea0a729318b6aefa';
+  const locations = [
+    { title: 'ESIC Model Hospital', lat: 28.6572872, lng: 77.1290898, color: 'green' },
+    { title: "Metro Hospital and Heart Institute's Blood Bank", lat: 28.5974385, lng: 77.3379625, color: 'yellow' },
+    { title: 'Adobe Systems India', lat: 28.5888039, lng: 77.344616, color: 'red' },
+    { title: 'Pari Chowk', lat: 28.4631285, lng: 77.5080985, color: 'purple' },
+  ];
+  const configuration = { title: 'Noida Hospitals group', description: 'Hospital of Noida', markers: locations, settings: { fit: true, zoom: 12 } };
+  const db = await mf.getD1Database('MAPS_DB');
+  await db.prepare('INSERT INTO maps (id, title, description, configuration, edit_token_hash) VALUES (?, ?, ?, ?, ?)')
+    .bind(id, configuration.title, configuration.description, JSON.stringify(configuration), 'fixture').run();
+  const page = await (await browserForMaps()).newPage();
+  await mockTiles(page);
+
+  async function markerBounds(view) {
+    const pins = view.locator('#viewer .mm-map-marker');
+    await pins.last().waitFor({ state: 'attached' });
+    return pins.evaluateAll(async (markers) => {
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      const canvas = document.querySelector('#viewer').getBoundingClientRect();
+      return markers.map((pin) => {
+        const wasHidden = pin.hidden;
+        pin.hidden = false;
+        const rect = pin.getBoundingClientRect();
+        pin.hidden = wasHidden;
+        return { left: rect.left - canvas.left, right: canvas.right - rect.right, top: rect.top - canvas.top, bottom: canvas.bottom - rect.bottom };
+      });
+    });
+  }
+
+  async function assertFit(view, viewport) {
+    const positions = await markerBounds(view);
+    assert.equal(positions.length, locations.length);
+    assert.ok(positions.every(({ left, right, top, bottom }) => Math.min(left, right, top, bottom) > 10), `${viewport}: ${JSON.stringify(positions)}`);
+  }
+
+  try {
+    for (const width of [1440, 768, 390]) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto(new URL(`/map/${id}`, base).href);
+      await assertFit(page, `share ${width}px`);
+    }
+    const buttons = page.getByRole('list', { name: 'Map locations' });
+    for (const { title } of locations) {
+      await buttons.getByRole('button', { name: title, exact: true }).click();
+      await page.locator('.maplibregl-popup-content').getByText(title, { exact: true }).waitFor();
+      await page.getByRole('button', { name: `Open ${title}`, exact: true }).waitFor();
+    }
+    await page.setViewportSize({ width: 420, height: 800 });
+    await markerBounds(page);
+    await page.locator('.maplibregl-popup-content').getByText('Pari Chowk', { exact: true }).waitFor();
+    await page.getByRole('button', { name: 'Fit All Locations' }).click();
+    await assertFit(page, 'share after focusing a location');
+
+    for (const [width, cssWidth, height] of [[1100, '100%', 450], [768, '600px', 450], [390, '350px', 300]]) {
+      await page.setViewportSize({ width, height: 800 });
+      const shell = new URL('/viewer-regression', base).href;
+      await page.route(shell, (route) => route.fulfill({
+        contentType: 'text/html',
+        body: `<meta name="viewport" content="width=device-width, initial-scale=1"><iframe style="display:block;width:${cssWidth};height:${height}px;border:0" src="/embed/${id}"></iframe>`,
+      }));
+      await page.goto(shell);
+      const embedded = page.frameLocator('iframe');
+      await assertFit(embedded, `iframe ${cssWidth} × ${height}px`);
+      const frame = await page.locator('iframe').boundingBox();
+      const canvas = await embedded.locator('#viewer').boundingBox();
+      assert.equal(canvas.width, frame.width);
+      assert.equal(canvas.height, height);
+      if (height === 300) {
+        await embedded.getByRole('button', { name: 'Zoom to 2 grouped locations' }).waitFor();
+        const picker = embedded.getByLabel('Go to a location');
+        for (const index of [1, 2]) {
+          await picker.selectOption(String(index));
+          await embedded.locator('.maplibregl-popup-content').getByText(locations[index].title, { exact: true }).waitFor();
+        }
+        await embedded.getByRole('button', { name: 'Fit All Locations' }).click();
+        await assertFit(embedded, 'iframe after focusing a location');
+      }
+      await page.unroute(shell);
+    }
+  } finally { await page.close(); }
 });

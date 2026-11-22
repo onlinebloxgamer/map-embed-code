@@ -1,4 +1,4 @@
-import { Map as MapLibre, Marker as MapPin, NavigationControl, Popup, setWorkerUrl, type GeoJSONSource, type LngLatBoundsLike, type MapGeoJSONFeature, type StyleSpecification } from 'maplibre-gl';
+import { LngLatBounds, Map as MapLibre, Marker as MapPin, NavigationControl, Popup, setWorkerUrl, type GeoJSONSource, type MapGeoJSONFeature, type StyleSpecification } from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import '../../styles/multiple-map-canvas.css';
@@ -17,6 +17,7 @@ interface MapActions {
   add?: (lat: number, lng: number) => void;
   move?: (index: number, lat: number, lng: number) => void;
   tileStatus?: (available: boolean) => void;
+  savedView?: boolean;
 }
 
 function popupContent(marker: Marker): HTMLElement {
@@ -46,7 +47,7 @@ function point(marker: Marker): [number, number] {
 }
 
 // Choose the shortest longitude span for maps crossing the antimeridian.
-function bounds(markers: Marker[]): LngLatBoundsLike {
+function bounds(markers: Marker[]): LngLatBounds {
   const longitudes = markers.map(({ lng }) => lng).sort((a, b) => a - b);
   let west = longitudes[0];
   let east = longitudes[longitudes.length - 1];
@@ -60,7 +61,7 @@ function bounds(markers: Marker[]): LngLatBoundsLike {
     }
   }
   const latitudes = markers.map((marker) => point(marker)[1]);
-  return [[west, Math.min(...latitudes)], [east, Math.max(...latitudes)]];
+  return new LngLatBounds([west, Math.min(...latitudes)], [east, Math.max(...latitudes)]);
 }
 
 function positions(markers: Marker[]) {
@@ -91,11 +92,13 @@ export function mountMap(element: HTMLElement, initialMarkers: Marker[], initial
   let basemap = true;
   let styleTimeout: number | undefined;
   let dragging = false;
+  let initialFitPending = Boolean(actions.savedView && markers.length);
+  let focusedIndex: number | undefined;
   const map = new MapLibre({
     container: element, style: styleUrl(settings.style), attributionControl: false,
     center: markers.length ? point(markers[0]) : [0, 20], zoom: markers.length ? settings.zoom : 2,
-    ...(settings.fit && markers.length > 1 ? { bounds: bounds(markers), fitBoundsOptions: { padding: 40, maxZoom: 17 } } : {}),
-    minZoom: 1, maxZoom: 19, maxPitch: 0, dragRotate: false, pitchWithRotate: false,
+    ...(!actions.savedView && settings.fit && markers.length > 1 ? { bounds: bounds(markers), fitBoundsOptions: { padding: 40, maxZoom: 17 } } : {}),
+    minZoom: actions.savedView ? -2 : 1, maxZoom: 19, maxPitch: 0, dragRotate: false, pitchWithRotate: false,
     scrollZoom: settings.scrollWheel, cooperativeGestures: false,
   });
   const navigation = new NavigationControl({ showCompass: false });
@@ -105,7 +108,12 @@ export function mountMap(element: HTMLElement, initialMarkers: Marker[], initial
   map.addControl({ onAdd: () => credits, onRemove: () => credits.remove() }, 'bottom-right');
   if (settings.zoomControls) map.addControl(navigation, 'top-left');
   map.touchZoomRotate.disableRotation();
-  new ResizeObserver(() => map.resize()).observe(element);
+  function resize() {
+    if (!element.clientWidth || !element.clientHeight) return;
+    if (initialFitPending) fit();
+    else map.resize();
+  }
+  new ResizeObserver(resize).observe(element);
 
   function watchStyle() {
     window.clearTimeout(styleTimeout);
@@ -139,6 +147,12 @@ export function mountMap(element: HTMLElement, initialMarkers: Marker[], initial
       const pop = new Popup({ offset: Math.max(19, Math.abs(offsets[index][1]) + 12), maxWidth: '270px' }).setDOMContent(popupContent(marker));
       const pin = new MapPin({ element: button, draggable: Boolean(actions.move), offset: offsets[index], clickTolerance: 4 })
         .setLngLat(point(marker)).setPopup(pop).addTo(map);
+      pop.on('close', () => {
+        if (focusedIndex !== index) return;
+        focusedIndex = undefined;
+        button.classList.remove('mm-marker-selected');
+        syncClusters();
+      });
       pin.on('dragstart', () => { dragging = true; });
       pin.on('dragend', () => {
         dragging = false;
@@ -163,7 +177,7 @@ export function mountMap(element: HTMLElement, initialMarkers: Marker[], initial
     }
     const visible = new Set(map.queryRenderedFeatures({ layers: [singles] }).map((feature) => Number(feature.properties.index)));
     pins.forEach((pin, index) => {
-      const hidden = !visible.has(index);
+      const hidden = index !== focusedIndex && !visible.has(index);
       pin.getElement().hidden = hidden;
       if (hidden && pin.getPopup()?.isOpen()) pin.togglePopup();
     });
@@ -246,10 +260,26 @@ export function mountMap(element: HTMLElement, initialMarkers: Marker[], initial
   });
   watchStyle();
   setPins();
+  if (actions.savedView) resize();
 
   function fit() {
-    if (markers.length === 1) map.jumpTo({ center: point(markers[0]), zoom: settings.zoom });
-    if (markers.length > 1) map.fitBounds(bounds(markers), { padding: 40, maxZoom: 17, duration: 0 });
+    const { clientWidth: width, clientHeight: height } = element;
+    if (!markers.length || !width || !height) return;
+    initialFitPending = false;
+    if (actions.savedView) {
+      if (focusedIndex !== undefined) pins[focusedIndex]?.getPopup()?.remove();
+      map.resize();
+    }
+    if (markers.length === 1) {
+      map.jumpTo({ center: point(markers[0]), zoom: actions.savedView ? Math.min(settings.zoom, 15) : settings.zoom });
+      return;
+    }
+    // Keep the pins clear of the viewer controls and attribution in short embeds.
+    const side = Math.min(48, Math.floor(width / 5));
+    const padding = actions.savedView
+      ? { top: Math.min(84, Math.floor(height * .3)), bottom: Math.min(52, Math.floor(height * .2)), left: side, right: side }
+      : 40;
+    map.fitBounds(bounds(markers), { padding, maxZoom: actions.savedView ? 15 : 17, duration: 0 });
   }
 
   function draw(next: Marker[], options: MapSettings, reframe = false) {
@@ -289,6 +319,13 @@ export function mountMap(element: HTMLElement, initialMarkers: Marker[], initial
     if (!pin) return;
     const marker = markers[index];
     const zoom = pin.getElement().hidden && settings.cluster ? Math.max(17, map.getZoom()) : map.getZoom();
+    if (actions.savedView) {
+      initialFitPending = false;
+      pins.forEach((other, position) => { if (position !== index) other.getPopup()?.remove(); });
+      focusedIndex = index;
+      pin.getElement().hidden = false;
+      pin.getElement().classList.add('mm-marker-selected');
+    }
     map.jumpTo({ center: point(marker), zoom });
     if (!pin.getPopup()?.isOpen()) pin.togglePopup();
   }
