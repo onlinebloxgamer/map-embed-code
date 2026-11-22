@@ -2,6 +2,7 @@ import { LngLatBounds, Map as MapLibre, Marker as MapPin, NavigationControl, Pop
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import '../../styles/multiple-map-canvas.css';
+import { separateBadges } from './marker-layout';
 import { markerColor, STYLES, type MapSettings, type Marker } from './schema';
 
 setWorkerUrl(workerUrl);
@@ -64,9 +65,13 @@ function bounds(markers: Marker[]): LngLatBounds {
   return new LngLatBounds([west, Math.min(...latitudes)], [east, Math.max(...latitudes)]);
 }
 
+function badgeOffset(marker: Marker): [number, number] {
+  return [0, marker.icon === 'circle' ? 0 : -9];
+}
+
 function positions(markers: Marker[]) {
   const groups = new Map<string, number[]>();
-  const offsets = markers.map((marker): [number, number] => [0, marker.icon === 'circle' ? 0 : -9]);
+  const offsets = markers.map(badgeOffset);
   markers.forEach(({ lat, lng }, index) => {
     const key = `${lat},${lng}`;
     const group = groups.get(key) ?? [];
@@ -88,6 +93,8 @@ export function mountMap(element: HTMLElement, initialMarkers: Marker[], initial
   let settings = initialSettings;
   let markers = initialMarkers;
   let pins: MapPin[] = [];
+  let badgeSizes: number[] = [];
+  let markerLayoutFrame: number | undefined;
   let ready = false;
   let basemap = true;
   let styleTimeout: number | undefined;
@@ -127,12 +134,20 @@ export function mountMap(element: HTMLElement, initialMarkers: Marker[], initial
 
   function setPins() {
     pins.forEach((pin) => pin.remove());
-    const offsets = positions(markers);
+    badgeSizes = [];
+    const offsets = actions.savedView ? markers.map(badgeOffset) : positions(markers);
     pins = markers.map((marker, index) => {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'mm-map-marker';
       button.setAttribute('aria-label', `Open ${marker.title}`);
+      if (actions.savedView) {
+        const leader = document.createElement('span');
+        leader.className = 'mm-marker-leader';
+        leader.hidden = true;
+        leader.setAttribute('aria-hidden', 'true');
+        button.append(leader);
+      }
       const shape = document.createElement('span');
       shape.className = `mm-pin mm-pin--${marker.icon}`;
       shape.style.backgroundColor = markerColor(marker.color);
@@ -161,6 +176,38 @@ export function mountMap(element: HTMLElement, initialMarkers: Marker[], initial
       });
       return pin;
     });
+    if (actions.savedView) scheduleMarkerLayout();
+  }
+
+  function scheduleMarkerLayout() {
+    if (markerLayoutFrame !== undefined) return;
+    markerLayoutFrame = requestAnimationFrame(() => {
+      markerLayoutFrame = undefined;
+      const { clientWidth: width, clientHeight: height } = element;
+      if (!width || !height || !pins.length) return;
+      if (!badgeSizes.length) {
+        badgeSizes = pins.map((pin) => {
+          const { width, height } = pin.getElement().querySelector('.mm-pin')!.getBoundingClientRect();
+          return Math.max(width, height) / 2;
+        });
+      }
+      const natural = pins.map((pin, index) => {
+        const anchor = map.project(pin.getLngLat());
+        return { x: anchor.x, y: anchor.y + badgeOffset(markers[index])[1], halfSize: badgeSizes[index] };
+      });
+      const layout = separateBadges(natural, width, height);
+      pins.forEach((pin, index) => {
+        const x = layout[index].x - natural[index].x;
+        const y = layout[index].y - natural[index].y + badgeOffset(markers[index])[1];
+        const currentOffset = pin.getOffset();
+        if (currentOffset.x === x && currentOffset.y === y) return;
+        pin.setOffset([x, y]);
+        const leader = pin.getElement().querySelector<HTMLSpanElement>('.mm-marker-leader')!;
+        leader.hidden = layout[index] === natural[index];
+        leader.style.width = `${Math.hypot(x, y)}px`;
+        leader.style.transform = `rotate(${Math.atan2(-y, -x)}rad)`;
+      });
+    });
   }
 
   function pinData(): GeoJSON.FeatureCollection<GeoJSON.Point> {
@@ -170,7 +217,7 @@ export function mountMap(element: HTMLElement, initialMarkers: Marker[], initial
   }
 
   function syncClusters() {
-    if (dragging) return;
+    if (actions.savedView || dragging) return;
     if (!settings.cluster || !map.getLayer(singles) || !map.isSourceLoaded(source)) {
       pins.forEach((pin) => { pin.getElement().hidden = false; });
       return;
@@ -184,7 +231,7 @@ export function mountMap(element: HTMLElement, initialMarkers: Marker[], initial
   }
 
   function updateClusters() {
-    if (!ready) return;
+    if (actions.savedView || !ready) return;
     if (!settings.cluster) {
       if (map.getSource(source)) {
         for (const layer of [singles, clusters]) map.removeLayer(layer);
@@ -250,8 +297,13 @@ export function mountMap(element: HTMLElement, initialMarkers: Marker[], initial
     updateClusters();
   });
   map.on('error', () => actions.tileStatus?.(false));
-  map.on('idle', syncClusterCounts);
-  map.on('moveend', syncClusterCounts);
+  if (actions.savedView) {
+    map.on('moveend', scheduleMarkerLayout);
+    map.on('resize', scheduleMarkerLayout);
+  } else {
+    map.on('idle', syncClusterCounts);
+    map.on('moveend', syncClusterCounts);
+  }
   map.on('click', (event) => {
     if (map.getLayer(clusters) && map.queryRenderedFeatures(event.point, { layers: [clusters] }).length) return;
     if ((event.originalEvent.target as HTMLElement | null)?.closest('.maplibregl-marker, .maplibregl-popup')) return;

@@ -174,9 +174,9 @@ test('geocode requires verification, validates inputs, caches resolved searches,
   assert.equal((await geocode('Museum', headers)).status, 429);
 });
 
-test('the shared Photon demo is rejected and optional search modes require explicit opt-in', async () => {
-  for (const [settings, enabled] of [[{ PHOTON_BASE_URL: '' }, false], [{ PHOTON_BASE_URL: 'https://photon.komoot.io' }, false], [{ PHOTON_ALLOW_AUTOCOMPLETE: 'false', PHOTON_ALLOW_BULK: 'false' }, true]]) {
-    const local = new Miniflare(workerOptions(settings));
+test('configured Photon endpoints enable search while optional modes require explicit opt-in', async () => {
+  for (const [endpoint, enabled] of [['', false], ['https://photon.komoot.io', true], ['https://photon.example.org', true]]) {
+    const local = new Miniflare(workerOptions({ PHOTON_BASE_URL: endpoint, PHOTON_ALLOW_AUTOCOMPLETE: 'false', PHOTON_ALLOW_BULK: 'false' }));
     try {
       const testOrigin = await local.ready;
       const response = await fetch(new URL('/api/map-tool/config', testOrigin));
@@ -357,8 +357,7 @@ test('editor and viewer work in a browser, including mobile layout and a cross-o
     const embedded = shared.frameLocator('iframe');
     await embedded.locator('#viewer.maplibregl-map canvas').waitFor();
     await embedded.getByRole('link', { name: 'OpenFreeMap', exact: true }).waitFor();
-    const embedCluster = embedded.getByRole('button', { name: /Zoom to \d+ grouped locations/ }).first();
-    await embedCluster.click();
+    assert.equal(await embedded.locator('.mm-cluster-count').count(), 0);
     await embedded.locator('.mm-map-marker:not([hidden])').first().click();
     await embedded.locator('.maplibregl-popup-content').waitFor();
   } finally { await new Promise((done) => host.close(done)); }
@@ -388,7 +387,7 @@ test('editor and viewer work in a browser, including mobile layout and a cross-o
   assert.match(await shared.locator('#embed-code-output').textContent(), /<iframe[\s\S]*maps\.google\.com/);
 });
 
-test('saved Delhi map fits all four locations and lets viewers open the nearby Noida pins', async () => {
+test('saved Delhi map fits four distinct clickable badges in the share page and iframes', async () => {
   const id = 'bf42a30a15a684b5ea0a729318b6aefa';
   const locations = [
     { title: 'ESIC Model Hospital', lat: 28.6572872, lng: 77.1290898, color: 'green' },
@@ -401,43 +400,63 @@ test('saved Delhi map fits all four locations and lets viewers open the nearby N
   await db.prepare('INSERT INTO maps (id, title, description, configuration, edit_token_hash) VALUES (?, ?, ?, ?, ?)')
     .bind(id, configuration.title, configuration.description, JSON.stringify(configuration), 'fixture').run();
   const page = await (await browserForMaps()).newPage();
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await mockTiles(page);
 
   async function markerBounds(view) {
-    const pins = view.locator('#viewer .mm-map-marker');
-    await pins.last().waitFor({ state: 'attached' });
-    return pins.evaluateAll(async (markers) => {
+    const badges = view.locator('#viewer .mm-map-marker .mm-pin');
+    await badges.last().waitFor({ state: 'visible' });
+    return badges.evaluateAll(async (markers) => {
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       const canvas = document.querySelector('#viewer').getBoundingClientRect();
-      return markers.map((pin) => {
-        const wasHidden = pin.hidden;
-        pin.hidden = false;
-        const rect = pin.getBoundingClientRect();
-        pin.hidden = wasHidden;
-        return { left: rect.left - canvas.left, right: canvas.right - rect.right, top: rect.top - canvas.top, bottom: canvas.bottom - rect.bottom };
+      return markers.map((badge) => {
+        const rect = badge.getBoundingClientRect();
+        return {
+          number: badge.textContent, visible: badge.checkVisibility(),
+          left: rect.left - canvas.left, right: rect.right - canvas.left,
+          top: rect.top - canvas.top, bottom: rect.bottom - canvas.top,
+          width: canvas.width, height: canvas.height,
+        };
       });
     });
   }
 
   async function assertFit(view, viewport) {
     const positions = await markerBounds(view);
-    assert.equal(positions.length, locations.length);
-    assert.ok(positions.every(({ left, right, top, bottom }) => Math.min(left, right, top, bottom) > 10), `${viewport}: ${JSON.stringify(positions)}`);
+    assert.deepEqual(positions.map(({ number }) => number), ['1', '2', '3', '4']);
+    assert.equal(await view.locator('#viewer .mm-cluster-count').count(), 0);
+    for (const [index, badge] of positions.entries()) {
+      assert.ok(badge.visible && Math.min(badge.left, badge.width - badge.right, badge.top, badge.height - badge.bottom) > 0, `${viewport}: ${JSON.stringify(badge)}`);
+      for (const other of positions.slice(index + 1)) {
+        assert.ok(badge.right <= other.left || other.right <= badge.left || badge.bottom <= other.top || other.bottom <= badge.top,
+          `${viewport}: badges ${badge.number} and ${other.number} overlap`);
+      }
+    }
+    return positions.map(({ left, top }) => [left, top]);
+  }
+
+  async function checkPopups(view) {
+    for (const { title } of locations) {
+      await view.getByRole('button', { name: `Open ${title}`, exact: true }).click();
+      await view.locator('.maplibregl-popup-content').getByText(title, { exact: true }).waitFor();
+      await view.locator('.maplibregl-popup-close-button').click();
+    }
   }
 
   try {
-    for (const width of [1440, 768, 390]) {
-      await page.setViewportSize({ width, height: 800 });
+    for (const [width, height] of [[1366, 768], [768, 1024], [390, 844]]) {
+      await page.setViewportSize({ width, height });
       await page.goto(new URL(`/map/${id}`, base).href);
-      await assertFit(page, `share ${width}px`);
+      await assertFit(page, `share ${width} × ${height}`);
     }
+    await checkPopups(page);
     const buttons = page.getByRole('list', { name: 'Map locations' });
     for (const { title } of locations) {
       await buttons.getByRole('button', { name: title, exact: true }).click();
       await page.locator('.maplibregl-popup-content').getByText(title, { exact: true }).waitFor();
       await page.getByRole('button', { name: `Open ${title}`, exact: true }).waitFor();
     }
-    await page.setViewportSize({ width: 420, height: 800 });
+    await page.setViewportSize({ width: 420, height: 844 });
     await markerBounds(page);
     await page.locator('.maplibregl-popup-content').getByText('Pari Chowk', { exact: true }).waitFor();
     await page.getByRole('button', { name: 'Fit All Locations' }).click();
@@ -452,22 +471,34 @@ test('saved Delhi map fits all four locations and lets viewers open the nearby N
       }));
       await page.goto(shell);
       const embedded = page.frameLocator('iframe');
-      await assertFit(embedded, `iframe ${cssWidth} × ${height}px`);
+      const initial = await assertFit(embedded, `iframe ${cssWidth} × ${height}px`);
       const frame = await page.locator('iframe').boundingBox();
       const canvas = await embedded.locator('#viewer').boundingBox();
       assert.equal(canvas.width, frame.width);
       assert.equal(canvas.height, height);
       if (height === 300) {
-        await embedded.getByRole('button', { name: 'Zoom to 2 grouped locations' }).waitFor();
+        await embedded.locator('.mm-marker-leader:visible').first().waitFor();
+        await checkPopups(embedded);
         const picker = embedded.getByLabel('Go to a location');
         for (const index of [1, 2]) {
           await picker.selectOption(String(index));
           await embedded.locator('.maplibregl-popup-content').getByText(locations[index].title, { exact: true }).waitFor();
         }
+        await embedded.locator('.maplibregl-popup-close-button').click();
+        const zoomIn = embedded.getByRole('button', { name: 'Zoom in', exact: true });
+        for (let i = 0; i < 3; i++) await zoomIn.click();
+        const zoomed = (await markerBounds(embedded)).slice(1, 3);
+        assert.ok(zoomed.every((badge) => badge.left > 0 && badge.right < badge.width && badge.top > 0 && badge.bottom < badge.height));
+        for (const index of [1, 2]) {
+          const pin = embedded.getByRole('button', { name: `Open ${locations[index].title}`, exact: true });
+          await pin.locator('.mm-marker-leader').waitFor({ state: 'hidden' });
+        }
         await embedded.getByRole('button', { name: 'Fit All Locations' }).click();
-        await assertFit(embedded, 'iframe after focusing a location');
+        assert.deepEqual(await assertFit(embedded, 'iframe after zooming'), initial);
       }
       await page.unroute(shell);
     }
+    const saved = await db.prepare('SELECT configuration FROM maps WHERE id = ?').bind(id).first();
+    assert.deepEqual(JSON.parse(saved.configuration), configuration);
   } finally { await page.close(); }
 });

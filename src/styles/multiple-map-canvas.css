@@ -5,6 +5,9 @@
   background-size: 36px 36px;
 }
 .mm-map-marker { display: grid; place-items: center; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.mm-marker-leader { position: absolute; top: 50%; left: 50%; height: 2px; transform-origin: left center; z-index: -1; pointer-events: none; background: #36554a; box-shadow: 0 0 0 1px #fff; }
+.mm-marker-leader[hidden] { display: none; }
+.mm-marker-leader::after { content: ''; position: absolute; right: -2px; top: -1px; width: 4px; height: 4px; border-radius: 50%; background: #36554a; box-shadow: 0 0 0 1px #fff; }
 .mm-canvas .mm-marker-selected { z-index: 1; }
 #viewer .maplibregl-popup { z-index: 2; }
 .mm-canvas .maplibregl-marker[hidden] { display: none !important; }
