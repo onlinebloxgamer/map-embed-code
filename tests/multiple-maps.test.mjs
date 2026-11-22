@@ -194,8 +194,15 @@ test('configured Photon endpoints enable search while optional modes require exp
 });
 
 test('static SEO routes are unique, indexed, internally linked, and preserve the Google Maps workflow', async () => {
-  const routes = [tool, '/create-map-with-multiple-pins/', '/custom-map-with-multiple-pins/', '/guides/how-to-create-map-with-multiple-pins/', '/guides/how-to-map-multiple-locations/'];
+  const routes = [tool, '/guides/how-to-create-map-with-multiple-pins/'];
+  const retired = {
+    '/create-map-with-multiple-pins/': 'three-pin-example',
+    '/custom-map-with-multiple-pins/': 'customize-pins',
+    '/guides/how-to-map-multiple-locations/': 'import-locations',
+  };
   const sitemap = readFileSync(join(dist, 'sitemap-0.xml'), 'utf8');
+  const redirects = readFileSync(join(dist, '_redirects'), 'utf8').trim().split(/\r?\n/);
+  const toolHtml = readFileSync(join(dist, tool, 'index.html'), 'utf8');
   const titles = new Set();
   const descriptions = new Set();
   for (const route of routes) {
@@ -209,6 +216,12 @@ test('static SEO routes are unique, indexed, internally linked, and preserve the
   }
   assert.equal(titles.size, routes.length);
   assert.equal(descriptions.size, routes.length);
+  for (const [route, anchor] of Object.entries(retired)) {
+    assert.ok(!existsSync(join(dist, route, 'index.html')), `Retired page was built: ${route}`);
+    assert.ok(!sitemap.includes(route), `Retired page is in the sitemap: ${route}`);
+    assert.ok(toolHtml.includes(`id="${anchor}"`));
+    for (const path of [route, route.slice(0, -1)]) assert.ok(redirects.includes(`${path} ${tool}#${anchor} 301`));
+  }
   assert.doesNotMatch(sitemap, /\/map-viewer|\/embed\/|\/map\//);
   for (const screenshot of ['native-multiple-map-editor.webp', 'native-multiple-map-marker-editor.webp']) {
     assert.ok(existsSync(join(dist, 'guides', screenshot)), 'Missing tutorial screenshot ' + screenshot);
@@ -217,6 +230,48 @@ test('static SEO routes are unique, indexed, internally linked, and preserve the
     const html = readFileSync(join(dist, route, 'index.html'), 'utf8');
     assert.match(html, /maps\.google\.com/);
     assert.doesNotMatch(html, /leaflet-|maplibre|openfreemap/i);
+  }
+});
+
+test('the consolidated guide opens three numbered example pins and preserves an existing draft', async () => {
+  await browserForMaps();
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  try {
+    await mockTiles(context);
+    await context.route(/https:\/\/(fonts\.|www\.googletagmanager|www\.google-analytics)/, (route) => route.abort());
+    const page = await context.newPage();
+    page.setDefaultTimeout(15000);
+    await page.goto(new URL(`${tool}#three-pin-example`, base).href);
+    const canvas = page.locator('#mm-canvas .maplibregl-canvas');
+    await canvas.waitFor();
+    const example = page.getByRole('link', { name: 'Open the three-pin example' });
+    await example.click();
+    const points = ['Central Park', 'New York Public Library', 'Brooklyn Bridge'];
+    const pins = page.locator('#mm-canvas .mm-map-marker');
+    assert.deepEqual(await pins.allTextContents(), ['1', '2', '3']);
+    assert.equal(await page.locator(':focus').getAttribute('id'), 'mm-live-preview');
+    await page.waitForFunction(() => {
+      const mapBox = document.querySelector('#mm-canvas .maplibregl-canvas')?.getBoundingClientRect();
+      return mapBox && mapBox.height > 0 && mapBox.top >= 0 && mapBox.bottom <= window.innerHeight;
+    });
+    for (const [index, title] of points.entries()) {
+      await pins.nth(index).click();
+      await page.locator('.maplibregl-popup-content').getByText(title, { exact: true }).waitFor();
+      await page.locator('.maplibregl-popup-close-button').click();
+    }
+    const editor = page.locator('#mm-marker-dialog');
+    await page.getByRole('button', { name: 'Edit Central Park', exact: true }).click();
+    await editor.getByLabel('Location title').fill('My meetup location');
+    await editor.getByRole('button', { name: 'Save Location' }).click();
+    const tabOpened = page.waitForEvent('popup');
+    await example.click();
+    const fresh = await tabOpened;
+    await fresh.getByRole('button', { name: 'Show Central Park on the map' }).waitFor();
+    assert.equal(new URL(fresh.url()).searchParams.get('example'), 'nyc');
+    assert.equal(await page.getByRole('button', { name: 'Show My meetup location on the map' }).count(), 1);
+    assert.equal(await page.locator('#mm-locations > li').count(), 3);
+  } finally {
+    await context.close();
   }
 });
 
@@ -313,6 +368,8 @@ test('editor and viewer work in a browser, including mobile layout and a cross-o
     for (let attempt = 0; !styleRequests.includes(expected) && attempt < 25; attempt++) await new Promise((done) => setTimeout(done, 60));
     assert.ok(styleRequests.includes(expected), expected);
   }
+  const mapTitle = '"Harbor" & <Parks>';
+  await page.getByLabel('Map title').fill(mapTitle);
   await page.getByRole('button', { name: 'Generate Map & Embed Code' }).click();
   await page.getByText(/Map saved/).waitFor();
   const url = await page.getByLabel('Shareable map URL').inputValue();
@@ -325,9 +382,14 @@ test('editor and viewer work in a browser, including mobile layout and a cross-o
   await page.locator('#mm-canvas.maplibregl-map canvas').waitFor();
   await page.locator('#mm-recovery-file').setInputFiles({ name: 'recovery.json', mimeType: 'application/json', buffer: readFileSync(recoveryPath) });
   await page.getByText(/Map opened for editing/).waitFor();
+  await page.locator('#mm-settings-panel summary').click();
+  await page.getByLabel('Responsive width').uncheck();
+  await page.getByLabel('Fixed width (px)', { exact: true }).fill('600');
+  await page.getByLabel('Height (px)', { exact: true }).fill('300');
   await page.getByLabel('Map title').fill('Recovered map');
   await page.getByRole('button', { name: 'Save Map Changes' }).click();
   await page.getByText(/Map saved/).waitFor();
+  const fixedCode = await page.getByLabel('HTML iframe').inputValue();
   const shared = await browser.newPage({ viewport: { width: 390, height: 844 } });
   shared.setDefaultTimeout(15000);
   await mockTiles(shared);
@@ -347,14 +409,46 @@ test('editor and viewer work in a browser, including mobile layout and a cross-o
   }
   const host = createServer((_request, response) => {
     response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    response.end(`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1">${code}`);
+    response.end(`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1">${code}${fixedCode}
+      <style>
+        .mapouter{position:relative;text-align:right;width:100%;aspect-ratio:600/450;}
+        .gmap_canvas{overflow:hidden;background:none!important;width:100%;height:100%;}
+        .gmap_iframe{display:block;width:100%!important;height:100%!important;}
+      </style>`);
   });
   await new Promise((done) => host.listen(0, '127.0.0.1', done));
   try {
     const thirdParty = `http://127.0.0.1:${host.address().port}`;
     assert.notEqual(new URL(url).origin, thirdParty);
     await shared.goto(thirdParty);
-    const embedded = shared.frameLocator('iframe');
+    const embedUrl = new URL(url);
+    embedUrl.pathname = embedUrl.pathname.replace(/^\/map\//, '/embed/');
+    const frames = shared.locator('.mapouter > .gmap_canvas > .gmap_iframe');
+    assert.equal(await frames.count(), 2);
+    for (const [index, expectedTitle, expectedWidth, height] of [[0, mapTitle, '100%', 450], [1, 'Recovered map', '600', 300]]) {
+      const iframe = frames.nth(index);
+      for (const [name, value] of Object.entries({
+        frameborder: '0', scrolling: 'no', marginheight: '0', marginwidth: '0',
+        src: embedUrl.href, title: expectedTitle, referrerpolicy: 'strict-origin-when-cross-origin',
+        allowfullscreen: '', loading: 'lazy', width: expectedWidth, height: String(height),
+      })) assert.equal(await iframe.getAttribute(name), value, name);
+      const credit = shared.getByRole('link', { name: 'map-embed-code.com', exact: true }).nth(index);
+      assert.equal(await credit.getAttribute('href'), 'https://map-embed-code.com/');
+      assert.ok(await credit.evaluate((link) => {
+        const bounds = link.getBoundingClientRect();
+        return bounds.top >= link.previousElementSibling.getBoundingClientRect().bottom
+          && bounds.bottom <= link.parentElement.getBoundingClientRect().bottom;
+      }), 'The credit below the map fits inside the wrapper');
+    }
+    for (const width of [900, 390]) {
+      await shared.setViewportSize({ width, height: 844 });
+      const available = await shared.evaluate(() => document.body.clientWidth);
+      assert.equal((await frames.nth(0).boundingBox()).width, available);
+      assert.equal((await frames.nth(1).boundingBox()).width, Math.min(600, available));
+      assert.equal((await frames.nth(0).boundingBox()).height, 450);
+      assert.equal((await frames.nth(1).boundingBox()).height, 300);
+    }
+    const embedded = shared.frameLocator('iframe.gmap_iframe').first();
     await embedded.locator('#viewer.maplibregl-map canvas').waitFor();
     await embedded.getByRole('link', { name: 'OpenFreeMap', exact: true }).waitFor();
     assert.equal(await embedded.locator('.mm-cluster-count').count(), 0);

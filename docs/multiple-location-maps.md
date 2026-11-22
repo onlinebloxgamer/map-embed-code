@@ -130,7 +130,7 @@ Address-only use would generate 500–1,000 potential uncached lookups for 100 m
 
 ## SEO and regression scope
 
-The homepage and the existing Google My Maps guide retain their URLs and canonical metadata. The five indexable native map pages still cover free map creation, a worked example, marker styling, a first-map tutorial, and CSV/bulk entry respectively. Saved links, viewer shells, and iframe routes stay out of the sitemap. Tutorial images show the migrated renderer. For competitor context, the first version was compared with MapCustomizer’s public editor and help, which document bulk text entry and describe limitations around embedding and clustering. [MapCustomizer FAQ](https://www.mapcustomizer.com/faq)
+The generator page covers free map creation, the editable three-pin example, marker styling, and CSV and bulk entry. The separate first-map walkthrough has its own URL. Cloudflare Pages redirects the three retired articles to their corresponding sections on the generator page with permanent redirects from `public/_redirects`. The homepage and Google My Maps guide retain their canonical URLs. Saved links, viewer shells, and iframe routes stay out of the sitemap. Tutorial images show the migrated renderer. For competitor context, the first version was compared with MapCustomizer’s public editor and help, which document bulk text entry and describe limitations around embedding and clustering. [MapCustomizer FAQ](https://www.mapcustomizer.com/faq)
 
 ## Migration files and verification
 

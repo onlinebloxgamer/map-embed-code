@@ -6,33 +6,72 @@ import MapEditor from '../components/multiple-maps/MapEditor.astro';
 <MapContentLayout
   title="Free Multiple Location Map Generator | Add Multiple Pins"
   heading="Free Multiple Location Map Generator"
-  description="Create a free map with multiple locations and custom pins. Add addresses, customize markers, and generate an interactive map embed code."
+  description="Create a free map with multiple pins. Add locations or import a CSV, customize each marker, then share your map or embed it on your website."
   intro="Create an interactive map for your branch locations, event venues, or favorite places. Enter coordinates, drop a pin directly on the map, or import a CSV of locations. Address search and bulk address lookup are available when a search provider is enabled. Give each pin a title, color, and description, then check the result in the live preview. Save your map to get a public link and responsive iframe code you can paste into a website that supports custom HTML. You don’t need an account or a Google Maps API key."
   kind="tool"
 >
   <MapEditor />
-  <div class="mm-reading">
-    <h2>How to Create a Map with Multiple Locations</h2>
-    <p>Add your first location, then repeat for the remaining places. Select <strong>Fit All Locations</strong> to check the coverage and open a few pins to review their details. Enter a map title, then select <strong>Generate Map &amp; Embed Code</strong>. Download the recovery file if you want to make changes later.</p>
-    <h2>Add Multiple Pins to One Map</h2>
-    <p>Drop pins on the map or enter exact coordinates. Use <strong>Import CSV</strong> when titles, descriptions, or coordinates are already in a spreadsheet. When bulk address lookup is available, use <strong>Add Multiple Locations</strong> and paste one address per line. If a row stays unresolved, you can enter its coordinates in the preview.</p>
-    <h2>Customize Your Map Markers</h2>
-    <p>Give each pin a descriptive title, then choose a standard pin, numbered pin, or circle. Use color to group related places and a description or website link to tell visitors what to do next. In <strong>Customize Your Map</strong>, you can show labels or cluster nearby markers.</p>
-    <h2>Generate a Map Embed Code</h2>
-    <p>Copy the generated iframe into the part of your website that accepts custom HTML. WordPress offers a Custom HTML block, and Shopify themes may offer a Custom Liquid section. Wix, Webflow, and Squarespace can accept iframe code through their embed controls where supported by the editor or plan. Use the shareable URL wherever an iframe is unavailable.</p>
-    <h2>Who Can Use a Multiple Location Map?</h2>
-    <ul><li>A retailer showing branches, pickup points, or pop-up shops.</li><li>An event organizer marking venues, entrances, and parking.</li><li>A community group sharing community gardens or public resources.</li><li>A travel writer plotting walks, stops, and nearby landmarks.</li></ul>
+  <article class="mm-reading prose-container readable-surface" aria-labelledby="create-multiple-pins">
+    <h2 id="create-multiple-pins">How to Create a Map With Multiple Pins</h2>
+    <p>Put your locations on one map so visitors can see where they are in relation to each other. A venue map can show entrances, ticket desks, and parking. A store locator can show branches and pickup points. For a trip or meetup, number the stops in the order you want people to visit them.</p>
+    <ol>
+      <li><strong>Add your locations.</strong> Use the search box when it’s available, enter coordinates, click the live map, or import a list.</li>
+      <li><strong>Check the pins.</strong> Select <strong>Fit All Locations</strong> to see the whole set, then use <strong>Show</strong> beside a location to inspect it. Correct any pin that landed at the wrong entrance, branch, or city.</li>
+      <li><strong>Give each pin a job.</strong> Use the title to identify the location and the popup to tell visitors what to do there. Reorder numbered pins with <strong>Move up</strong> and <strong>Move down</strong>.</li>
+      <li><strong>Publish the map.</strong> Enter a title and select <strong>Generate Map &amp; Embed Code</strong> to get a shareable link and an iframe.</li>
+    </ol>
+
+    <h2 id="three-pin-example">Try an Interactive Three-Pin Map</h2>
+    <p>Open this editable New York meetup map to see how numbered pins, colors, and popup notes work together. The example uses coordinates and loads without an address lookup.</p>
+    <ol>
+      <li><strong>Central Park</strong> uses a green pin for the Bethesda Terrace meeting point.</li>
+      <li><strong>New York Public Library</strong> uses a blue pin with a note about the Fifth Avenue entrance.</li>
+      <li><strong>Brooklyn Bridge</strong> uses a purple pin with a note about the pedestrian walkway.</li>
+    </ol>
+    <p><a id="mm-guide-example" class="btn-primary" href="/multiple-location-map-generator/?example=nyc#mm-live-preview" target="_blank" rel="noopener">Open the three-pin example</a></p>
+    <p>Click a pin or select <strong>Show</strong> to read its note. Try editing a title or moving a location up the list to see the numbers change. If you already have pins in the editor, the example opens in a separate tab.</p>
+    <figure>
+      <img src="/guides/native-multiple-map-editor.webp" width="1152" height="787" alt="Map editor showing a location list and three colored, numbered pins in New York City" loading="lazy" decoding="async" />
+      <figcaption>Each pin number matches the location’s position in the list.</figcaption>
+    </figure>
+
+    <h2 id="add-locations">Add Locations by Address, Coordinates, or Map Click</h2>
+    <ul>
+      <li><strong>Search for a place.</strong> When search is available, enter a landmark, business, postcode, or street address and select <strong>Add Location</strong>. Check the city and street in the results before choosing a match.</li>
+      <li><strong>Enter exact coordinates.</strong> Choose <strong>Enter Coordinates</strong> and enter latitude and longitude in decimal degrees. For the library example, latitude is <code>40.7532</code> and longitude is <code>-73.9822</code>. Keep the minus sign for west longitudes and south latitudes.</li>
+      <li><strong>Drop a pin.</strong> Choose <strong>Add Pin on Map</strong>, select the spot, and enter a title. You can drag a pin to refine the position or edit its coordinates directly.</li>
+    </ul>
+
+    <h2 id="import-locations">Map Multiple Addresses or Import a CSV</h2>
+    <h3>Paste an address list</h3>
+    <p>Choose <strong>Add Multiple Locations</strong> and paste one address per line. Add the city or postcode when a street name is common. Use a vertical bar to add a note for the popup.</p>
+    <pre><code>{'New Delhi, India | Head office\nMumbai, India | Regional office\nBengaluru, India | Technology center'}</code></pre>
+    <p>Select <strong>Preview Locations</strong> to review the rows, then <strong>Add Locations</strong>. Address-only rows need bulk lookup to be enabled. If it’s unavailable or a row stays unresolved, open <strong>Edit this row</strong> and supply both coordinates. When several matches are returned, choose the correct one before retrying the remaining rows.</p>
+    <h3>Import locations from a spreadsheet</h3>
+    <p><a href="/examples/multiple-map-locations.csv" download>Download the sample CSV</a> or export your spreadsheet as a comma-separated file. Give each place its own row and keep latitude and longitude in separate columns. The editor accepts files up to 128 KB, and each import must fit the number of remaining locations shown in the editor.</p>
+    <pre><code>{'title,address,lat,lon,description,color\nDelhi,"New Delhi, India",28.6139,77.2090,Head office,#e63946'}</code></pre>
+    <p>Choose <strong>Import CSV</strong>, upload the file, and preview the rows before adding them. The headings <code>latitude</code> and <code>longitude</code> also work. Valid coordinate pairs plot directly, and you can keep the address for display. A file can mix coordinate and address-only rows. Unresolved rows stay in the preview for correction while successfully placed pins are added to the map.</p>
+
+    <h2 id="customize-pins">Customize Pin Colors, Labels, and Popups</h2>
+    <p>Select <strong>Edit</strong> beside a location to change its color, icon, title, description, or website link. Match the icon to what visitors need to find.</p>
+    <ul>
+      <li><strong>Numbered pins</strong> put stops in order for a meetup, campus tour, or market trail. The order follows the location list.</li>
+      <li><strong>Standard pins</strong> identify places visitors can choose independently, such as store branches or public entrances.</li>
+      <li><strong>Circle markers</strong> distinguish supporting facilities such as bike racks or water stations from main stops.</li>
+    </ul>
+    <p>Keep colors consistent by category and include the category in the title so visitors can tell the pins apart by name. On a campus map, for example, use green for entrances and blue for talks, with a title such as <em>South entrance</em> or <em>Talks at the library</em>. Add access instructions, opening hours, or a venue link to the popup.</p>
+    <p>Open <strong>Customize Your Map</strong> to choose Liberty, Bright, Positron, or Dark. Try Positron for a quieter background behind colored pins. Enable <strong>Show marker labels</strong> when names need to be visible at a glance. For nearby locations, the editor’s <strong>Cluster nearby markers</strong> option groups pins in the preview. Public maps open fitted to the saved locations and display individual markers.</p>
+
+    <h2 id="share-or-embed">Share or Embed a Map With Multiple Locations</h2>
+    <p>Once you generate the embed code, choose <strong>Copy Map URL</strong> to send visitors a link or <strong>Copy Embed Code</strong> to copy the iframe for your site. Paste it into a custom HTML or embed block that accepts iframes. In WordPress, for example, use a Custom HTML block if your site permits iframes. If your site’s editor removes the iframe, use the public link.</p>
+    <p>Keep <strong>Responsive width</strong> enabled for a map that follows the width of its page column. Adjust the height if visitors need more room to view pins and open popups. Use <strong>Preview Map</strong> before publishing and check the actual embed on a phone.</p>
+    <p>Download the recovery file and keep it private. To edit a published map, use <strong>Open Recovery File</strong> and then <strong>Save Map Changes</strong>. Updates use the same public link and iframe and appear after the public cache refreshes. Anyone with the link can view the published locations, and anyone with the recovery file can edit or delete the map.</p>
+
     <h2>Frequently Asked Questions</h2>
-    <details><summary>Do I need an account or an API key?</summary><p>No. The map editor works without registration and handles map-provider access for you.</p></details>
-    <details><summary>Can I edit a map after embedding it?</summary><p>Yes. Open the recovery file in the editor, make your changes, and save. The same public link and iframe will show the updated map once the cache expires.</p></details>
-    <details><summary>Who can see my saved map?</summary><p>Anyone with the public link can view the markers and details. Keep the recovery file private because it grants permission to change or delete the map.</p></details>
-    <details><summary>Can I use a Google My Maps embed?</summary><p>Yes. Follow the existing <a href="/guides/embed-google-map-multiple-locations/">Google My Maps embedding guide</a> for that workflow.</p></details>
-    <h2>Multiple-location map guides</h2>
-    <div class="mm-link-grid">
-      <a href="/guides/how-to-create-map-with-multiple-pins/">First map walkthrough</a>
-      <a href="/custom-map-with-multiple-pins/">Marker styles and map appearance</a>
-      <a href="/guides/how-to-map-multiple-locations/">Bulk addresses and CSV imports</a>
-      <a href="/create-map-with-multiple-pins/">Try a three-pin example</a>
-    </div>
-  </div>
+    <details><summary>Can I create a map for free without an account?</summary><p>Yes. You can use the map generator without registering or supplying a Google Maps API key.</p></details>
+    <details><summary>How many locations can I add?</summary><p>The editor normally allows up to 20 locations per map. Check the count in <strong>Your locations</strong> before importing a list.</p></details>
+    <details><summary>Do numbered pins calculate a route?</summary><p>The numbers show the order you choose. Visitors can open each stop individually. Use a directions tool if you need a walking or driving route.</p></details>
+    <details><summary>What if two pins have the same street address?</summary><p>Use separate coordinates for the exact entrances or meeting points. Give them distinct titles so visitors know which pin to open.</p></details>
+    <p>Follow the <a href="/guides/how-to-create-map-with-multiple-pins/">step-by-step walkthrough</a> for a first map, or see the <a href="/guides/embed-google-map-multiple-locations/">Google My Maps embedding guide</a> if your map is already in Google My Maps.</p>
+  </article>
 </MapContentLayout>

@@ -11,6 +11,12 @@ const guides = [
         platform: "Multiple locations",
     },
     {
+        title: "How to Create a Map With Multiple Pins",
+        desc: "Add locations, customize your pins, and save a map you can share by link or embed on your website.",
+        href: "/guides/how-to-create-map-with-multiple-pins/",
+        platform: "Multiple Location Map Generator",
+    },
+    {
         title: "How to Embed Google Maps in WordPress",
         desc: "Step-by-step instructions for adding a Google Maps iframe to any WordPress page, post, or widget area using the Block Editor or Classic Editor.",
         href: "/guides/embed-google-maps-wordpress/",
@@ -49,7 +55,7 @@ const guides = [
             </div>
         </div>
 
-        <section class="section" aria-label="Platform guides">
+        <section class="section" aria-label="Map guides">
             <div class="container">
                 <div class="guides-grid">
                     {
@@ -73,12 +79,9 @@ const guides = [
             </div>
         </section>
         <section class="section" aria-labelledby="native-map-guides">
-            <div class="container">
-                <h2 id="native-map-guides" class="text-heading-md">Multiple-location map tutorials</h2>
-                <ul>
-                    <li><a href="/guides/how-to-create-map-with-multiple-pins/">Create and publish your first map with pins</a></li>
-                    <li><a href="/guides/how-to-map-multiple-locations/">Prepare a spreadsheet and import locations</a></li>
-                </ul>
+            <div class="container readable-surface guide-imports">
+                <h2 id="native-map-guides" class="text-heading-md">Spreadsheet imports</h2>
+                <a href="/multiple-location-map-generator/#import-locations">Prepare a spreadsheet and import locations</a>
             </div>
         </section>
     </main>
@@ -137,6 +140,17 @@ const guides = [
         font-size: 13px;
         font-weight: 500;
         color: var(--color-link);
+    }
+
+    .guide-imports {
+        max-width: 960px;
+        padding-block: var(--spacing-lg);
+    }
+    .guide-imports h2 { margin-bottom: var(--spacing-xs); }
+    .guide-imports a {
+        color: var(--color-link-deep);
+        text-decoration: underline;
+        text-underline-offset: .18em;
     }
 
     @media (max-width: 640px) {

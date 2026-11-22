@@ -39,6 +39,7 @@ export async function startEditor() {
   const mapButton = byId<HTMLButtonElement>('map-pick');
   const fitButton = byId<HTMLButtonElement>('fit');
   const exampleButton = byId<HTMLButtonElement>('example');
+  const preview = byId('live-preview');
   const saveButton = byId<HTMLButtonElement>('save');
   const camera = byId('canvas');
   let markers: Marker[] = [];
@@ -121,6 +122,12 @@ export async function startEditor() {
     return true;
   }
 
+  function loadExample() {
+    settings = { ...settings, fit: true, cluster: false };
+    writeSettings();
+    add(examples.slice(0, config.markerLimit));
+  }
+
   function openMarker(marker?: Partial<Marker>, index?: number) {
     if (index === undefined && markers.length >= config.markerLimit) {
       editorStatus.textContent = `This map can hold up to ${config.markerLimit} locations.`;
@@ -166,7 +173,14 @@ export async function startEditor() {
     button.addEventListener('click', () => button.closest('dialog')?.close());
   });
   byId('coordinates').addEventListener('click', () => openMarker());
-  exampleButton.addEventListener('click', () => add(examples.slice(0, config.markerLimit)));
+  exampleButton.addEventListener('click', loadExample);
+  byId<HTMLAnchorElement>('guide-example').addEventListener('click', (event) => {
+    if (markers.length || ownership || busy || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    loadExample();
+    preview.scrollIntoView();
+    preview.focus({ preventScroll: true });
+  });
   mapButton.disabled = true;
   mapButton.addEventListener('click', () => setPicking(!picking));
   fitButton.addEventListener('click', () => liveMap?.fit());
@@ -314,11 +328,14 @@ export async function startEditor() {
 
   root.inert = false;
   byId('initial-status').hidden = true;
-  writeSettings();
   if (new URLSearchParams(location.search).get('example') === 'nyc') {
-    add(examples.slice(0, config.markerLimit));
-    if (location.hash === '#location-editor') root.scrollIntoView();
-  } else render();
+    loadExample();
+    if (location.hash === '#mm-live-preview') preview.scrollIntoView();
+    else if (location.hash === '#location-editor') root.scrollIntoView();
+  } else {
+    writeSettings();
+    render();
+  }
   try {
     const { mountMap } = await import('./maplibre');
     const mapNote = byId('map-note');

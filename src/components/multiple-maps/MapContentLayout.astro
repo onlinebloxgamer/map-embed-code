@@ -33,14 +33,16 @@ const page = {
 <BaseLayout title={title} description={description} canonical={canonical} ogType={kind === 'article' ? 'article' : 'website'} ogImage="/images/google-map-embed-generator.webp" structuredData={[breadcrumbs, page]}>
   <Header />
   <main id="main-content" class="mm-content">
-    <div class:list={['container', 'mm-page', { 'mm-article': kind !== 'tool' }]}>
-      <nav aria-label="Breadcrumb" class="mm-crumbs">
-        <ol>{crumbs.map((item, index) => <li>{index === crumbs.length - 1 ? <span aria-current="page">{item.name}</span> : <a href={item.path}>{item.name}</a>}</li>)}</ol>
-      </nav>
-      <header class="mm-intro">
-        <h1>{heading}</h1>
-        <p>{intro}</p>
-      </header>
+    <header class:list={['page-hero', 'mm-hero', { 'mm-hero-tool': kind === 'tool' }]}>
+      <div class="container readable-surface">
+        <nav aria-label="Breadcrumb" class="mm-crumbs">
+          <ol>{crumbs.map((item, index) => <li>{index === crumbs.length - 1 ? <span aria-current="page">{item.name}</span> : <a href={item.path}>{item.name}</a>}</li>)}</ol>
+        </nav>
+        <h1 class="text-heading-lg">{heading}</h1>
+        <p class="text-body-lg">{intro}</p>
+      </div>
+    </header>
+    <div class="container mm-page">
       <slot />
     </div>
   </main>

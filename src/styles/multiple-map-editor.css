@@ -1,5 +1,6 @@
 .mm-editor, .mm-stack { display: grid; gap: 1rem; }
-.mm-editor { --mm-border: #dce4de; scroll-margin-top: 4.5rem; }
+.mm-editor { --mm-border: #dce4de; }
+.mm-editor, #mm-live-preview { scroll-margin-top: 4.5rem; }
 #location-editor [hidden], #location-editor[hidden] { display: none !important; }
 .mm-editor h2, .mm-editor h3 { margin: 0; font-size: 1.16rem; letter-spacing: -.025em; }
 .mm-editor p { margin: 0; }

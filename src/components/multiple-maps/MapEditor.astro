@@ -28,9 +28,9 @@ import '../../styles/multiple-map-editor.css';
       <p id="mm-edit-status" class="mm-secondary-text" role="status"></p>
     </div>
 
-    <div class="mm-map-card card">
+    <section id="mm-live-preview" class="mm-map-card card" aria-labelledby="mm-live-heading" tabindex="-1">
       <div class="mm-panel-heading mm-map-heading">
-        <h2>Live map</h2>
+        <h2 id="mm-live-heading">Live map</h2>
         <div class="mm-actions">
           <button type="button" class="btn-ghost-sm" id="mm-fit" disabled>Fit All Locations</button>
           <button type="button" class="btn-ghost-sm" id="mm-map-pick" aria-pressed="false">Add Pin on Map</button>
@@ -38,7 +38,7 @@ import '../../styles/multiple-map-editor.css';
       </div>
       <div class="mm-map-wrap"><div class="mm-canvas mm-editor-canvas" id="mm-canvas" aria-label="Interactive map preview"></div></div>
       <p id="mm-map-note" class="mm-map-note" role="status">Loading map preview…</p>
-    </div>
+    </section>
   </div>
 
   <details class="mm-settings card" id="mm-settings-panel">

@@ -115,6 +115,30 @@ export function links(id: string, config: MapConfig) {
   const embed = new URL(`/embed/${id}`, location.origin).href;
   const share = new URL(`/map/${id}`, location.origin).href;
   const { width, height, responsive } = config.settings;
-  const code = `<iframe\n  src="${embed}"\n  width="${responsive ? '100%' : width}"\n  height="${height}"\n  style="border:0;max-width:100%;"\n  loading="lazy"\n  title="${escapeAttribute(config.title)}"\n></iframe>`;
+  const outerWidth = responsive ? '100%' : `${width}px`;
+  const code = `<div class="mapouter" data-multiple-location-map style="width:${outerWidth};--map-embed-height:${height}px;">
+  <div class="gmap_canvas">
+    <iframe
+      class="gmap_iframe"
+      frameborder="0"
+      scrolling="no"
+      marginheight="0"
+      marginwidth="0"
+      src="${embed}"
+      title="${escapeAttribute(config.title)}"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen=""
+      loading="lazy"
+      width="${responsive ? '100%' : width}"
+      height="${height}"
+    ></iframe>
+    <a href="https://map-embed-code.com/">map-embed-code.com</a>
+  </div>
+  <style>
+    .mapouter[data-multiple-location-map]{position:relative;text-align:right;max-width:100%;height:auto;aspect-ratio:auto;}
+    .mapouter[data-multiple-location-map]>.gmap_canvas{overflow:hidden;background:none!important;width:100%;height:auto;}
+    .mapouter[data-multiple-location-map] .gmap_iframe{display:block;width:100%!important;height:var(--map-embed-height)!important;border:0;}
+  </style>
+</div>`;
   return { code, share };
 }
