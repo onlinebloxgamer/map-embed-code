@@ -7,7 +7,7 @@ import MapEditor from '../components/multiple-maps/MapEditor.astro';
   title="Free Multiple Location Map Generator | Add Multiple Pins"
   heading="Free Multiple Location Map Generator"
   description="Create a free map with multiple pins. Add locations or import a CSV, customize each marker, then share your map or embed it on your website."
-  intro="Create an interactive map for your branch locations, event venues, or favorite places. Enter coordinates, drop a pin directly on the map, or import a CSV of locations. Address search and bulk address lookup are available when a search provider is enabled. Give each pin a title, color, and description, then check the result in the live preview. Save your map to get a public link and responsive iframe code you can paste into a website that supports custom HTML. You don’t need an account or a Google Maps API key."
+  intro="Create an interactive map for your branch locations, event venues, or favorite places. Enter coordinates, drop a pin directly on the map, or import a CSV of locations. You can also search for places when address search is enabled. Give each pin a title, color, and description, then check the result in the live preview. Save your map to get a public link and responsive iframe code you can paste into a website that supports custom HTML. You don’t need an account or a Google Maps API key."
   kind="tool"
 >
   <MapEditor />
@@ -31,7 +31,7 @@ import MapEditor from '../components/multiple-maps/MapEditor.astro';
     <p><a id="mm-guide-example" class="btn-primary" href="/multiple-location-map-generator/?example=nyc#mm-live-preview" target="_blank" rel="noopener">Open the three-pin example</a></p>
     <p>Click a pin or select <strong>Show</strong> to read its note. Try editing a title or moving a location up the list to see the numbers change. If you already have pins in the editor, the example opens in a separate tab.</p>
     <figure>
-      <img src="/guides/native-multiple-map-editor.webp" width="1152" height="787" alt="Map editor showing a location list and three colored, numbered pins in New York City" loading="lazy" decoding="async" />
+      <img src="/guides/native-multiple-map-editor.webp" width="1152" height="740" alt="Map editor showing a location list and three colored, numbered pins in New York City" loading="lazy" decoding="async" />
       <figcaption>Each pin number matches the location’s position in the list.</figcaption>
     </figure>
 
@@ -42,24 +42,20 @@ import MapEditor from '../components/multiple-maps/MapEditor.astro';
       <li><strong>Drop a pin.</strong> Choose <strong>Add Pin on Map</strong>, select the spot, and enter a title. You can drag a pin to refine the position or edit its coordinates directly.</li>
     </ul>
 
-    <h2 id="import-locations">Map Multiple Addresses or Import a CSV</h2>
-    <h3>Paste an address list</h3>
-    <p>Choose <strong>Add Multiple Locations</strong> and paste one address per line. Add the city or postcode when a street name is common. Use a vertical bar to add a note for the popup.</p>
-    <pre><code>{'New Delhi, India | Head office\nMumbai, India | Regional office\nBengaluru, India | Technology center'}</code></pre>
-    <p>Select <strong>Preview Locations</strong> to review the rows, then <strong>Add Locations</strong>. Address-only rows need bulk lookup to be enabled. If it’s unavailable or a row stays unresolved, open <strong>Edit this row</strong> and supply both coordinates. When several matches are returned, choose the correct one before retrying the remaining rows.</p>
-    <h3>Import locations from a spreadsheet</h3>
+    <h2 id="import-locations">Import Multiple Locations From a CSV</h2>
     <p><a href="/examples/multiple-map-locations.csv" download>Download the sample CSV</a> or export your spreadsheet as a comma-separated file. Give each place its own row and keep latitude and longitude in separate columns. The editor accepts files up to 128 KB, and each import must fit the number of remaining locations shown in the editor.</p>
     <pre><code>{'title,address,lat,lon,description,color\nDelhi,"New Delhi, India",28.6139,77.2090,Head office,#e63946'}</code></pre>
-    <p>Choose <strong>Import CSV</strong>, upload the file, and preview the rows before adding them. The headings <code>latitude</code> and <code>longitude</code> also work. Valid coordinate pairs plot directly, and you can keep the address for display. A file can mix coordinate and address-only rows. Unresolved rows stay in the preview for correction while successfully placed pins are added to the map.</p>
+    <p>Choose <strong>Import CSV</strong>, upload the file, and select <strong>Preview Locations</strong> before adding them. The headings <code>latitude</code> and <code>longitude</code> also work. Valid coordinate pairs plot directly, and you can keep the address for display.</p>
+    <p>Address-only rows require CSV address lookup. If lookup is unavailable or a row stays unresolved, open <strong>Edit this row</strong> and enter both coordinates. When several matches appear, choose the correct one before retrying the remaining rows.</p>
 
     <h2 id="customize-pins">Customize Pin Colors, Labels, and Popups</h2>
-    <p>Select <strong>Edit</strong> beside a location to change its color, icon, title, description, or website link. Match the icon to what visitors need to find.</p>
+    <p>Select <strong>Edit</strong> beside a location to change its color, icon, title, or description. Match the icon to what visitors need to find.</p>
     <ul>
       <li><strong>Numbered pins</strong> put stops in order for a meetup, campus tour, or market trail. The order follows the location list.</li>
       <li><strong>Standard pins</strong> identify places visitors can choose independently, such as store branches or public entrances.</li>
       <li><strong>Circle markers</strong> distinguish supporting facilities such as bike racks or water stations from main stops.</li>
     </ul>
-    <p>Keep colors consistent by category and include the category in the title so visitors can tell the pins apart by name. On a campus map, for example, use green for entrances and blue for talks, with a title such as <em>South entrance</em> or <em>Talks at the library</em>. Add access instructions, opening hours, or a venue link to the popup.</p>
+    <p>Keep colors consistent by category and include the category in the title so visitors can tell the pins apart by name. On a campus map, for example, use green for entrances and blue for talks, with a title such as <em>South entrance</em> or <em>Talks at the library</em>. Add access instructions or opening hours to the popup.</p>
     <p>Open <strong>Customize Your Map</strong> to choose Liberty, Bright, Positron, or Dark. Try Positron for a quieter background behind colored pins. Enable <strong>Show marker labels</strong> when names need to be visible at a glance. For nearby locations, the editor’s <strong>Cluster nearby markers</strong> option groups pins in the preview. Public maps open fitted to the saved locations and display individual markers.</p>
 
     <h2 id="share-or-embed">Share or Embed a Map With Multiple Locations</h2>

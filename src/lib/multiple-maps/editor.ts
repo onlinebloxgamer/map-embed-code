@@ -160,7 +160,13 @@ export async function startEditor() {
   markerForm.addEventListener('submit', (event) => {
     event.preventDefault();
     const fields = new FormData(markerForm);
-    const result = markerSchema.safeParse({ ...Object.fromEntries(fields), color: colorSelect.value === 'custom' ? customColor.value : colorSelect.value, lat: coordinate(dataText(fields, 'lat')), lng: coordinate(dataText(fields, 'lng')), website: dataText(fields, 'website') });
+    const result = markerSchema.safeParse({
+      ...Object.fromEntries(fields),
+      color: colorSelect.value === 'custom' ? customColor.value : colorSelect.value,
+      lat: coordinate(dataText(fields, 'lat')),
+      lng: coordinate(dataText(fields, 'lng')),
+      website: editingIndex === undefined ? undefined : markers[editingIndex].website,
+    });
     if (!result.success) {
       byId('marker-error').textContent = copy.invalidMarker;
       return;

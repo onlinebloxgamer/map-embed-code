@@ -220,6 +220,7 @@ test('static SEO routes are unique, indexed, internally linked, and preserve the
       assert.ok(html.includes(`href="${prefix}${path === tool ? guide : tool}"`));
       assert.ok(html.includes(`"inLanguage":"${locale}"`));
       assert.ok(sitemap.includes(`<loc>${site}${route}</loc>`));
+      if (path === tool) assert.doesNotMatch(html, /id="mm-bulk"|id="mm-paste-fields"|name="website"/);
       for (const [alternate, target] of Object.entries({ ...localePrefixes, 'x-default': '' })) {
         assert.ok(html.includes(`rel="alternate" hreflang="${alternate}" href="${site}${target}${path}"`));
       }
@@ -376,9 +377,12 @@ test('editor and viewer work in a browser, including mobile layout and a cross-o
   await page.getByLabel('Search locations').fill('Brooklyn Mu');
   await page.getByRole('button', { name: 'Add Brooklyn Museum, 200 Eastern Parkway, Brooklyn, NY' }).waitFor();
   await page.getByLabel('Search locations').press('Escape');
-  await page.getByRole('button', { name: 'Add Multiple Locations', exact: true }).click();
+  await page.getByRole('button', { name: 'Import CSV' }).click();
   const importer = page.locator('#mm-import-dialog');
-  await importer.getByLabel('One address per line').fill('Brooklyn Museum | Group visit\nUnknown address');
+  await importer.locator('input[type=file]').setInputFiles({
+    name: 'addresses.csv', mimeType: 'text/csv',
+    buffer: Buffer.from('address,description\nBrooklyn Museum,Group visit\nUnknown address,'),
+  });
   await importer.getByRole('button', { name: 'Preview Locations' }).click();
   await importer.getByRole('button', { name: 'Add Locations', exact: true }).click();
   await importer.getByText(/1 added.*1 still need attention/).waitFor();
@@ -428,10 +432,20 @@ test('editor and viewer work in a browser, including mobile layout and a cross-o
   const startDownload = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Download Recovery File' }).click();
   const recoveryPath = await (await startDownload).path();
+  const { id, token } = JSON.parse(readFileSync(recoveryPath, 'utf8'));
+  const mapPath = `/api/maps/${id}`;
+  const { configuration } = await (await request(mapPath)).json();
+  const legacyWebsite = 'https://example.org/museum';
+  configuration.markers.find(({ title }) => title === 'Coordinate pin').website = legacyWebsite;
+  assert.equal((await request(mapPath, 'PATCH', configuration, { headers: { Authorization: `Bearer ${token}` } })).status, 200);
   await page.reload();
   await page.locator('#mm-canvas.maplibregl-map canvas').waitFor();
   await page.locator('#mm-recovery-file').setInputFiles({ name: 'recovery.json', mimeType: 'application/json', buffer: readFileSync(recoveryPath) });
   await page.getByText(/Map opened for editing/).waitFor();
+  await page.getByRole('button', { name: 'Edit Coordinate pin' }).click();
+  assert.equal(await editor.locator('[name=website]').count(), 0);
+  await editor.getByLabel('Description').fill('Updated legacy location');
+  await editor.getByRole('button', { name: 'Save Location' }).click();
   await page.locator('#mm-settings-panel summary').click();
   await page.getByLabel('Responsive width').uncheck();
   await page.getByLabel('Fixed width (px)', { exact: true }).fill('600');
@@ -439,6 +453,10 @@ test('editor and viewer work in a browser, including mobile layout and a cross-o
   await page.getByLabel('Map title').fill('Recovered map');
   await page.getByRole('button', { name: 'Save Map Changes' }).click();
   await page.getByText(/Map saved/).waitFor();
+  const updatedMap = await (await request(mapPath)).json();
+  const updatedMarker = updatedMap.configuration.markers.find(({ title }) => title === 'Coordinate pin');
+  assert.equal(updatedMarker.website, legacyWebsite);
+  assert.equal(updatedMarker.description, 'Updated legacy location');
   const fixedCode = await page.getByLabel('HTML iframe').inputValue();
   const shared = await browser.newPage({ viewport: { width: 390, height: 844 } });
   shared.setDefaultTimeout(15000);
@@ -512,11 +530,13 @@ test('editor and viewer work in a browser, including mobile layout and a cross-o
   assert.equal(await shared.evaluate(() => document.documentElement.scrollWidth), 390);
   const paused = shared.locator('#mm-import-dialog');
   const beforeFallback = photonRequests;
-  await shared.getByRole('button', { name: 'Add Multiple Locations', exact: true }).click();
-  await paused.getByLabel('One address per line').fill('New Delhi, India');
+  await shared.getByRole('button', { name: 'Import CSV' }).click();
+  await paused.locator('input[type=file]').setInputFiles({
+    name: 'addresses.csv', mimeType: 'text/csv', buffer: Buffer.from('address\n"New Delhi, India"'),
+  });
   await paused.getByRole('button', { name: 'Preview Locations' }).click();
   await paused.getByRole('button', { name: 'Add Locations', exact: true }).click();
-  await paused.getByText(/Bulk address lookup is unavailable. Enter latitude/).waitFor();
+  await paused.getByText(/CSV address lookup is unavailable. Enter latitude/).waitFor();
   await paused.getByText('Edit this row').click();
   await paused.getByLabel('Latitude').fill('28.6139');
   await paused.getByLabel('Longitude').fill('77.2090');

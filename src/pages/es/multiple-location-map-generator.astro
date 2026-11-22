@@ -16,7 +16,7 @@ import MapEditor from '../../components/multiple-maps/MapEditor.astro';
     <ol>
       <li><strong>Añade los lugares.</strong> Busca una dirección si la búsqueda está disponible, introduce coordenadas, coloca un marcador o importa una lista.</li>
       <li><strong>Revisa el mapa.</strong> Pulsa <strong>Mostrar todas las ubicaciones</strong> para ver los puntos juntos. Usa <strong>Mostrar</strong> para comprobar un punto en detalle.</li>
-      <li><strong>Personaliza cada marcador.</strong> Escribe un nombre que identifique el lugar y añade indicaciones, horarios o un enlace. El orden de la lista determina la numeración.</li>
+      <li><strong>Personaliza cada marcador.</strong> Escribe un nombre que identifique el lugar y añade indicaciones u horarios. El orden de la lista determina la numeración.</li>
       <li><strong>Publica el mapa.</strong> Ponle un título y selecciona <strong>Generar mapa y código de inserción</strong>.</li>
     </ol>
 
@@ -30,7 +30,7 @@ import MapEditor from '../../components/multiple-maps/MapEditor.astro';
     <p><a id="mm-guide-example" class="btn-primary" href="/es/multiple-location-map-generator/?example=nyc#mm-live-preview" target="_blank" rel="noopener">Abrir el ejemplo de tres marcadores</a></p>
     <p>Abre un marcador para leer su nota. Prueba también <strong>Mover arriba</strong> o <strong>Mover abajo</strong> para cambiar la numeración. Si el editor ya contiene ubicaciones, el ejemplo se abre en otra pestaña.</p>
     <figure>
-      <img src="/guides/native-multiple-map-editor.webp" width="1152" height="787" alt="Editor de mapas con una lista de ubicaciones y tres marcadores numerados en Nueva York" loading="lazy" decoding="async" />
+      <img src="/guides/native-multiple-map-editor.webp" width="1152" height="740" alt="Editor de mapas con una lista de ubicaciones y tres marcadores numerados en Nueva York" loading="lazy" decoding="async" />
       <figcaption>La numeración del mapa corresponde al orden de la lista. La captura muestra el editor en inglés.</figcaption>
     </figure>
 
@@ -41,18 +41,14 @@ import MapEditor from '../../components/multiple-maps/MapEditor.astro';
       <li><strong>Marcar un punto.</strong> Elige <strong>Colocar marcador en el mapa</strong>, selecciona el lugar y ponle un nombre. Puedes arrastrar el marcador para ajustar su posición.</li>
     </ul>
 
-    <h2 id="import-locations">Añadir varias direcciones o importar un CSV</h2>
-    <h3>Pegar una lista de direcciones</h3>
-    <p>Abre <strong>Añadir varias ubicaciones</strong> y pega una dirección por línea. Separa la dirección y la nota con una barra vertical. Añade la ciudad o el código postal para distinguir calles con el mismo nombre.</p>
-    <pre><code>{'Madrid, España | Sede central\nValencia, España | Oficina regional'}</code></pre>
-    <p>Pulsa <strong>Revisar ubicaciones</strong> y después <strong>Añadir ubicaciones</strong>. Las filas que solo tienen una dirección requieren que la búsqueda múltiple esté habilitada. Si no está disponible o falta una coincidencia, usa <strong>Editar esta fila</strong> e introduce la latitud y la longitud.</p>
-    <h3>Importar una hoja de cálculo</h3>
+    <h2 id="import-locations">Importar varias ubicaciones desde un CSV</h2>
     <p><a href="/examples/multiple-map-locations.csv" download>Descarga un CSV de ejemplo</a>. Usa un archivo separado por comas de hasta 128 KB. El editor indica cuántas ubicaciones puedes añadir. Mantén los encabezados en el formato del ejemplo y escribe un lugar por fila.</p>
     <pre><code>{'title,address,lat,lon,description,color\nMadrid,"Madrid, España",40.4168,-3.7038,Sede central,#e63946'}</code></pre>
-    <p>Selecciona <strong>Importar CSV</strong> y revisa las filas antes de añadirlas. Puedes usar los encabezados <code>latitude</code> y <code>longitude</code>. Si ambas coordenadas son válidas, el marcador se coloca directamente. Las filas pendientes se mantienen en la vista de revisión para que puedas corregirlas.</p>
+    <p>Selecciona <strong>Importar CSV</strong> y revisa las filas antes de añadirlas. Puedes usar los encabezados <code>latitude</code> y <code>longitude</code>. Si ambas coordenadas son válidas, el marcador se coloca directamente.</p>
+    <p>Las filas que solo contienen una dirección requieren que esté habilitada la búsqueda de direcciones del CSV. Si no está disponible o falta una coincidencia, usa <strong>Editar esta fila</strong> e introduce la latitud y la longitud.</p>
 
     <h2 id="customize-pins">Personalizar colores, iconos y etiquetas</h2>
-    <p>Usa <strong>Editar</strong> junto a una ubicación para cambiar su color, icono, nombre, descripción o enlace. Los marcadores numerados funcionan bien para un recorrido. Los marcadores estándar sirven para sucursales o entradas, y los círculos para servicios como aparcabicis. Combina el color con un nombre claro, como «Entrada sur», para que se pueda distinguir el punto sin depender del color.</p>
+    <p>Usa <strong>Editar</strong> junto a una ubicación para cambiar su color, icono, nombre o descripción. Los marcadores numerados funcionan bien para un recorrido. Los marcadores estándar sirven para sucursales o entradas, y los círculos para servicios como aparcabicis. Combina el color con un nombre claro, como «Entrada sur», para que se pueda distinguir el punto sin depender del color.</p>
     <p>En <strong>Personalizar el mapa</strong> puedes cambiar el fondo entre Liberty, Bright, Positron y Dark, mostrar etiquetas y modificar los controles de zoom. La agrupación de marcadores se aplica en el editor. Los mapas publicados se abren ajustados a los puntos guardados y muestran los marcadores individualmente.</p>
 
     <h2 id="share-or-embed">Compartir o insertar un mapa con varias ubicaciones</h2>

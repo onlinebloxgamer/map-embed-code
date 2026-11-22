@@ -26,7 +26,6 @@ const copy = editorCopy[lang];
       </form>
       <div class="mm-actions mm-entry-actions">
         <button type="button" id="mm-coordinates" class="btn-ghost-sm">{copy.coordinates}</button>
-        <button type="button" id="mm-bulk" class="btn-ghost-sm">{copy.bulk}</button>
         <button type="button" id="mm-csv" class="btn-ghost-sm">{copy.csv}</button>
       </div>
       <p id="mm-empty" class="mm-empty">{copy.empty}</p>
@@ -115,7 +114,6 @@ const copy = editorCopy[lang];
         <label>{copy.icon}<select name="icon" class="input"><option value="number">{copy.numbered}</option><option value="pin">{copy.standard}</option><option value="circle">{copy.circle}</option></select></label>
       </div>
       <label id="mm-custom-color" hidden>{copy.customColor}<input name="customColor" class="input" type="color" value="#e63946" /></label>
-      <label>{copy.website} <span>{copy.optional}</span><input name="website" class="input" type="url" placeholder="https://example.com/" maxlength="500" /></label>
       <p id="mm-marker-error" role="alert"></p>
       <div class="mm-actions"><button class="btn-sm" type="submit">{copy.saveLocation}</button><button class="btn-ghost-sm" type="button" data-close>{copy.cancel}</button></div>
     </form>
@@ -123,14 +121,9 @@ const copy = editorCopy[lang];
 
   <dialog id="mm-import-dialog" class="mm-dialog mm-import" aria-labelledby="mm-import-heading">
     <div class="mm-stack">
-      <h2 id="mm-import-heading">{copy.bulk}</h2>
+      <h2 id="mm-import-heading">{copy.csvHeading}</h2>
       <form id="mm-import-form" class="mm-stack">
-        <div id="mm-paste-fields" class="mm-stack">
-          <label for="mm-lines">{copy.oneLine}</label>
-          <textarea id="mm-lines" class="input" rows="5" maxlength="35000" placeholder={copy.pasteSample}></textarea>
-          <small>{copy.pasteHelp.split('{format}')[0]}<code>address | description</code>{copy.pasteHelp.split('{format}')[1]}</small>
-        </div>
-        <div id="mm-csv-fields" class="mm-stack" hidden>
+        <div class="mm-stack">
           <label for="mm-csv-file">{copy.csvFile}</label>
           <input id="mm-csv-file" type="file" accept=".csv,text/csv" />
           <small>{copy.csvHelp.split(/(\{columns\}|\{lat\}|\{lon\})/).map((part) =>

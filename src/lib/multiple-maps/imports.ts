@@ -12,15 +12,6 @@ export interface ImportRow {
   color: string;
 }
 
-const blank = () => ({ title: '', address: '', description: '', latitude: '', longitude: '', color: 'red' });
-
-export function pasteRows(value: string): ImportRow[] {
-  return value.split(/\r?\n/).filter((line) => line.trim()).map((line) => {
-    const [address, ...description] = line.split('|');
-    return { ...blank(), address: address.trim(), description: description.join('|').trim() };
-  });
-}
-
 export async function csvRows(value: string, copy = defaultCopy): Promise<ImportRow[]> {
   const { default: Papa } = await import('papaparse');
   const csv = Papa.parse<Record<string, string>>(value.replace(/^\uFEFF/, ''), {

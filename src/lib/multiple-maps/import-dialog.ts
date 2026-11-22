@@ -1,7 +1,7 @@
 import type { Locale } from '../../i18n/config';
 import { editorCopy, formatMapMessage } from '../../i18n/map-editor';
 import { ApiError, createGeocoder, reason } from './client';
-import { csvRows, pasteRows, validateRow, type ImportRow } from './imports';
+import { csvRows, validateRow, type ImportRow } from './imports';
 import { markerSchema, MAX_CSV_BYTES, type GeocodeResult, type Marker, type PublicConfig } from './schema';
 
 const get = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(`mm-${id}`) as T;
@@ -26,22 +26,8 @@ export function setupImport(geocoder: ReturnType<typeof createGeocoder>, config:
   const run = get<HTMLButtonElement>('run-import');
   const close = get<HTMLButtonElement>('close-import');
   const file = get<HTMLInputElement>('csv-file');
-  const lines = get<HTMLTextAreaElement>('lines');
-  let mode: 'paste' | 'csv';
   let rows: PendingRow[] = [];
   let busy = false;
-
-  function open(kind: typeof mode) {
-    mode = kind;
-    rows = [];
-    form.reset();
-    status.textContent = [formatMapMessage(copy.capacity, { count: capacity() }), config.geocodeBulk ? '' : copy.bulkUnavailable].filter(Boolean).join(' ');
-    get('import-heading').textContent = kind === 'csv' ? copy.csvHeading : copy.bulk;
-    get('csv-fields').hidden = kind !== 'csv';
-    get('paste-fields').hidden = kind !== 'paste';
-    render();
-    dialog.showModal();
-  }
 
   function render() {
     list.replaceChildren();
@@ -101,13 +87,18 @@ export function setupImport(geocoder: ReturnType<typeof createGeocoder>, config:
     run.textContent = rows.some((row) => row.done || row.issue) ? copy.retryRows : copy.addLocations;
   }
 
-  get('bulk').addEventListener('click', () => open('paste'));
-  get('csv').addEventListener('click', () => open('csv'));
+  get('csv').addEventListener('click', () => {
+    rows = [];
+    form.reset();
+    status.textContent = [formatMapMessage(copy.capacity, { count: capacity() }), config.geocodeBulk ? '' : copy.bulkUnavailable].filter(Boolean).join(' ');
+    render();
+    dialog.showModal();
+  });
   dialog.addEventListener('cancel', (event) => { if (busy) event.preventDefault(); });
 
   function setBusy(value: boolean) {
     busy = value;
-    for (const element of [preview, run, close, file, lines]) element.disabled = value;
+    for (const element of [preview, run, close, file]) element.disabled = value;
   }
 
   form.addEventListener('submit', async (event) => {
@@ -115,12 +106,9 @@ export function setupImport(geocoder: ReturnType<typeof createGeocoder>, config:
     if (busy) return;
     setBusy(true);
     try {
-      let values: ImportRow[];
-      if (mode === 'csv') {
-        const input = file.files?.[0];
-        if (!input || input.size > MAX_CSV_BYTES) throw new Error(copy.chooseFile);
-        values = await csvRows(await input.text(), copy);
-      } else values = pasteRows(lines.value);
+      const input = file.files?.[0];
+      if (!input || input.size > MAX_CSV_BYTES) throw new Error(copy.chooseFile);
+      const values = await csvRows(await input.text(), copy);
       const remaining = capacity();
       if (!values.length) throw new Error(copy.needLocation);
       if (values.length > remaining) throw new Error(formatMapMessage(copy.tooManyRows, { count: remaining }));

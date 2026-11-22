@@ -16,7 +16,7 @@ import MapEditor from '../../components/multiple-maps/MapEditor.astro';
     <ol>
       <li><strong>Standorte hinzufügen.</strong> Suche nach Adressen, wenn die Suche verfügbar ist. Du kannst auch Koordinaten eingeben, Punkte auf der Karte setzen oder eine Liste importieren.</li>
       <li><strong>Positionen prüfen.</strong> Wähle <strong>Alle Standorte anzeigen</strong> für die Übersicht. Mit <strong>Anzeigen</strong> kannst du einen einzelnen Standort prüfen.</li>
-      <li><strong>Markierungen anpassen.</strong> Ergänze Namen, Hinweise und Links. Bei nummerierten Markierungen entspricht die Reihenfolge der Standortliste.</li>
+      <li><strong>Markierungen anpassen.</strong> Ergänze Namen und Hinweise. Bei nummerierten Markierungen entspricht die Reihenfolge der Standortliste.</li>
       <li><strong>Karte veröffentlichen.</strong> Gib einen Kartentitel ein und wähle <strong>Karte und Einbettungscode erstellen</strong>.</li>
     </ol>
 
@@ -30,7 +30,7 @@ import MapEditor from '../../components/multiple-maps/MapEditor.astro';
     <p><a id="mm-guide-example" class="btn-primary" href="/de/multiple-location-map-generator/?example=nyc#mm-live-preview" target="_blank" rel="noopener">Beispiel mit drei Markierungen öffnen</a></p>
     <p>Klicke auf eine Markierung, um den Hinweis zu lesen. Mit <strong>Nach oben</strong> und <strong>Nach unten</strong> änderst du die Reihenfolge. Sind bereits Standorte im Editor vorhanden, öffnet sich das Beispiel in einem neuen Tab.</p>
     <figure>
-      <img src="/guides/native-multiple-map-editor.webp" width="1152" height="787" alt="Karteneditor mit Standortliste und drei nummerierten Markierungen in New York" loading="lazy" decoding="async" />
+      <img src="/guides/native-multiple-map-editor.webp" width="1152" height="740" alt="Karteneditor mit Standortliste und drei nummerierten Markierungen in New York" loading="lazy" decoding="async" />
       <figcaption>Die Nummern auf der Karte folgen der Reihenfolge in der Liste. Der Screenshot zeigt den englischen Editor.</figcaption>
     </figure>
 
@@ -41,18 +41,14 @@ import MapEditor from '../../components/multiple-maps/MapEditor.astro';
       <li><strong>Einen Punkt markieren.</strong> Wähle <strong>Markierung auf Karte setzen</strong>, klicke auf die Stelle und gib einen Namen ein. Du kannst die Markierung anschließend verschieben.</li>
     </ul>
 
-    <h2 id="import-locations">Mehrere Adressen auf einmal einfügen oder CSV importieren</h2>
-    <h3>Eine Adressliste einfügen</h3>
-    <p>Wähle <strong>Mehrere Standorte hinzufügen</strong>. Setze jede Adresse in eine eigene Zeile. Hinter einem senkrechten Strich kannst du einen Hinweis für das Pop-up ergänzen.</p>
-    <pre><code>{'Berlin, Deutschland | Hauptsitz\nHamburg, Deutschland | Niederlassung'}</code></pre>
-    <p>Wähle <strong>Standorte prüfen</strong> und anschließend <strong>Standorte hinzufügen</strong>. Zeilen ohne Koordinaten benötigen die Sammelsuche. Ist sie nicht verfügbar oder bleibt eine Adresse offen, wähle <strong>Diese Zeile bearbeiten</strong> und trage den Breiten- und Längengrad ein.</p>
-    <h3>Standorte aus einer Tabelle importieren</h3>
+    <h2 id="import-locations">Mehrere Standorte aus einer CSV-Datei importieren</h2>
     <p><a href="/examples/multiple-map-locations.csv" download>Lade die CSV-Beispieldatei herunter</a> oder exportiere deine Tabelle als kommaseparierte CSV. Die Datei darf bis zu 128 KB groß sein. Im Editor siehst du, wie viele weitere Standorte Platz haben. Verwende die unten angegebenen englischen Spaltennamen.</p>
     <pre><code>{'title,address,lat,lon,description,color\nBerlin,"Berlin, Deutschland",52.5200,13.4050,Hauptsitz,#e63946'}</code></pre>
-    <p>Wähle <strong>CSV importieren</strong> und prüfe die Zeilen vor dem Hinzufügen. Die Namen <code>latitude</code> und <code>longitude</code> funktionieren ebenfalls. Bei gültigen Koordinaten wird der Standort direkt gesetzt. Offene Zeilen bleiben zur Korrektur in der Vorschau.</p>
+    <p>Wähle <strong>CSV importieren</strong> und prüfe die Zeilen vor dem Hinzufügen. Die Namen <code>latitude</code> und <code>longitude</code> funktionieren ebenfalls. Bei gültigen Koordinaten wird der Standort direkt gesetzt.</p>
+    <p>Zeilen ohne Koordinaten benötigen die Adresssuche für CSV-Dateien. Ist sie nicht verfügbar oder bleibt eine Adresse offen, wähle <strong>Diese Zeile bearbeiten</strong> und trage den Breiten- und Längengrad ein.</p>
 
     <h2 id="customize-pins">Farben, Symbole und Beschriftungen anpassen</h2>
-    <p>Mit <strong>Bearbeiten</strong> passt du die Markierung an. Nummerierte Markierungen eignen sich für einen Rundgang, Standardsymbole für Filialen und Kreise für ergänzende Angebote wie Fahrradständer. Nutze Farben für Kategorien und ergänze eindeutige Namen wie „Südeingang“. Öffnungszeiten, Zugangshinweise und weiterführende Links passen in das Pop-up.</p>
+    <p>Mit <strong>Bearbeiten</strong> passt du die Markierung an. Nummerierte Markierungen eignen sich für einen Rundgang, Standardsymbole für Filialen und Kreise für ergänzende Angebote wie Fahrradständer. Nutze Farben für Kategorien und ergänze eindeutige Namen wie „Südeingang“. Öffnungszeiten und Zugangshinweise passen in das Pop-up.</p>
     <p>Unter <strong>Karte anpassen</strong> findest du die Kartenstile Liberty, Bright, Positron und Dark sowie die Optionen für Beschriftungen und Zoom. Nahe beieinanderliegende Markierungen können im Editor gruppiert werden. Veröffentlichte Karten zeigen die gespeicherten Standorte in der Übersicht mit einzelnen Markierungen.</p>
 
     <h2 id="share-or-embed">Eine Karte mit mehreren Standorten teilen oder einbetten</h2>
