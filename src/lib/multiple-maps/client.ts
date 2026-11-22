@@ -132,11 +132,12 @@ export function links(id: string, config: MapConfig) {
       width="${responsive ? '100%' : width}"
       height="${height}"
     ></iframe>
-    <a href="https://map-embed-code.com/">map-embed-code.com</a>
+    <a href="https://map-embed-code.com/" hidden>map-embed-code.com</a>
   </div>
   <style>
     .mapouter[data-multiple-location-map]{position:relative;text-align:right;max-width:100%;height:auto;aspect-ratio:auto;}
     .mapouter[data-multiple-location-map]>.gmap_canvas{overflow:hidden;background:none!important;width:100%;height:auto;}
+    .mapouter[data-multiple-location-map]>.gmap_canvas>a[hidden]{display:none!important;}
     .mapouter[data-multiple-location-map] .gmap_iframe{display:block;width:100%!important;height:var(--map-embed-height)!important;border:0;}
   </style>
 </div>`;

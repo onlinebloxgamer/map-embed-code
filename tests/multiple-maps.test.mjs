@@ -414,6 +414,7 @@ test('editor and viewer work in a browser, including mobile layout and a cross-o
         .mapouter{position:relative;text-align:right;width:100%;aspect-ratio:600/450;}
         .gmap_canvas{overflow:hidden;background:none!important;width:100%;height:100%;}
         .gmap_iframe{display:block;width:100%!important;height:100%!important;}
+        .gmap_canvas a{display:inline-block;}
       </style>`);
   });
   await new Promise((done) => host.listen(0, '127.0.0.1', done));
@@ -432,14 +433,16 @@ test('editor and viewer work in a browser, including mobile layout and a cross-o
         src: embedUrl.href, title: expectedTitle, referrerpolicy: 'strict-origin-when-cross-origin',
         allowfullscreen: '', loading: 'lazy', width: expectedWidth, height: String(height),
       })) assert.equal(await iframe.getAttribute(name), value, name);
-      const credit = shared.getByRole('link', { name: 'map-embed-code.com', exact: true }).nth(index);
-      assert.equal(await credit.getAttribute('href'), 'https://map-embed-code.com/');
-      assert.ok(await credit.evaluate((link) => {
-        const bounds = link.getBoundingClientRect();
-        return bounds.top >= link.previousElementSibling.getBoundingClientRect().bottom
-          && bounds.bottom <= link.parentElement.getBoundingClientRect().bottom;
-      }), 'The credit below the map fits inside the wrapper');
     }
+    const credits = shared.locator('.mapouter > .gmap_canvas > a[href="https://map-embed-code.com/"][hidden]');
+    assert.deepEqual(await credits.allTextContents(), ['map-embed-code.com', 'map-embed-code.com']);
+    for (const credit of await credits.all()) assert.ok(await credit.isHidden());
+    const embedded = shared.frameLocator('iframe.gmap_iframe').first();
+    await embedded.locator('#viewer.maplibregl-map canvas').waitFor();
+    await embedded.getByRole('link', { name: 'OpenFreeMap', exact: true }).waitFor();
+    assert.equal(await embedded.locator('.mm-cluster-count').count(), 0);
+    await embedded.locator('.mm-map-marker:not([hidden])').first().click();
+    await embedded.locator('.maplibregl-popup-content').waitFor();
     for (const width of [900, 390]) {
       await shared.setViewportSize({ width, height: 844 });
       const available = await shared.evaluate(() => document.body.clientWidth);
@@ -448,12 +451,6 @@ test('editor and viewer work in a browser, including mobile layout and a cross-o
       assert.equal((await frames.nth(0).boundingBox()).height, 450);
       assert.equal((await frames.nth(1).boundingBox()).height, 300);
     }
-    const embedded = shared.frameLocator('iframe.gmap_iframe').first();
-    await embedded.locator('#viewer.maplibregl-map canvas').waitFor();
-    await embedded.getByRole('link', { name: 'OpenFreeMap', exact: true }).waitFor();
-    assert.equal(await embedded.locator('.mm-cluster-count').count(), 0);
-    await embedded.locator('.mm-map-marker:not([hidden])').first().click();
-    await embedded.locator('.maplibregl-popup-content').waitFor();
   } finally { await new Promise((done) => host.close(done)); }
   await page.getByRole('button', { name: 'Delete Saved Map' }).click();
   await page.getByText(/Map deleted/).waitFor();
