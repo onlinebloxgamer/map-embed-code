@@ -14,6 +14,8 @@ const toolHeaders = readFileSync('public/_headers', 'utf8').match(/^\s*Content-S
 const marker = { title: 'Museum', lat: 40.67, lng: -73.96, description: '<img src=x onerror=alert(1)>', website: 'https://example.org/' };
 const draft = { title: 'Test map', markers: [marker], settings: {} };
 const tool = '/multiple-location-map-generator/';
+const guide = '/guides/how-to-create-map-with-multiple-pins/';
+const localePrefixes = { en: '', es: '/es', de: '/de' };
 const styleHost = 'https://tiles.openfreemap.org';
 const fixtureStyle = { version: 8, sources: {}, layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#e3ede6' } }] };
 const styleRequests = [];
@@ -30,7 +32,7 @@ function assets(request) {
   if (!filename.startsWith(`${dist}${sep}`) || !existsSync(filename)) return new Response('Asset unavailable', { status: 404 });
   const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.xml': 'application/xml', '.webp': 'image/webp' };
   const headers = { 'Content-Type': types[extname(filename)] ?? 'application/octet-stream' };
-  if (pathname === tool) headers['Content-Security-Policy'] = toolHeaders;
+  if (Object.values(localePrefixes).some((prefix) => pathname === prefix + tool)) headers['Content-Security-Policy'] = toolHeaders;
   return new Response(readFileSync(filename), { headers });
 }
 
@@ -194,7 +196,6 @@ test('configured Photon endpoints enable search while optional modes require exp
 });
 
 test('static SEO routes are unique, indexed, internally linked, and preserve the Google Maps workflow', async () => {
-  const routes = [tool, '/guides/how-to-create-map-with-multiple-pins/'];
   const retired = {
     '/create-map-with-multiple-pins/': 'three-pin-example',
     '/custom-map-with-multiple-pins/': 'customize-pins',
@@ -203,19 +204,33 @@ test('static SEO routes are unique, indexed, internally linked, and preserve the
   const sitemap = readFileSync(join(dist, 'sitemap-0.xml'), 'utf8');
   const redirects = readFileSync(join(dist, '_redirects'), 'utf8').trim().split(/\r?\n/);
   const toolHtml = readFileSync(join(dist, tool, 'index.html'), 'utf8');
+  const headerRules = readFileSync(join(dist, '_headers'), 'utf8');
+  const site = 'https://map-embed-code.com';
   const titles = new Set();
   const descriptions = new Set();
-  for (const route of routes) {
-    const html = readFileSync(join(dist, route, 'index.html'), 'utf8');
-    titles.add(html.match(/<title>(.*?)<\/title>/)[1]);
-    descriptions.add(html.match(/<meta name="description" content="([^"]+)"/)[1]);
-    assert.equal((html.match(/<h1[ >]/g) ?? []).length, 1);
-    assert.ok(html.includes(`rel="canonical" href="https://map-embed-code.com${route}"`));
-    assert.ok(html.includes('href="/multiple-location-map-generator/'));
-    assert.ok(sitemap.includes(`https://map-embed-code.com${route}`));
+  for (const [locale, prefix] of Object.entries(localePrefixes)) {
+    for (const path of [tool, guide]) {
+      const route = prefix + path;
+      const html = readFileSync(join(dist, route, 'index.html'), 'utf8');
+      titles.add(html.match(/<title>(.*?)<\/title>/)[1]);
+      descriptions.add(html.match(/<meta name="description" content="([^"]+)"/)[1]);
+      assert.equal((html.match(/<h1[ >]/g) ?? []).length, 1);
+      assert.ok(html.includes(`<html lang="${locale}"`));
+      assert.ok(html.includes(`rel="canonical" href="${site}${route}"`));
+      assert.ok(html.includes(`href="${prefix}${path === tool ? guide : tool}"`));
+      assert.ok(html.includes(`"inLanguage":"${locale}"`));
+      assert.ok(sitemap.includes(`<loc>${site}${route}</loc>`));
+      for (const [alternate, target] of Object.entries({ ...localePrefixes, 'x-default': '' })) {
+        assert.ok(html.includes(`rel="alternate" hreflang="${alternate}" href="${site}${target}${path}"`));
+      }
+    }
+    const index = readFileSync(join(dist, prefix, 'guides', 'index.html'), 'utf8');
+    assert.ok(index.includes(`href="${prefix}${guide}"`));
+    assert.ok(index.includes(`href="${prefix}${tool}#import-locations"`));
+    assert.ok(headerRules.replaceAll('\r', '').includes(`\n${prefix}${tool}\n  Content-Security-Policy: ${toolHeaders}`));
   }
-  assert.equal(titles.size, routes.length);
-  assert.equal(descriptions.size, routes.length);
+  assert.equal(titles.size, 6);
+  assert.equal(descriptions.size, 6);
   for (const [route, anchor] of Object.entries(retired)) {
     assert.ok(!existsSync(join(dist, route, 'index.html')), `Retired page was built: ${route}`);
     assert.ok(!sitemap.includes(route), `Retired page is in the sitemap: ${route}`);
@@ -230,6 +245,41 @@ test('static SEO routes are unique, indexed, internally linked, and preserve the
     const html = readFileSync(join(dist, route, 'index.html'), 'utf8');
     assert.match(html, /maps\.google\.com/);
     assert.doesNotMatch(html, /leaflet-|maplibre|openfreemap/i);
+  }
+});
+
+test('Spanish and German guides open their localized editors and update locations in that language', async () => {
+  await browserForMaps();
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  try {
+    await mockTiles(context);
+    await context.route(/https:\/\/(fonts\.|www\.googletagmanager|www\.google-analytics)/, (route) => route.abort());
+    const page = await context.newPage();
+    page.setDefaultTimeout(15000);
+    for (const [lang, example, coordinates, name, save, listLabel, addedStatus] of [
+      ['es', 'Abrir el ejemplo de tres marcadores', 'Introducir coordenadas', 'Nombre de la ubicación', 'Guardar ubicación', 'Mostrar Museo en el mapa', 'Se añadió Museo.'],
+      ['de', 'Beispiel mit drei Markierungen öffnen', 'Koordinaten eingeben', 'Name des Standorts', 'Standort speichern', 'Museo auf der Karte anzeigen', 'Museo wurde hinzugefügt.'],
+    ]) {
+      const prefix = localePrefixes[lang];
+      await page.goto(new URL(`${prefix}/guides/`, base).href);
+      await page.locator(`.guide-card[href="${prefix}${guide}"]`).click();
+      await page.locator(`.mm-reading a[href="${prefix}${tool}"]`).first().click();
+      assert.equal(await page.locator('html').getAttribute('lang'), lang);
+      await page.locator('#mm-canvas .maplibregl-canvas').waitFor();
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 390);
+      await page.getByRole('link', { name: example }).click();
+      assert.equal(await page.locator('#mm-locations > li').count(), 3);
+      await page.getByRole('button', { name: coordinates, exact: true }).click();
+      const dialog = page.locator('#mm-marker-dialog');
+      await dialog.getByLabel(name).fill('Museo');
+      await dialog.locator('[name=lat]').fill('40.67');
+      await dialog.locator('[name=lng]').fill('-73.96');
+      await dialog.getByRole('button', { name: save }).click();
+      await page.getByRole('button', { name: listLabel, exact: true }).waitFor();
+      assert.equal(await page.locator('#mm-edit-status').textContent(), addedStatus);
+    }
+  } finally {
+    await context.close();
   }
 });
 

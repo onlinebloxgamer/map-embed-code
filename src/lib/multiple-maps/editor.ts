@@ -1,14 +1,16 @@
 import { api, createGeocoder, links, reason, verify } from './client';
+import { defaultLocale, isLocale, type Locale } from '../../i18n/config';
+import { editorCopy, formatMapMessage } from '../../i18n/map-editor';
 import { setupImport } from './import-dialog';
-import { configSchema, coordinate, DEFAULT_MARKER_LIMIT, mapSchema, markerColor, markerSchema, recoverySchema, settingsSchema, type GeocodeResult, type MapConfig, type Marker, type PublicConfig } from './schema';
+import { COLORS, configSchema, coordinate, DEFAULT_MARKER_LIMIT, mapSchema, markerColor, markerSchema, recoverySchema, settingsSchema, type GeocodeResult, type MapConfig, type Marker, type PublicConfig } from './schema';
 
 export const byId = <T extends HTMLElement = HTMLElement>(id: string): T => document.getElementById(`mm-${id}`) as T;
 export const dataText = (form: FormData, name: string) => String(form.get(name) ?? '').trim();
 
 const examples = [
-  { title: 'Central Park', address: 'Manhattan, New York', description: 'Meet at Bethesda Terrace.', lat: 40.7736, lng: -73.9708, color: 'green' },
-  { title: 'New York Public Library', address: '476 Fifth Avenue, New York', description: 'Start at the Fifth Avenue entrance.', lat: 40.7532, lng: -73.9822, color: 'blue' },
-  { title: 'Brooklyn Bridge', address: 'New York, New York', description: 'Use the pedestrian walkway.', lat: 40.7061, lng: -73.9969, color: 'purple' },
+  { title: 'Central Park', address: 'Manhattan, New York', lat: 40.7736, lng: -73.9708, color: 'green' },
+  { title: 'New York Public Library', address: '476 Fifth Avenue, New York', lat: 40.7532, lng: -73.9822, color: 'blue' },
+  { title: 'Brooklyn Bridge', address: 'New York, New York', lat: 40.7061, lng: -73.9969, color: 'purple' },
 ].map((entry) => markerSchema.parse(entry));
 
 function makeButton(text: string, label: string, action: () => void): HTMLButtonElement {
@@ -23,10 +25,13 @@ function makeButton(text: string, label: string, action: () => void): HTMLButton
 
 export async function startEditor() {
   const root = document.querySelector<HTMLElement>('#location-editor')!;
+  const htmlLanguage = document.documentElement.lang;
+  const lang = isLocale(htmlLanguage) ? htmlLanguage : defaultLocale;
+  const copy = editorCopy[lang];
   let config: PublicConfig = configSchema.parse({ markerLimit: DEFAULT_MARKER_LIMIT, turnstileSiteKey: '', geocoding: false });
   try { config = configSchema.parse(await api('/api/map-tool/config', 'GET', undefined, undefined, AbortSignal.timeout(4000))); }
   catch { /* The local coordinate editor is available without hosted services. */ }
-  const geocoder = createGeocoder(config.turnstileSiteKey);
+  const geocoder = createGeocoder(config.turnstileSiteKey, lang);
   const editorStatus = byId('edit-status');
   const markerDialog = byId<HTMLDialogElement>('marker-dialog');
   const markerForm = byId<HTMLFormElement>('marker-form');
@@ -54,8 +59,8 @@ export async function startEditor() {
     picking = value;
     mapButton.setAttribute('aria-pressed', String(value));
     camera.classList.toggle('mm-picking', value);
-    if (value) editorStatus.textContent = 'Choose a spot on the map, or use Enter Coordinates.';
-    else if (editorStatus.textContent?.startsWith('Choose a spot')) editorStatus.textContent = '';
+    if (value) editorStatus.textContent = copy.pick;
+    else if (editorStatus.textContent === copy.pick) editorStatus.textContent = '';
   }
 
   function render(reframe = false, focus?: { index: number; label: string }) {
@@ -72,7 +77,7 @@ export async function startEditor() {
       count.className = 'mm-row-number';
       count.style.backgroundColor = markerColor(marker.color);
       count.textContent = String(index + 1);
-      count.setAttribute('aria-label', `${marker.color} marker ${index + 1}`);
+      count.setAttribute('aria-label', formatMapMessage(copy.numberLabel, { color: copy[marker.color as keyof typeof COLORS] ?? marker.color, position: index + 1 }));
       const title = document.createElement('strong');
       title.textContent = marker.title;
       heading.append(count, title);
@@ -80,17 +85,17 @@ export async function startEditor() {
       address.textContent = marker.address || `${marker.lat.toFixed(5)}, ${marker.lng.toFixed(5)}`;
       const actions = document.createElement('div');
       actions.className = 'mm-actions';
-      const view = makeButton('Show', `Show ${marker.title} on the map`, () => liveMap?.show(index));
-      const edit = makeButton('Edit', `Edit ${marker.title}`, () => openMarker(marker, index));
-      const remove = makeButton('Delete', `Delete ${marker.title}`, () => {
+      const view = makeButton(copy.show, formatMapMessage(copy.showLocation, { title: marker.title }), () => liveMap?.show(index));
+      const edit = makeButton(copy.edit, formatMapMessage(copy.editLocation, { title: marker.title }), () => openMarker(marker, index));
+      const remove = makeButton(copy.delete, formatMapMessage(copy.deleteLocation, { title: marker.title }), () => {
         markers = markers.filter((_, row) => row !== index);
         const nextIndex = Math.min(index, markers.length - 1);
-        render(true, { index: nextIndex, label: 'Delete' });
+        render(true, { index: nextIndex, label: copy.delete });
         if (nextIndex < 0) exampleButton.focus();
-        editorStatus.textContent = `Deleted ${marker.title}.`;
+        editorStatus.textContent = formatMapMessage(copy.deleted, { title: marker.title });
       });
-      const earlier = makeButton('Move up', `Move ${marker.title} up`, () => reorder(index, -1));
-      const later = makeButton('Move down', `Move ${marker.title} down`, () => reorder(index, 1));
+      const earlier = makeButton(copy.up, formatMapMessage(copy.moveUp, { title: marker.title }), () => reorder(index, -1));
+      const later = makeButton(copy.down, formatMapMessage(copy.moveDown, { title: marker.title }), () => reorder(index, 1));
       earlier.disabled = index === 0;
       later.disabled = index === markers.length - 1;
       const buttons = [view, edit, remove, earlier, later];
@@ -107,35 +112,36 @@ export async function startEditor() {
     const ordered = [...markers];
     [ordered[index], ordered[next]] = [ordered[next], ordered[index]];
     markers = ordered;
-    render(false, { index: next, label: delta < 0 ? 'Move up' : 'Move down' });
-    editorStatus.textContent = `${markers[next].title} moved to position ${next + 1}.`;
+    render(false, { index: next, label: delta < 0 ? copy.up : copy.down });
+    editorStatus.textContent = formatMapMessage(copy.reordered, { title: markers[next].title, position: next + 1 });
   }
 
   function add(items: Marker[]): boolean {
     if (markers.length + items.length > config.markerLimit) {
-      editorStatus.textContent = `This map can hold up to ${config.markerLimit} locations.`;
+      editorStatus.textContent = formatMapMessage(copy.limit, { count: config.markerLimit });
       return false;
     }
     markers = [...markers, ...items];
     render(true);
-    editorStatus.textContent = items.length === 1 ? `Added ${items[0].title}.` : `Added ${items.length} locations.`;
+    editorStatus.textContent = items.length === 1 ? formatMapMessage(copy.addedOne, { title: items[0].title }) : formatMapMessage(copy.addedMany, { count: items.length });
     return true;
   }
 
   function loadExample() {
     settings = { ...settings, fit: true, cluster: false };
     writeSettings();
-    add(examples.slice(0, config.markerLimit));
+    const descriptions = [copy.centralPark, copy.library, copy.bridge];
+    add(examples.slice(0, config.markerLimit).map((marker, index) => ({ ...marker, description: descriptions[index] })));
   }
 
   function openMarker(marker?: Partial<Marker>, index?: number) {
     if (index === undefined && markers.length >= config.markerLimit) {
-      editorStatus.textContent = `This map can hold up to ${config.markerLimit} locations.`;
+      editorStatus.textContent = formatMapMessage(copy.limit, { count: config.markerLimit });
       return;
     }
     editingIndex = index;
     markerForm.reset();
-    byId('marker-heading').textContent = index === undefined ? 'Add a location' : 'Edit location';
+    byId('marker-heading').textContent = index === undefined ? copy.newMarker : copy.editMarker;
     byId('marker-error').textContent = '';
     for (const [key, value] of Object.entries(marker ?? {})) {
       const field = markerForm.elements.namedItem(key) as HTMLInputElement | null;
@@ -156,7 +162,7 @@ export async function startEditor() {
     const fields = new FormData(markerForm);
     const result = markerSchema.safeParse({ ...Object.fromEntries(fields), color: colorSelect.value === 'custom' ? customColor.value : colorSelect.value, lat: coordinate(dataText(fields, 'lat')), lng: coordinate(dataText(fields, 'lng')), website: dataText(fields, 'website') });
     if (!result.success) {
-      byId('marker-error').textContent = 'Enter a title, latitude from −90 to 90, longitude from −180 to 180, and a valid website URL if included.';
+      byId('marker-error').textContent = copy.invalidMarker;
       return;
     }
     markerDialog.close();
@@ -164,8 +170,8 @@ export async function startEditor() {
     else {
       const pointMoved = markers[editingIndex].lat !== result.data.lat || markers[editingIndex].lng !== result.data.lng;
       markers = markers.map((marker, index) => index === editingIndex ? result.data : marker);
-      render(pointMoved, { index: editingIndex, label: 'Edit' });
-      editorStatus.textContent = `Updated ${result.data.title}.`;
+      render(pointMoved, { index: editingIndex, label: copy.edit });
+      editorStatus.textContent = formatMapMessage(copy.updated, { title: result.data.title });
     }
   });
 
@@ -207,8 +213,8 @@ export async function startEditor() {
     liveMap?.draw(markers, settings, reframe);
   });
 
-  initSearch(geocoder, config, (result) => add([markerSchema.parse({ ...result, title: result.title || result.address })]));
-  setupImport(geocoder, config, () => Math.max(0, config.markerLimit - markers.length), add);
+  initSearch(geocoder, config, lang, (result) => add([markerSchema.parse({ ...result, title: result.title || result.address })]));
+  setupImport(geocoder, config, () => Math.max(0, config.markerLimit - markers.length), add, lang);
 
   function showLinks(id: string, saved: MapConfig) {
     const { code, share } = links(id, saved);
@@ -216,7 +222,7 @@ export async function startEditor() {
     byId<HTMLInputElement>('share-url').value = share;
     byId<HTMLAnchorElement>('preview').href = share;
     byId('result').hidden = false;
-    saveButton.textContent = 'Save Map Changes';
+    saveButton.textContent = copy.saveChanges;
   }
 
   function reset() {
@@ -229,7 +235,7 @@ export async function startEditor() {
     byId('copy-status').textContent = '';
     publishStatus.textContent = '';
     editorStatus.textContent = '';
-    saveButton.textContent = 'Generate Map & Embed Code';
+    saveButton.textContent = copy.generate;
     render();
   }
 
@@ -249,17 +255,17 @@ export async function startEditor() {
     const form = new FormData(publishForm);
     const parsed = mapSchema.safeParse({ title: dataText(form, 'title'), description: dataText(form, 'description'), markers, settings });
     if (!parsed.success || markers.length > config.markerLimit) {
-      publishStatus.textContent = `Provide a map title and 1–${config.markerLimit} valid locations.`;
+      publishStatus.textContent = formatMapMessage(copy.invalidMap, { count: config.markerLimit });
       return;
     }
     const saved = parsed.data;
     setBusy(true);
     try {
       if (ownership) await api(`/api/maps/${ownership.id}`, 'PATCH', saved, { Authorization: `Bearer ${ownership.token}` });
-      else ownership = recoverySchema.parse(await api('/api/maps', 'POST', { configuration: saved, verification: await verify(config.turnstileSiteKey, 'publish-map') }));
+      else ownership = recoverySchema.parse(await api('/api/maps', 'POST', { configuration: saved, verification: await verify(config.turnstileSiteKey, 'publish-map', lang) }));
       showLinks(ownership.id, saved);
-      publishStatus.textContent = 'Map saved. Copy your embed code or share the map URL.';
-    } catch (error) { publishStatus.textContent = reason(error, 'The map could not be saved. Try again.'); }
+      publishStatus.textContent = copy.mapSaved;
+    } catch (error) { publishStatus.textContent = reason(error, copy.saveFailed, lang); }
     finally { setBusy(false); }
   });
 
@@ -269,8 +275,8 @@ export async function startEditor() {
     const file = recoveryFile.files?.[0];
     recoveryFile.value = '';
     if (!file || busy) return;
-    if (file.size > 4096) { publishStatus.textContent = 'Select a valid map recovery file.'; return; }
-    if (markers.length && !window.confirm('Replace the locations in this editor with the saved map?')) return;
+    if (file.size > 4096) { publishStatus.textContent = copy.badRecovery; return; }
+    if (markers.length && !window.confirm(copy.replaceLocations)) return;
     setBusy(true);
     try {
       const credentials = recoverySchema.parse(JSON.parse(await file.text()));
@@ -284,8 +290,8 @@ export async function startEditor() {
       (publishForm.elements.namedItem('description') as HTMLTextAreaElement).value = saved.description;
       render(true);
       showLinks(credentials.id, saved);
-      publishStatus.textContent = 'Map opened for editing. Save changes to update its shared map and embed.';
-    } catch (error) { publishStatus.textContent = reason(error, 'Select a valid map recovery file.'); }
+      publishStatus.textContent = copy.mapOpened;
+    } catch (error) { publishStatus.textContent = reason(error, copy.badRecovery, lang); }
     finally { setBusy(false); }
   });
 
@@ -299,16 +305,16 @@ export async function startEditor() {
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
   byId('another').addEventListener('click', () => {
-    if (window.confirm('Start a new map? Download the recovery file first if you want to edit this map later.')) reset();
+    if (window.confirm(copy.confirmNew)) reset();
   });
   byId('delete-map').addEventListener('click', async () => {
-    if (!ownership || busy || !window.confirm('Delete this saved map? Its link and embeds will stop working.')) return;
+    if (!ownership || busy || !window.confirm(copy.confirmDelete)) return;
     setBusy(true);
     try {
       await api(`/api/maps/${ownership.id}`, 'DELETE', undefined, { Authorization: `Bearer ${ownership.token}` });
       reset();
-      publishStatus.textContent = 'Map deleted. Cached viewers may take up to a minute to update.';
-    } catch (error) { publishStatus.textContent = reason(error, 'The map could not be deleted.'); }
+      publishStatus.textContent = copy.mapDeleted;
+    } catch (error) { publishStatus.textContent = reason(error, copy.deleteFailed, lang); }
     finally { setBusy(false); }
   });
 
@@ -317,11 +323,11 @@ export async function startEditor() {
       const input = byId<HTMLInputElement | HTMLTextAreaElement>(field);
       try {
         await navigator.clipboard.writeText(input.value);
-        byId('copy-status').textContent = field === 'embed-code' ? 'Embed code copied.' : 'Map URL copied.';
+        byId('copy-status').textContent = field === 'embed-code' ? copy.copiedCode : copy.copiedUrl;
       } catch {
         input.focus();
         input.select();
-        byId('copy-status').textContent = 'Text selected. Copy it with your browser or keyboard.';
+        byId('copy-status').textContent = copy.copyFallback;
       }
     });
   }
@@ -339,9 +345,10 @@ export async function startEditor() {
   try {
     const { mountMap } = await import('./maplibre');
     const mapNote = byId('map-note');
-    const instructions = 'Choose Add Pin on Map to place a pin. Drag an existing pin to move it.';
-    const unavailable = 'The basemap is unavailable. Coordinates and pins are still available.';
+    const instructions = copy.mapInstructions;
+    const unavailable = copy.basemapUnavailable;
     liveMap = mountMap(camera, markers, settings, {
+      copy,
       add(lat, lng) {
         if (!picking) return;
         setPicking(false);
@@ -350,7 +357,7 @@ export async function startEditor() {
       move(index, lat, lng) {
         markers = markers.map((marker, row) => row === index ? { ...marker, lat, lng, address: '' } : marker);
         render();
-        editorStatus.textContent = `Moved ${markers[index].title}.`;
+        editorStatus.textContent = formatMapMessage(copy.moved, { title: markers[index].title });
       },
       tileStatus(available) {
         const text = available ? instructions : unavailable;
@@ -360,10 +367,11 @@ export async function startEditor() {
     mapButton.disabled = false;
     mapNote.textContent = instructions;
     render();
-  } catch { byId('map-note').textContent = 'The map preview could not load. You can still manage locations using the list.'; }
+  } catch { byId('map-note').textContent = copy.previewFailed; }
 }
 
-function initSearch(geocoder: ReturnType<typeof createGeocoder>, config: PublicConfig, add: (marker: GeocodeResult) => boolean) {
+function initSearch(geocoder: ReturnType<typeof createGeocoder>, config: PublicConfig, lang: Locale, add: (marker: GeocodeResult) => boolean) {
+  const copy = editorCopy[lang];
   const form = byId<HTMLFormElement>('search');
   const query = byId<HTMLInputElement>('query');
   const list = byId('suggestions');
@@ -390,8 +398,8 @@ function initSearch(geocoder: ReturnType<typeof createGeocoder>, config: PublicC
       if (version !== generation) return;
       for (const result of results) {
         const row = document.createElement('li');
-        row.append(makeButton(result.address, `Add ${result.address}`, () => {
-          if (!add(result)) { status.textContent = 'The map is at its location limit.'; return; }
+        row.append(makeButton(result.address, formatMapMessage(copy.addResult, { address: result.address }), () => {
+          if (!add(result)) { status.textContent = copy.limitReached; return; }
           query.value = '';
           lastInput = '';
           status.textContent = '';
@@ -401,9 +409,9 @@ function initSearch(geocoder: ReturnType<typeof createGeocoder>, config: PublicC
         list.append(row);
       }
       list.hidden = results.length === 0;
-      status.textContent = results.length ? 'Select a result to add it to your map.' : mode === 'search' ? 'No results found. Try adding a city, postcode, or country.' : '';
+      status.textContent = results.length ? copy.pickResult : mode === 'search' ? copy.noResults : '';
     } catch (error) {
-      if (version === generation && !controller.signal.aborted) status.textContent = reason(error, 'Location search could not complete.');
+      if (version === generation && !controller.signal.aborted) status.textContent = reason(error, copy.searchFailed, lang);
     }
   }
 
@@ -415,11 +423,11 @@ function initSearch(geocoder: ReturnType<typeof createGeocoder>, config: PublicC
     resetResults();
     const version = generation;
     unlocking = true;
-    status.textContent = 'Searching…';
+    status.textContent = copy.searching;
     try {
       await geocoder.unlock();
       if (version === generation) await search('search', value, version);
-    } catch (error) { if (version === generation) status.textContent = reason(error, 'Location search could not start.'); }
+    } catch (error) { if (version === generation) status.textContent = reason(error, copy.searchStartFailed, lang); }
     finally { unlocking = false; }
   });
   query.addEventListener('input', () => {
@@ -443,6 +451,6 @@ function initSearch(geocoder: ReturnType<typeof createGeocoder>, config: PublicC
   if (!config.geocoding) {
     query.disabled = true;
     form.querySelector('button')!.disabled = true;
-    status.textContent = 'Location search is unavailable. Use coordinates or import a CSV with coordinates.';
+    status.textContent = copy.searchUnavailable;
   }
 }

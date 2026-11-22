@@ -1,0 +1,69 @@
+---
+import MapContentLayout from '../../components/multiple-maps/MapContentLayout.astro';
+import MapEditor from '../../components/multiple-maps/MapEditor.astro';
+---
+
+<MapContentLayout
+  title="Karte mit mehreren Standorten kostenlos erstellen | Map Embed Code"
+  heading="Karte mit mehreren Standorten erstellen"
+  description="Erstelle kostenlos eine interaktive Karte mit mehreren Markierungen. Füge Standorte per Adresse, Koordinaten oder CSV hinzu und teile oder bette die Karte ein."
+  intro="Zeige deine Filialen, Veranstaltungsorte oder Treffpunkte auf einer gemeinsamen Karte. Gib Koordinaten ein, markiere einen Punkt direkt auf der Karte oder importiere Standorte aus einer CSV-Datei. Wenn die Adresssuche verfügbar ist, kannst du auch nach Orten suchen. Gib jeder Markierung einen Namen, eine Farbe und eine Beschreibung. Beim Speichern erhältst du einen öffentlichen Kartenlink und einen Einbettungscode für Websites, die HTML-Iframes unterstützen. Für den Karteneditor brauchst du weder ein Konto noch einen Google-Maps-API-Schlüssel."
+  kind="tool"
+>
+  <MapEditor />
+  <article class="mm-reading prose-container readable-surface" aria-labelledby="create-multiple-pins">
+    <h2 id="create-multiple-pins">So erstellst du eine Karte mit mehreren Markierungen</h2>
+    <ol>
+      <li><strong>Standorte hinzufügen.</strong> Suche nach Adressen, wenn die Suche verfügbar ist. Du kannst auch Koordinaten eingeben, Punkte auf der Karte setzen oder eine Liste importieren.</li>
+      <li><strong>Positionen prüfen.</strong> Wähle <strong>Alle Standorte anzeigen</strong> für die Übersicht. Mit <strong>Anzeigen</strong> kannst du einen einzelnen Standort prüfen.</li>
+      <li><strong>Markierungen anpassen.</strong> Ergänze Namen, Hinweise und Links. Bei nummerierten Markierungen entspricht die Reihenfolge der Standortliste.</li>
+      <li><strong>Karte veröffentlichen.</strong> Gib einen Kartentitel ein und wähle <strong>Karte und Einbettungscode erstellen</strong>.</li>
+    </ol>
+
+    <h2 id="three-pin-example">Interaktives Beispiel mit drei Markierungen</h2>
+    <p>Die Beispielkarte zeigt drei Treffpunkte in New York. Sie verwendet Koordinaten, damit du sie auch bei deaktivierter Adresssuche öffnen kannst.</p>
+    <ol>
+      <li><strong>Central Park.</strong> Die grüne Markierung zeigt den Treffpunkt an der Bethesda Terrace.</li>
+      <li><strong>New York Public Library.</strong> Die blaue Markierung nennt den Eingang an der Fifth Avenue.</li>
+      <li><strong>Brooklyn Bridge.</strong> Die violette Markierung enthält einen Hinweis zum Fußgängerweg.</li>
+    </ol>
+    <p><a id="mm-guide-example" class="btn-primary" href="/de/multiple-location-map-generator/?example=nyc#mm-live-preview" target="_blank" rel="noopener">Beispiel mit drei Markierungen öffnen</a></p>
+    <p>Klicke auf eine Markierung, um den Hinweis zu lesen. Mit <strong>Nach oben</strong> und <strong>Nach unten</strong> änderst du die Reihenfolge. Sind bereits Standorte im Editor vorhanden, öffnet sich das Beispiel in einem neuen Tab.</p>
+    <figure>
+      <img src="/guides/native-multiple-map-editor.webp" width="1152" height="787" alt="Karteneditor mit Standortliste und drei nummerierten Markierungen in New York" loading="lazy" decoding="async" />
+      <figcaption>Die Nummern auf der Karte folgen der Reihenfolge in der Liste. Der Screenshot zeigt den englischen Editor.</figcaption>
+    </figure>
+
+    <h2 id="add-locations">Standorte per Adresse, Koordinaten oder Kartenklick hinzufügen</h2>
+    <ul>
+      <li><strong>Nach einer Adresse suchen.</strong> Gib einen Namen, eine Straße oder eine Postleitzahl ein und wähle <strong>Standort hinzufügen</strong>. Prüfe bei mehreren Treffern den Ort und die Straße.</li>
+      <li><strong>Koordinaten eingeben.</strong> Für die Bibliothek im Beispiel ist der Breitengrad <code>40.7532</code> und der Längengrad <code>-73.9822</code>. Das Minuszeichen kennzeichnet westliche Längen- und südliche Breitengrade.</li>
+      <li><strong>Einen Punkt markieren.</strong> Wähle <strong>Markierung auf Karte setzen</strong>, klicke auf die Stelle und gib einen Namen ein. Du kannst die Markierung anschließend verschieben.</li>
+    </ul>
+
+    <h2 id="import-locations">Mehrere Adressen auf einmal einfügen oder CSV importieren</h2>
+    <h3>Eine Adressliste einfügen</h3>
+    <p>Wähle <strong>Mehrere Standorte hinzufügen</strong>. Setze jede Adresse in eine eigene Zeile. Hinter einem senkrechten Strich kannst du einen Hinweis für das Pop-up ergänzen.</p>
+    <pre><code>{'Berlin, Deutschland | Hauptsitz\nHamburg, Deutschland | Niederlassung'}</code></pre>
+    <p>Wähle <strong>Standorte prüfen</strong> und anschließend <strong>Standorte hinzufügen</strong>. Zeilen ohne Koordinaten benötigen die Sammelsuche. Ist sie nicht verfügbar oder bleibt eine Adresse offen, wähle <strong>Diese Zeile bearbeiten</strong> und trage den Breiten- und Längengrad ein.</p>
+    <h3>Standorte aus einer Tabelle importieren</h3>
+    <p><a href="/examples/multiple-map-locations.csv" download>Lade die CSV-Beispieldatei herunter</a> oder exportiere deine Tabelle als kommaseparierte CSV. Die Datei darf bis zu 128 KB groß sein. Im Editor siehst du, wie viele weitere Standorte Platz haben. Verwende die unten angegebenen englischen Spaltennamen.</p>
+    <pre><code>{'title,address,lat,lon,description,color\nBerlin,"Berlin, Deutschland",52.5200,13.4050,Hauptsitz,#e63946'}</code></pre>
+    <p>Wähle <strong>CSV importieren</strong> und prüfe die Zeilen vor dem Hinzufügen. Die Namen <code>latitude</code> und <code>longitude</code> funktionieren ebenfalls. Bei gültigen Koordinaten wird der Standort direkt gesetzt. Offene Zeilen bleiben zur Korrektur in der Vorschau.</p>
+
+    <h2 id="customize-pins">Farben, Symbole und Beschriftungen anpassen</h2>
+    <p>Mit <strong>Bearbeiten</strong> passt du die Markierung an. Nummerierte Markierungen eignen sich für einen Rundgang, Standardsymbole für Filialen und Kreise für ergänzende Angebote wie Fahrradständer. Nutze Farben für Kategorien und ergänze eindeutige Namen wie „Südeingang“. Öffnungszeiten, Zugangshinweise und weiterführende Links passen in das Pop-up.</p>
+    <p>Unter <strong>Karte anpassen</strong> findest du die Kartenstile Liberty, Bright, Positron und Dark sowie die Optionen für Beschriftungen und Zoom. Nahe beieinanderliegende Markierungen können im Editor gruppiert werden. Veröffentlichte Karten zeigen die gespeicherten Standorte in der Übersicht mit einzelnen Markierungen.</p>
+
+    <h2 id="share-or-embed">Eine Karte mit mehreren Standorten teilen oder einbetten</h2>
+    <p>Mit <strong>Kartenlink kopieren</strong> erhältst du eine URL für E-Mails oder Nachrichten. Mit <strong>Einbettungscode kopieren</strong> erhältst du einen Iframe für einen HTML-Block, zum Beispiel in WordPress. Falls dein Website-Editor Iframes entfernt, kannst du den öffentlichen Kartenlink verwenden.</p>
+    <p>Mit <strong>Responsive Breite</strong> passt sich die Karte an die Seitenspalte an. Stelle eine Höhe ein, bei der genug Platz für Markierungen und Pop-ups bleibt, und prüfe die Einbettung auf einem Smartphone.</p>
+    <p>Bewahre die Wiederherstellungsdatei sicher auf. Über <strong>Wiederherstellungsdatei öffnen</strong> und <strong>Kartenänderungen speichern</strong> kannst du eine veröffentlichte Karte aktualisieren. Link und Iframe zeigen die Änderungen, sobald der Cache abgelaufen ist.</p>
+
+    <h2>Häufige Fragen</h2>
+    <details><summary>Brauche ich ein Konto oder einen API-Schlüssel?</summary><p>Der Kartengenerator lässt sich kostenlos ohne Konto und ohne Google-Maps-API-Schlüssel nutzen.</p></details>
+    <details><summary>Wie viele Standorte kann ich hinzufügen?</summary><p>Normalerweise sind bis zu 20 Standorte pro Karte möglich. Prüfe den Zähler unter <strong>Deine Standorte</strong>.</p></details>
+    <details><summary>Berechnet die Karte eine Route?</summary><p>Die Nummern bilden die gewählte Reihenfolge ab. Für eine Fußgänger- oder Autoroute brauchst du einen Routenplaner.</p></details>
+    <p>Sieh dir die <a href="/de/guides/how-to-create-map-with-multiple-pins/">Schritt-für-Schritt-Anleitung für deine erste Karte</a> oder die <a href="/de/guides/embed-google-map-multiple-locations/">Anleitung zum Einbetten einer Google-My-Maps-Karte</a> an.</p>
+  </article>
+</MapContentLayout>

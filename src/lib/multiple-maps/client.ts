@@ -1,10 +1,16 @@
 import { geocodeResultSchema, type GeocodeResult, type MapConfig } from './schema';
+import type { Locale } from '../../i18n/config';
+import { editorCopy } from '../../i18n/map-editor';
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) { super(message); }
 }
 
-export const reason = (error: unknown, fallback: string) => error instanceof ApiError ? error.message : fallback;
+export function reason(error: unknown, fallback: string, lang: Locale): string {
+  if (!(error instanceof ApiError)) return fallback;
+  if (lang === 'en') return error.message;
+  return error.status === 429 ? editorCopy[lang].rateLimited : fallback;
+}
 
 export async function api(path: string, method = 'GET', data?: unknown, headers?: HeadersInit, signal?: AbortSignal): Promise<unknown> {
   const requestHeaders = new Headers(headers);
@@ -18,7 +24,7 @@ export async function api(path: string, method = 'GET', data?: unknown, headers?
 }
 
 interface Turnstile {
-  render(target: HTMLElement, options: { sitekey: string; action: string; callback: (token: string) => void; 'error-callback': () => void; 'expired-callback': () => void }): string;
+  render(target: HTMLElement, options: { sitekey: string; action: string; language: Locale; callback: (token: string) => void; 'error-callback': () => void; 'expired-callback': () => void }): string;
   remove(widget: string): void;
 }
 
@@ -49,7 +55,7 @@ function loadTurnstile(): Promise<Turnstile> {
   return turnstileScript;
 }
 
-export async function verify(siteKey: string, action: 'geocode' | 'publish-map'): Promise<string> {
+export async function verify(siteKey: string, action: 'geocode' | 'publish-map', lang: Locale): Promise<string> {
   if (!siteKey) throw new ApiError(503, 'Human verification is unavailable.');
   const turnstile = await loadTurnstile();
   const dialog = document.querySelector<HTMLDialogElement>('#mm-verification')!;
@@ -61,7 +67,7 @@ export async function verify(siteKey: string, action: 'geocode' | 'publish-map')
     return await new Promise((resolve, reject) => {
       dialog.addEventListener('close', () => reject(new ApiError(400, 'Verification was canceled.')), { signal: closed.signal });
       widget = turnstile.render(target, {
-        sitekey: siteKey, action, callback: resolve,
+        sitekey: siteKey, action, language: lang, callback: resolve,
         'error-callback': () => reject(new ApiError(503, 'Verification failed. Please try again.')),
         'expired-callback': () => reject(new ApiError(400, 'Verification expired. Please try again.')),
       });
@@ -73,7 +79,7 @@ export async function verify(siteKey: string, action: 'geocode' | 'publish-map')
   }
 }
 
-export function createGeocoder(siteKey: string) {
+export function createGeocoder(siteKey: string, lang: Locale) {
   let session: string | undefined;
   let sessionRequest: Promise<void> | undefined;
   const answers = new Map<string, GeocodeResult[]>();
@@ -84,7 +90,7 @@ export function createGeocoder(siteKey: string) {
     if (unlocked()) return Promise.resolve();
     if (!sessionRequest) {
       sessionRequest = (async () => {
-        const verification = await verify(siteKey, 'geocode');
+        const verification = await verify(siteKey, 'geocode', lang);
         const result = await api('/api/map-tool/session', 'POST', { verification }) as { session?: string };
         if (!result.session) throw new ApiError(503, 'Location search is unavailable.');
         session = result.session;

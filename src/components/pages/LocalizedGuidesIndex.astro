@@ -4,6 +4,7 @@ import Header from "../layout/Header.astro";
 import Footer from "../layout/Footer.astro";
 import { localizedPath, localizedUrl } from "../../i18n/config";
 import { guidePaths, guidesIndexContent, type TranslatedLocale } from "../../i18n/guides";
+import { multipleMapsNavigation, multipleMapsPath, multiplePinsGuidePath } from "../../i18n/multiple-maps";
 
 interface Props {
     lang: TranslatedLocale;
@@ -11,6 +12,20 @@ interface Props {
 
 const { lang } = Astro.props;
 const content = guidesIndexContent[lang];
+const mapGuide = {
+    es: {
+        title: "Cómo crear un mapa con varios marcadores",
+        description: "Añade ubicaciones, personaliza los marcadores y comparte el mapa con un enlace o insértalo en tu web.",
+        importTitle: "Importar ubicaciones desde una hoja de cálculo",
+        importLink: "Preparar un CSV y añadir varias ubicaciones",
+    },
+    de: {
+        title: "So erstellst du eine Karte mit mehreren Markierungen",
+        description: "Füge Standorte hinzu, passe die Markierungen an und teile oder bette deine Karte ein.",
+        importTitle: "Standorte aus einer Tabelle importieren",
+        importLink: "CSV vorbereiten und mehrere Standorte hinzufügen",
+    },
+}[lang];
 const pageUrl = localizedUrl("/guides/", lang, Astro.site!);
 const structuredData = {
     "@context": "https://schema.org",
@@ -51,7 +66,19 @@ const structuredData = {
                             <span class="guide-cta">{content.read}</span>
                         </a>
                     ))}
+                    <a href={localizedPath(multiplePinsGuidePath, lang)} class="guide-card card">
+                        <span class="platform-tag">{multipleMapsNavigation[lang].tool}</span>
+                        <h2 class="text-heading-md guide-title">{mapGuide.title}</h2>
+                        <p class="text-body-md guide-desc">{mapGuide.description}</p>
+                        <span class="guide-cta">{content.read}</span>
+                    </a>
                 </div>
+            </div>
+        </section>
+        <section class="section" aria-labelledby="native-map-guides">
+            <div class="container readable-surface guide-imports">
+                <h2 id="native-map-guides" class="text-heading-md">{mapGuide.importTitle}</h2>
+                <a href={localizedPath(multipleMapsPath, lang) + '#import-locations'}>{mapGuide.importLink}</a>
             </div>
         </section>
     </main>
@@ -70,5 +97,8 @@ const structuredData = {
     .guide-title { margin: 0; color: var(--color-ink); }
     .guide-desc { flex: 1; margin: 0; color: var(--color-body); }
     .guide-cta { color: var(--color-link); font-size: 13px; font-weight: 500; }
+    .guide-imports { max-width: 960px; padding-block: var(--spacing-lg); }
+    .guide-imports h2 { margin-bottom: var(--spacing-xs); }
+    .guide-imports a { color: var(--color-link-deep); text-decoration: underline; text-underline-offset: .18em; }
     @media (max-width: 640px) { .guides-grid { grid-template-columns: 1fr; } }
 </style>

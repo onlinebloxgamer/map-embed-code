@@ -4,6 +4,8 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import '../../styles/multiple-map-canvas.css';
 import { separateBadges } from './marker-layout';
 import { markerColor, STYLES, type MapSettings, type Marker } from './schema';
+import type { MapEditorCopy } from '../../i18n/map-editor';
+import { formatMapMessage } from '../../i18n/map-messages';
 
 setWorkerUrl(workerUrl);
 
@@ -19,9 +21,10 @@ interface MapActions {
   move?: (index: number, lat: number, lng: number) => void;
   tileStatus?: (available: boolean) => void;
   savedView?: boolean;
+  copy?: MapEditorCopy;
 }
 
-function popupContent(marker: Marker): HTMLElement {
+function popupContent(marker: Marker, websiteLabel: string): HTMLElement {
   const wrapper = document.createElement('div');
   const title = document.createElement('strong');
   title.textContent = marker.title;
@@ -37,7 +40,7 @@ function popupContent(marker: Marker): HTMLElement {
     link.href = marker.website;
     link.target = '_blank';
     link.rel = 'noopener noreferrer nofollow ugc';
-    link.textContent = 'Visit website';
+    link.textContent = websiteLabel;
     wrapper.append(link);
   }
   return wrapper;
@@ -107,6 +110,12 @@ export function mountMap(element: HTMLElement, initialMarkers: Marker[], initial
     ...(!actions.savedView && settings.fit && markers.length > 1 ? { bounds: bounds(markers), fitBoundsOptions: { padding: 40, maxZoom: 17 } } : {}),
     minZoom: actions.savedView ? -2 : 1, maxZoom: 19, maxPitch: 0, dragRotate: false, pitchWithRotate: false,
     scrollZoom: settings.scrollWheel, cooperativeGestures: false,
+    locale: actions.copy && {
+      'Map.Title': actions.copy.preview,
+      'NavigationControl.ZoomIn': actions.copy.zoomIn,
+      'NavigationControl.ZoomOut': actions.copy.zoomOut,
+      'Popup.Close': actions.copy.closePopup,
+    },
   });
   const navigation = new NavigationControl({ showCompass: false });
   const credits = document.createElement('div');
@@ -140,7 +149,7 @@ export function mountMap(element: HTMLElement, initialMarkers: Marker[], initial
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'mm-map-marker';
-      button.setAttribute('aria-label', `Open ${marker.title}`);
+      button.setAttribute('aria-label', formatMapMessage(actions.copy?.openPin ?? 'Open {title}', { title: marker.title }));
       if (actions.savedView) {
         const leader = document.createElement('span');
         leader.className = 'mm-marker-leader';
@@ -159,7 +168,8 @@ export function mountMap(element: HTMLElement, initialMarkers: Marker[], initial
         label.textContent = marker.title;
         button.append(label);
       }
-      const pop = new Popup({ offset: Math.max(19, Math.abs(offsets[index][1]) + 12), maxWidth: '270px' }).setDOMContent(popupContent(marker));
+      const pop = new Popup({ offset: Math.max(19, Math.abs(offsets[index][1]) + 12), maxWidth: '270px' })
+        .setDOMContent(popupContent(marker, actions.copy?.visitWebsite ?? 'Visit website'));
       const pin = new MapPin({ element: button, draggable: Boolean(actions.move), offset: offsets[index], clickTolerance: 4 })
         .setLngLat(point(marker)).setPopup(pop).addTo(map);
       pop.on('close', () => {
@@ -277,7 +287,7 @@ export function mountMap(element: HTMLElement, initialMarkers: Marker[], initial
         button.type = 'button';
         button.className = 'mm-cluster-count';
         button.textContent = String(count);
-        button.setAttribute('aria-label', `Zoom to ${count} grouped locations`);
+        button.setAttribute('aria-label', formatMapMessage(actions.copy?.zoomCluster ?? 'Zoom to {count} grouped locations', { count }));
         button.addEventListener('click', (event) => { event.stopPropagation(); expand(feature); });
         const coords = feature.geometry.coordinates as [number, number];
         clusterPins.set(id, new MapPin({ element: button }).setLngLat(coords).addTo(map));

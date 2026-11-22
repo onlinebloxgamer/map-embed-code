@@ -1,6 +1,7 @@
 ---
 import { languageNames, languageCodes, locales, localizedPath, type Locale } from "../../i18n/config";
 import { getHomeContent } from "../../i18n/home";
+import { multipleMapsNavigation, multipleMapsPath } from "../../i18n/multiple-maps";
 
 interface Props {
     lang?: Locale;
@@ -14,7 +15,7 @@ const targetPath = translationPath ?? "/";
 
 const navLinks = [
     { label: copy.generator, href: `${home}#generator` },
-    { label: lang === "es" ? "Mapa con varios lugares" : lang === "de" ? "Karte mit mehreren Orten" : "Multiple Location Map", href: "/multiple-location-map-generator/", destinationLanguage: "en" },
+    { label: multipleMapsNavigation[lang].tool, href: localizedPath(multipleMapsPath, lang), destinationLanguage: lang },
     { label: copy.how, href: `${home}#how-it-works` },
     { label: copy.guide, href: localizedPath("/guides/", lang) },
     { label: copy.faq, href: `${home}#faq` },

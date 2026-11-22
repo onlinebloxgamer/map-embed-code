@@ -1,0 +1,69 @@
+---
+import MapContentLayout from '../../components/multiple-maps/MapContentLayout.astro';
+import MapEditor from '../../components/multiple-maps/MapEditor.astro';
+---
+
+<MapContentLayout
+  title="Crear un mapa con varias ubicaciones gratis | Map Embed Code"
+  heading="Crea un mapa con varias ubicaciones gratis"
+  description="Crea un mapa interactivo con varios marcadores. Añade direcciones o importa un CSV, personaliza cada punto y comparte el mapa o insértalo en tu web."
+  intro="Reúne en un mismo mapa tus sucursales, los puntos de encuentro de un evento o las paradas de una visita. Añade ubicaciones con coordenadas, colócalas directamente en el mapa o impórtalas desde un archivo CSV. Si la búsqueda de direcciones está disponible, también puedes buscar lugares por su nombre. Personaliza los marcadores y guarda el resultado para obtener un enlace público y código de inserción adaptable. Puedes usar el editor sin registrarte ni configurar una clave de Google Maps."
+  kind="tool"
+>
+  <MapEditor />
+  <article class="mm-reading prose-container readable-surface" aria-labelledby="create-multiple-pins">
+    <h2 id="create-multiple-pins">Cómo crear un mapa con varios marcadores</h2>
+    <ol>
+      <li><strong>Añade los lugares.</strong> Busca una dirección si la búsqueda está disponible, introduce coordenadas, coloca un marcador o importa una lista.</li>
+      <li><strong>Revisa el mapa.</strong> Pulsa <strong>Mostrar todas las ubicaciones</strong> para ver los puntos juntos. Usa <strong>Mostrar</strong> para comprobar un punto en detalle.</li>
+      <li><strong>Personaliza cada marcador.</strong> Escribe un nombre que identifique el lugar y añade indicaciones, horarios o un enlace. El orden de la lista determina la numeración.</li>
+      <li><strong>Publica el mapa.</strong> Ponle un título y selecciona <strong>Generar mapa y código de inserción</strong>.</li>
+    </ol>
+
+    <h2 id="three-pin-example">Prueba un mapa interactivo con tres marcadores</h2>
+    <p>El ejemplo editable de Nueva York incluye tres puntos con sus coordenadas. Puedes abrirlo aunque la búsqueda de direcciones esté desactivada.</p>
+    <ol>
+      <li><strong>Central Park.</strong> El marcador verde señala el punto de encuentro cerca de Bethesda Terrace.</li>
+      <li><strong>New York Public Library.</strong> El marcador azul indica la entrada de la Quinta Avenida.</li>
+      <li><strong>Brooklyn Bridge.</strong> El marcador morado incluye una nota sobre el paso peatonal.</li>
+    </ol>
+    <p><a id="mm-guide-example" class="btn-primary" href="/es/multiple-location-map-generator/?example=nyc#mm-live-preview" target="_blank" rel="noopener">Abrir el ejemplo de tres marcadores</a></p>
+    <p>Abre un marcador para leer su nota. Prueba también <strong>Mover arriba</strong> o <strong>Mover abajo</strong> para cambiar la numeración. Si el editor ya contiene ubicaciones, el ejemplo se abre en otra pestaña.</p>
+    <figure>
+      <img src="/guides/native-multiple-map-editor.webp" width="1152" height="787" alt="Editor de mapas con una lista de ubicaciones y tres marcadores numerados en Nueva York" loading="lazy" decoding="async" />
+      <figcaption>La numeración del mapa corresponde al orden de la lista. La captura muestra el editor en inglés.</figcaption>
+    </figure>
+
+    <h2 id="add-locations">Añadir direcciones, coordenadas o puntos en el mapa</h2>
+    <ul>
+      <li><strong>Buscar una dirección.</strong> Cuando esté habilitada la búsqueda, escribe el nombre, la calle o el código postal. Pulsa <strong>Añadir ubicación</strong> y comprueba la ciudad antes de seleccionar un resultado.</li>
+      <li><strong>Introducir coordenadas.</strong> Para la biblioteca del ejemplo, escribe <code>40.7532</code> como latitud y <code>-73.9822</code> como longitud. Conserva el signo menos para el oeste y el sur.</li>
+      <li><strong>Marcar un punto.</strong> Elige <strong>Colocar marcador en el mapa</strong>, selecciona el lugar y ponle un nombre. Puedes arrastrar el marcador para ajustar su posición.</li>
+    </ul>
+
+    <h2 id="import-locations">Añadir varias direcciones o importar un CSV</h2>
+    <h3>Pegar una lista de direcciones</h3>
+    <p>Abre <strong>Añadir varias ubicaciones</strong> y pega una dirección por línea. Separa la dirección y la nota con una barra vertical. Añade la ciudad o el código postal para distinguir calles con el mismo nombre.</p>
+    <pre><code>{'Madrid, España | Sede central\nValencia, España | Oficina regional'}</code></pre>
+    <p>Pulsa <strong>Revisar ubicaciones</strong> y después <strong>Añadir ubicaciones</strong>. Las filas que solo tienen una dirección requieren que la búsqueda múltiple esté habilitada. Si no está disponible o falta una coincidencia, usa <strong>Editar esta fila</strong> e introduce la latitud y la longitud.</p>
+    <h3>Importar una hoja de cálculo</h3>
+    <p><a href="/examples/multiple-map-locations.csv" download>Descarga un CSV de ejemplo</a>. Usa un archivo separado por comas de hasta 128 KB. El editor indica cuántas ubicaciones puedes añadir. Mantén los encabezados en el formato del ejemplo y escribe un lugar por fila.</p>
+    <pre><code>{'title,address,lat,lon,description,color\nMadrid,"Madrid, España",40.4168,-3.7038,Sede central,#e63946'}</code></pre>
+    <p>Selecciona <strong>Importar CSV</strong> y revisa las filas antes de añadirlas. Puedes usar los encabezados <code>latitude</code> y <code>longitude</code>. Si ambas coordenadas son válidas, el marcador se coloca directamente. Las filas pendientes se mantienen en la vista de revisión para que puedas corregirlas.</p>
+
+    <h2 id="customize-pins">Personalizar colores, iconos y etiquetas</h2>
+    <p>Usa <strong>Editar</strong> junto a una ubicación para cambiar su color, icono, nombre, descripción o enlace. Los marcadores numerados funcionan bien para un recorrido. Los marcadores estándar sirven para sucursales o entradas, y los círculos para servicios como aparcabicis. Combina el color con un nombre claro, como «Entrada sur», para que se pueda distinguir el punto sin depender del color.</p>
+    <p>En <strong>Personalizar el mapa</strong> puedes cambiar el fondo entre Liberty, Bright, Positron y Dark, mostrar etiquetas y modificar los controles de zoom. La agrupación de marcadores se aplica en el editor. Los mapas publicados se abren ajustados a los puntos guardados y muestran los marcadores individualmente.</p>
+
+    <h2 id="share-or-embed">Compartir o insertar un mapa con varias ubicaciones</h2>
+    <p>Usa <strong>Copiar enlace del mapa</strong> para compartirlo por mensaje o correo. Con <strong>Copiar código de inserción</strong> puedes pegar el iframe en un bloque HTML que lo admita, como un bloque HTML personalizado en WordPress. Si tu editor web elimina el iframe, publica el enlace al mapa.</p>
+    <p>Con <strong>Anchura adaptable</strong>, el mapa ocupa el ancho de la columna. Ajusta la altura para que haya espacio para los puntos y sus notas. Comprueba la página publicada en el móvil.</p>
+    <p>Guarda el archivo de recuperación en privado. Para actualizar un mapa, usa <strong>Abrir archivo de recuperación</strong> y después <strong>Guardar cambios del mapa</strong>. Las actualizaciones se verán en el mismo enlace y en el iframe al renovarse la caché.</p>
+
+    <h2>Preguntas frecuentes</h2>
+    <details><summary>¿Necesito una cuenta o una clave de API?</summary><p>El generador es gratuito y puedes usarlo sin cuenta ni clave de Google Maps.</p></details>
+    <details><summary>¿Cuántas ubicaciones puedo añadir?</summary><p>El límite habitual es de 20 por mapa. Puedes consultar el contador en <strong>Tus ubicaciones</strong>.</p></details>
+    <details><summary>¿El mapa calcula una ruta?</summary><p>Los números indican el orden que elegiste para los puntos. Para calcular trayectos a pie o en coche, usa una herramienta de rutas.</p></details>
+    <p>Sigue la <a href="/es/guides/how-to-create-map-with-multiple-pins/">guía para crear tu primer mapa con varios marcadores</a> o aprende a <a href="/es/guides/embed-google-map-multiple-locations/">insertar un mapa creado en Google My Maps</a>.</p>
+  </article>
+</MapContentLayout>

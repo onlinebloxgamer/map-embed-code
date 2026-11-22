@@ -2,6 +2,8 @@
 import Header from '../layout/Header.astro';
 import Footer from '../layout/Footer.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { defaultLocale, isLocale, localizedPath, localizedUrl } from '../../i18n/config';
+import { multipleMapsNavigation, multipleMapsPath, multiplePinsGuidePath } from '../../i18n/multiple-maps';
 import '../../styles/multiple-map-content.css';
 
 interface Props {
@@ -9,33 +11,38 @@ interface Props {
   description: string;
   heading: string;
   intro: string;
-  kind?: 'tool' | 'article' | 'page';
-  guide?: boolean;
+  kind: 'tool' | 'article';
 }
 
-const { title, description, heading, intro, kind = 'page', guide = false } = Astro.props;
-const path = `${Astro.url.pathname.replace(/\/$/, '')}/`;
-const canonical = new URL(path, Astro.site!).href;
-const crumbs = [ { name: 'Home', path: '/' }, ...(guide ? [{ name: 'Guides', path: '/guides/' }] : []), { name: heading, path } ];
+const { title, description, heading, intro, kind } = Astro.props;
+const lang = isLocale(Astro.currentLocale) ? Astro.currentLocale : defaultLocale;
+const navigation = multipleMapsNavigation[lang];
+const alternatePath = kind === 'tool' ? multipleMapsPath : multiplePinsGuidePath;
+const canonical = localizedUrl(alternatePath, lang, Astro.site!);
+const crumbs = [
+  { name: navigation.home, path: localizedPath('/', lang) },
+  ...(kind === 'article' ? [{ name: navigation.guides, path: localizedPath('/guides/', lang) }] : []),
+  { name: heading, path: localizedPath(alternatePath, lang) },
+];
 const breadcrumbs = {
   '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   itemListElement: crumbs.map((item, index) => ({ '@type': 'ListItem', position: index + 1, name: item.name, item: new URL(item.path, Astro.site!).href })),
 };
 const page = {
   '@context': 'https://schema.org',
-  '@type': kind === 'tool' ? 'SoftwareApplication' : kind === 'article' ? 'Article' : 'WebPage',
-  name: heading, description, url: canonical, inLanguage: 'en',
+  '@type': kind === 'tool' ? 'SoftwareApplication' : 'Article',
+  name: heading, description, url: canonical, inLanguage: lang,
   ...(kind === 'tool' ? { applicationCategory: 'UtilitiesApplication', operatingSystem: 'Web browser', offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' } } : {}),
   ...(kind === 'article' ? { headline: heading, author: { '@type': 'Organization', name: 'Map Embed Code', url: new URL('/', Astro.site!).href } } : {}),
 };
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical} ogType={kind === 'article' ? 'article' : 'website'} ogImage="/images/google-map-embed-generator.webp" structuredData={[breadcrumbs, page]}>
-  <Header />
+<BaseLayout title={title} description={description} canonical={canonical} ogType={kind === 'article' ? 'article' : 'website'} ogImage="/images/google-map-embed-generator.webp" structuredData={[breadcrumbs, page]} lang={lang} alternatePath={alternatePath}>
+  <Header lang={lang} translationPath={alternatePath} />
   <main id="main-content" class="mm-content">
     <header class:list={['page-hero', 'mm-hero', { 'mm-hero-tool': kind === 'tool' }]}>
       <div class="container readable-surface">
-        <nav aria-label="Breadcrumb" class="mm-crumbs">
+        <nav aria-label={navigation.breadcrumb} class="mm-crumbs">
           <ol>{crumbs.map((item, index) => <li>{index === crumbs.length - 1 ? <span aria-current="page">{item.name}</span> : <a href={item.path}>{item.name}</a>}</li>)}</ol>
         </nav>
         <h1 class="text-heading-lg">{heading}</h1>
@@ -46,5 +53,5 @@ const page = {
       <slot />
     </div>
   </main>
-  <Footer />
+  <Footer lang={lang} />
 </BaseLayout>

@@ -1,53 +1,60 @@
 ---
+import { defaultLocale, isLocale } from '../../i18n/config';
+import { editorCopy } from '../../i18n/map-editor';
 import { COLORS } from '../../lib/multiple-maps/schema';
 import '../../styles/multiple-map-editor.css';
+
+const lang = isLocale(Astro.currentLocale) ? Astro.currentLocale : defaultLocale;
+const copy = editorCopy[lang];
 ---
 
-<section id="location-editor" class="mm-editor" aria-label="Multiple location map editor" inert>
+<section id="location-editor" class="mm-editor" aria-label={copy.editor} inert>
   <div class="mm-workspace">
     <div class="mm-sidebar card">
-      <div class="mm-panel-heading"><h2>Your locations</h2><span id="mm-count">0 / 20</span></div>
+      <div class="mm-panel-heading"><h2>{copy.locations}</h2><span id="mm-count">0 / 20</span></div>
       <form id="mm-search" class="mm-stack" role="search">
-        <label for="mm-query">Search locations</label>
+        <label for="mm-query">{copy.search}</label>
         <div class="mm-input-row">
-          <input class="input" id="mm-query" type="search" placeholder="Address, city, or place" autocomplete="off" minlength="3" maxlength="300" required />
-          <button class="btn-sm" type="submit">Add Location</button>
+          <input class="input" id="mm-query" type="search" placeholder={copy.searchPlaceholder} autocomplete="off" minlength="3" maxlength="300" required />
+          <button class="btn-sm" type="submit">{copy.addLocation}</button>
         </div>
         <small id="mm-search-note" role="status"></small>
-        <ul id="mm-suggestions" class="mm-suggestions" aria-label="Location suggestions" hidden></ul>
-        <small>Address search, when available, uses <a href="https://github.com/komoot/photon">Photon</a> and <a href="https://www.openstreetmap.org/copyright">OpenStreetMap data</a>.</small>
+        <ul id="mm-suggestions" class="mm-suggestions" aria-label={copy.suggestions} hidden></ul>
+        <small>{copy.searchProvider.split(/(\{photon\}|\{osm\})/).map((part) =>
+          part === '{photon}' ? <a href="https://github.com/komoot/photon">Photon</a> :
+          part === '{osm}' ? <a href="https://www.openstreetmap.org/copyright">{copy.osm}</a> : part)}</small>
       </form>
       <div class="mm-actions mm-entry-actions">
-        <button type="button" id="mm-coordinates" class="btn-ghost-sm">Enter Coordinates</button>
-        <button type="button" id="mm-bulk" class="btn-ghost-sm">Add Multiple Locations</button>
-        <button type="button" id="mm-csv" class="btn-ghost-sm">Import CSV</button>
+        <button type="button" id="mm-coordinates" class="btn-ghost-sm">{copy.coordinates}</button>
+        <button type="button" id="mm-bulk" class="btn-ghost-sm">{copy.bulk}</button>
+        <button type="button" id="mm-csv" class="btn-ghost-sm">{copy.csv}</button>
       </div>
-      <p id="mm-empty" class="mm-empty">Your pins will appear here. Search for a place, enter coordinates, or choose a spot on the map.</p>
-      <ol id="mm-locations" class="mm-locations" aria-label="Added locations"></ol>
-      <button type="button" id="mm-example" class="mm-text-button">Try an example map</button>
+      <p id="mm-empty" class="mm-empty">{copy.empty}</p>
+      <ol id="mm-locations" class="mm-locations" aria-label={copy.addedLocations}></ol>
+      <button type="button" id="mm-example" class="mm-text-button">{copy.example}</button>
       <p id="mm-edit-status" class="mm-secondary-text" role="status"></p>
     </div>
 
     <section id="mm-live-preview" class="mm-map-card card" aria-labelledby="mm-live-heading" tabindex="-1">
       <div class="mm-panel-heading mm-map-heading">
-        <h2 id="mm-live-heading">Live map</h2>
+        <h2 id="mm-live-heading">{copy.liveMap}</h2>
         <div class="mm-actions">
-          <button type="button" class="btn-ghost-sm" id="mm-fit" disabled>Fit All Locations</button>
-          <button type="button" class="btn-ghost-sm" id="mm-map-pick" aria-pressed="false">Add Pin on Map</button>
+          <button type="button" class="btn-ghost-sm" id="mm-fit" disabled>{copy.fitAll}</button>
+          <button type="button" class="btn-ghost-sm" id="mm-map-pick" aria-pressed="false">{copy.dropPin}</button>
         </div>
       </div>
-      <div class="mm-map-wrap"><div class="mm-canvas mm-editor-canvas" id="mm-canvas" aria-label="Interactive map preview"></div></div>
-      <p id="mm-map-note" class="mm-map-note" role="status">Loading map preview…</p>
+      <div class="mm-map-wrap"><div class="mm-canvas mm-editor-canvas" id="mm-canvas" aria-label={copy.preview}></div></div>
+      <p id="mm-map-note" class="mm-map-note" role="status">{copy.loadingPreview}</p>
     </section>
   </div>
 
   <details class="mm-settings card" id="mm-settings-panel">
-    <summary>Customize Your Map</summary>
+    <summary>{copy.customize}</summary>
     <form id="mm-settings" class="mm-settings-grid">
-      <label>Map style<select class="input" name="style"><option value="streets">Liberty</option><option value="bright">Bright</option><option value="light">Positron</option><option value="dark">Dark</option></select></label>
-      <label>Default zoom<input class="input" name="zoom" type="number" min="1" max="19" value="12" required /></label>
-      <label>Fixed width (px)<input class="input" name="width" type="number" min="240" max="2400" value="800" required /></label>
-      <label>Height (px)<input class="input" name="height" type="number" min="200" max="1200" value="450" required /></label>
+      <label>{copy.style}<select class="input" name="style"><option value="streets">Liberty</option><option value="bright">Bright</option><option value="light">Positron</option><option value="dark">Dark</option></select></label>
+      <label>{copy.zoom}<input class="input" name="zoom" type="number" min="1" max="19" value="12" required /></label>
+      <label>{copy.width}<input class="input" name="width" type="number" min="240" max="2400" value="800" required /></label>
+      <label>{copy.height}<input class="input" name="height" type="number" min="200" max="1200" value="450" required /></label>
       <label class="mm-check"><input type="checkbox" name="responsive" checked /> Responsive width</label>
       <label class="mm-check"><input type="checkbox" name="fit" checked /> Fit markers on load</label>
       <label class="mm-check"><input type="checkbox" name="zoomControls" checked /> Show zoom controls</label>
@@ -58,37 +65,38 @@ import '../../styles/multiple-map-editor.css';
   </details>
 
   <div class="mm-publish card">
-    <h2>Share or embed your map</h2>
+    <h2>{copy.publish}</h2>
     <form id="mm-publish" class="mm-stack">
       <div class="mm-fields">
-        <label>Map title<input name="title" class="input" maxlength="120" value="My location map" required /></label>
-        <label>Map description <span>(optional)</span><textarea name="description" class="input" maxlength="1000" rows="2"></textarea></label>
+        <label>{copy.mapTitle}<input name="title" class="input" maxlength="120" value={copy.defaultTitle} required /></label>
+        <label>{copy.mapDescription} <span>{copy.optional}</span><textarea name="description" class="input" maxlength="1000" rows="2"></textarea></label>
       </div>
-      <p class="mm-secondary-text">Saved maps are public to anyone with the link. See how <a href="/privacy-policy/#multiple-location-maps">saved maps and location searches are handled</a>.</p>
+      <p class="mm-secondary-text">{copy.privacy.split('{privacyLink}').map((part, index) => index === 0 ? part : <>
+        <a href="/privacy-policy/#multiple-location-maps" hreflang="en">{copy.privacyLink}</a>{part}</>)}</p>
       <div class="mm-actions">
-        <button type="submit" id="mm-save" class="btn-primary">Generate Map &amp; Embed Code</button>
-        <button type="button" id="mm-recover" class="btn-secondary">Open Recovery File</button>
+        <button type="submit" id="mm-save" class="btn-primary">{copy.generate}</button>
+        <button type="button" id="mm-recover" class="btn-secondary">{copy.recover}</button>
         <input type="file" id="mm-recovery-file" accept=".json,application/json" hidden />
       </div>
       <p id="mm-publish-status" role="status"></p>
     </form>
 
     <div id="mm-result" class="mm-result mm-stack" hidden>
-      <h3>Your embed code</h3>
-      <label for="mm-embed-code">HTML iframe</label>
+      <h3>{copy.embedCode}</h3>
+      <label for="mm-embed-code">{copy.htmlIframe}</label>
       <textarea id="mm-embed-code" class="input" rows="5" readonly spellcheck="false"></textarea>
-      <label for="mm-share-url">Shareable map URL</label>
+      <label for="mm-share-url">{copy.shareUrl}</label>
       <input id="mm-share-url" type="url" class="input" readonly />
       <div class="mm-actions">
-        <button type="button" id="mm-copy-code" class="btn-sm">Copy Embed Code</button>
-        <button type="button" id="mm-copy-url" class="btn-ghost-sm">Copy Map URL</button>
-        <a id="mm-preview" class="btn-ghost-sm" target="_blank" rel="noopener">Preview Map</a>
-        <button type="button" id="mm-another" class="btn-ghost-sm">Create Another Map</button>
+        <button type="button" id="mm-copy-code" class="btn-sm">{copy.copyCode}</button>
+        <button type="button" id="mm-copy-url" class="btn-ghost-sm">{copy.copyUrl}</button>
+        <a id="mm-preview" class="btn-ghost-sm" target="_blank" rel="noopener">{copy.previewMap}</a>
+        <button type="button" id="mm-another" class="btn-ghost-sm">{copy.another}</button>
       </div>
-      <p class="mm-secondary-text">Download the recovery file before leaving. Anyone with the file can edit or delete this map. Keep it private.</p>
+      <p class="mm-secondary-text">{copy.recoveryNotice}</p>
       <div class="mm-actions">
-        <button type="button" id="mm-download" class="btn-ghost-sm">Download Recovery File</button>
-        <button type="button" id="mm-delete-map" class="mm-text-button mm-danger">Delete Saved Map</button>
+        <button type="button" id="mm-download" class="btn-ghost-sm">{copy.download}</button>
+        <button type="button" id="mm-delete-map" class="mm-text-button mm-danger">{copy.deleteMap}</button>
       </div>
       <p id="mm-copy-status" role="status"></p>
     </div>
@@ -96,60 +104,62 @@ import '../../styles/multiple-map-editor.css';
 
   <dialog id="mm-marker-dialog" class="mm-dialog" aria-labelledby="mm-marker-heading">
     <form id="mm-marker-form" class="mm-stack">
-      <h2 id="mm-marker-heading">Add a location</h2>
-      <label>Location title<input name="title" class="input" maxlength="120" required /></label>
-      <label>Address <span>(optional)</span><input name="address" class="input" maxlength="300" /></label>
-      <label>Description <span>(optional)</span><textarea name="description" class="input" rows="2" maxlength="1000"></textarea></label>
+      <h2 id="mm-marker-heading">{copy.newMarker}</h2>
+      <label>{copy.locationTitle}<input name="title" class="input" maxlength="120" required /></label>
+      <label>{copy.address} <span>{copy.optional}</span><input name="address" class="input" maxlength="300" /></label>
+      <label>{copy.description} <span>{copy.optional}</span><textarea name="description" class="input" rows="2" maxlength="1000"></textarea></label>
       <div class="mm-fields">
-        <label>Latitude<input name="lat" class="input" inputmode="decimal" placeholder="28.6139" required /></label>
-        <label>Longitude<input name="lng" class="input" inputmode="decimal" placeholder="77.2090" required /></label>
-        <label>Color<select name="color" class="input">{Object.keys(COLORS).map((color) => <option value={color}>{color[0].toUpperCase() + color.slice(1)}</option>)}<option value="custom">Custom</option></select></label>
-        <label>Marker icon<select name="icon" class="input"><option value="number">Numbered pin</option><option value="pin">Standard pin</option><option value="circle">Circle marker</option></select></label>
+        <label>{copy.latitude}<input name="lat" class="input" inputmode="decimal" placeholder="28.6139" required /></label>
+        <label>{copy.longitude}<input name="lng" class="input" inputmode="decimal" placeholder="77.2090" required /></label>
+        <label>{copy.color}<select name="color" class="input">{(Object.keys(COLORS) as Array<keyof typeof COLORS>).map((color) => <option value={color}>{copy[color]}</option>)}<option value="custom">{copy.custom}</option></select></label>
+        <label>{copy.icon}<select name="icon" class="input"><option value="number">{copy.numbered}</option><option value="pin">{copy.standard}</option><option value="circle">{copy.circle}</option></select></label>
       </div>
-      <label id="mm-custom-color" hidden>Custom color<input name="customColor" class="input" type="color" value="#e63946" /></label>
-      <label>Website <span>(optional)</span><input name="website" class="input" type="url" placeholder="https://example.com/" maxlength="500" /></label>
+      <label id="mm-custom-color" hidden>{copy.customColor}<input name="customColor" class="input" type="color" value="#e63946" /></label>
+      <label>{copy.website} <span>{copy.optional}</span><input name="website" class="input" type="url" placeholder="https://example.com/" maxlength="500" /></label>
       <p id="mm-marker-error" role="alert"></p>
-      <div class="mm-actions"><button class="btn-sm" type="submit">Save Location</button><button class="btn-ghost-sm" type="button" data-close>Cancel</button></div>
+      <div class="mm-actions"><button class="btn-sm" type="submit">{copy.saveLocation}</button><button class="btn-ghost-sm" type="button" data-close>{copy.cancel}</button></div>
     </form>
   </dialog>
 
   <dialog id="mm-import-dialog" class="mm-dialog mm-import" aria-labelledby="mm-import-heading">
     <div class="mm-stack">
-      <h2 id="mm-import-heading">Add multiple locations</h2>
+      <h2 id="mm-import-heading">{copy.bulk}</h2>
       <form id="mm-import-form" class="mm-stack">
         <div id="mm-paste-fields" class="mm-stack">
-          <label for="mm-lines">One address per line</label>
-          <textarea id="mm-lines" class="input" rows="5" maxlength="35000" placeholder={'New Delhi, India | Head Office\nMumbai, India | Regional Office'}></textarea>
-          <small>Use <code>address | description</code> to add an optional description.</small>
+          <label for="mm-lines">{copy.oneLine}</label>
+          <textarea id="mm-lines" class="input" rows="5" maxlength="35000" placeholder={copy.pasteSample}></textarea>
+          <small>{copy.pasteHelp.split('{format}')[0]}<code>address | description</code>{copy.pasteHelp.split('{format}')[1]}</small>
         </div>
         <div id="mm-csv-fields" class="mm-stack" hidden>
-          <label for="mm-csv-file">CSV file (up to 128 KB)</label>
+          <label for="mm-csv-file">{copy.csvFile}</label>
           <input id="mm-csv-file" type="file" accept=".csv,text/csv" />
-          <small>Use columns <code>title,address,lat,lon,description,color</code>. Use both coordinates for direct import. The longer <code>latitude</code> and <code>longitude</code> headers also work.</small>
-          <a href="/examples/multiple-map-locations.csv" download>Download sample CSV</a>
+          <small>{copy.csvHelp.split(/(\{columns\}|\{lat\}|\{lon\})/).map((part) =>
+            part === '{columns}' ? <code>title,address,lat,lon,description,color</code> :
+            part === '{lat}' ? <code>latitude</code> : part === '{lon}' ? <code>longitude</code> : part)}</small>
+          <a href="/examples/multiple-map-locations.csv" download>{copy.sampleCsv}</a>
         </div>
-        <button type="submit" class="btn-ghost-sm" id="mm-preview-import">Preview Locations</button>
+        <button type="submit" class="btn-ghost-sm" id="mm-preview-import">{copy.previewLocations}</button>
       </form>
       <p id="mm-import-status" role="status"></p>
       <ol id="mm-import-rows" class="mm-locations"></ol>
       <div class="mm-actions">
-        <button type="button" class="btn-sm" id="mm-run-import" hidden>Add Locations</button>
-        <button type="button" class="btn-ghost-sm" id="mm-close-import" data-close>Close</button>
+        <button type="button" class="btn-sm" id="mm-run-import" hidden>{copy.addLocations}</button>
+        <button type="button" class="btn-ghost-sm" id="mm-close-import" data-close>{copy.close}</button>
       </div>
     </div>
   </dialog>
 
   <dialog id="mm-verification" class="mm-dialog" aria-labelledby="mm-verify-title">
     <div class="mm-stack">
-      <h2 id="mm-verify-title">Verify you’re human</h2>
-      <p>This check keeps automated requests from using the map service.</p>
+      <h2 id="mm-verify-title">{copy.verifyTitle}</h2>
+      <p>{copy.verifyText}</p>
       <div id="mm-turnstile"></div>
-      <button type="button" class="btn-ghost-sm" data-close>Cancel</button>
+      <button type="button" class="btn-ghost-sm" data-close>{copy.cancel}</button>
     </div>
   </dialog>
 </section>
-<p id="mm-initial-status" class="mm-secondary-text" role="status">Loading the map editor…</p>
-<noscript><p>Enable JavaScript to use the map editor and interactive preview.</p></noscript>
+<p id="mm-initial-status" class="mm-secondary-text" role="status">{copy.loading}</p>
+<noscript><p>{copy.noScript}</p></noscript>
 
 <script>
   import { startEditor } from '../../lib/multiple-maps/editor';

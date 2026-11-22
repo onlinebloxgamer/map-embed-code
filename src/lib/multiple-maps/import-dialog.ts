@@ -1,11 +1,11 @@
+import type { Locale } from '../../i18n/config';
+import { editorCopy, formatMapMessage } from '../../i18n/map-editor';
 import { ApiError, createGeocoder, reason } from './client';
 import { csvRows, pasteRows, validateRow, type ImportRow } from './imports';
 import { markerSchema, MAX_CSV_BYTES, type GeocodeResult, type Marker, type PublicConfig } from './schema';
 
 const get = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(`mm-${id}`) as T;
-const fields = {
-  title: 'Title', address: 'Address', description: 'Description', latitude: 'Latitude', longitude: 'Longitude', color: 'Color',
-} as const;
+const fields = ['title', 'address', 'description', 'latitude', 'longitude', 'color'] as const satisfies readonly (keyof ImportRow)[];
 
 interface PendingRow {
   input: ImportRow;
@@ -16,7 +16,8 @@ interface PendingRow {
   done?: boolean;
 }
 
-export function setupImport(geocoder: ReturnType<typeof createGeocoder>, config: PublicConfig, capacity: () => number, add: (markers: Marker[]) => boolean) {
+export function setupImport(geocoder: ReturnType<typeof createGeocoder>, config: PublicConfig, capacity: () => number, add: (markers: Marker[]) => boolean, lang: Locale) {
+  const copy = editorCopy[lang];
   const dialog = get<HTMLDialogElement>('import-dialog');
   const form = get<HTMLFormElement>('import-form');
   const list = get('import-rows');
@@ -34,8 +35,8 @@ export function setupImport(geocoder: ReturnType<typeof createGeocoder>, config:
     mode = kind;
     rows = [];
     form.reset();
-    status.textContent = `This map has room for ${capacity()} more locations.${config.geocodeBulk ? '' : ' Bulk address lookup is unavailable. Coordinates can still be added.'}`;
-    get('import-heading').textContent = kind === 'csv' ? 'Import locations from CSV' : 'Add Multiple Locations';
+    status.textContent = [formatMapMessage(copy.capacity, { count: capacity() }), config.geocodeBulk ? '' : copy.bulkUnavailable].filter(Boolean).join(' ');
+    get('import-heading').textContent = kind === 'csv' ? copy.csvHeading : copy.bulk;
     get('csv-fields').hidden = kind !== 'csv';
     get('paste-fields').hidden = kind !== 'paste';
     render();
@@ -48,17 +49,17 @@ export function setupImport(geocoder: ReturnType<typeof createGeocoder>, config:
       if (row.done) continue;
       const item = document.createElement('li');
       const summary = document.createElement('strong');
-      summary.textContent = `${row.number}. ${row.input.title || row.input.address || 'Location'}`;
+      summary.textContent = `${row.number}. ${row.input.title || row.input.address || copy.location}`;
       const details = document.createElement('p');
       details.textContent = row.issue || (row.input.latitude && row.input.longitude
-        ? `Coordinates ${row.input.latitude}, ${row.input.longitude}` : 'Address lookup');
+        ? formatMapMessage(copy.rowCoordinates, { lat: row.input.latitude, lon: row.input.longitude }) : copy.lookup);
       item.append(summary, details);
       if (row.results?.length) {
         const label = document.createElement('label');
-        label.textContent = 'Choose the correct result';
+        label.textContent = copy.chooseResult;
         const select = document.createElement('select');
         select.className = 'input';
-        select.add(new Option('Select a location', ''));
+        select.add(new Option(copy.selectLocation, ''));
         row.results.forEach((result, index) => select.add(new Option(result.address, String(index))));
         select.value = row.selection ? String(row.results.indexOf(row.selection)) : '';
         select.disabled = busy;
@@ -68,17 +69,17 @@ export function setupImport(geocoder: ReturnType<typeof createGeocoder>, config:
       }
       const editor = document.createElement('details');
       const toggle = document.createElement('summary');
-      toggle.textContent = 'Edit this row';
+      toggle.textContent = copy.editRow;
       editor.append(toggle);
       const inputs = document.createElement('div');
       inputs.className = 'mm-fields';
-      for (const key of Object.keys(fields) as (keyof ImportRow)[]) {
+      for (const key of fields) {
         const label = document.createElement('label');
-        label.textContent = fields[key];
+        label.textContent = copy[key];
         const input = document.createElement('input');
         input.className = 'input';
         input.maxLength = key === 'description' ? 1000 : key === 'address' ? 300 : 120;
-        if (key === 'color') input.placeholder = 'green or #2a9d8f';
+        if (key === 'color') input.placeholder = copy.colorHint;
         input.value = row.input[key];
         input.disabled = busy;
         input.addEventListener('input', () => {
@@ -97,7 +98,7 @@ export function setupImport(geocoder: ReturnType<typeof createGeocoder>, config:
       list.append(item);
     }
     run.hidden = !rows.some((row) => !row.done);
-    run.textContent = rows.some((row) => row.done || row.issue) ? 'Add or Retry Remaining Locations' : 'Add Locations';
+    run.textContent = rows.some((row) => row.done || row.issue) ? copy.retryRows : copy.addLocations;
   }
 
   get('bulk').addEventListener('click', () => open('paste'));
@@ -117,17 +118,17 @@ export function setupImport(geocoder: ReturnType<typeof createGeocoder>, config:
       let values: ImportRow[];
       if (mode === 'csv') {
         const input = file.files?.[0];
-        if (!input || input.size > MAX_CSV_BYTES) throw new Error('Choose a CSV file up to 128 KB.');
-        values = await csvRows(await input.text());
+        if (!input || input.size > MAX_CSV_BYTES) throw new Error(copy.chooseFile);
+        values = await csvRows(await input.text(), copy);
       } else values = pasteRows(lines.value);
       const remaining = capacity();
-      if (!values.length) throw new Error('Enter at least one location.');
-      if (values.length > remaining) throw new Error(`This map has room for ${remaining} more locations. Reduce the number of rows and preview again.`);
-      rows = values.map((input, index) => ({ input, number: index + 1, issue: validateRow(input).issue }));
-      status.textContent = `${values.length} ${values.length === 1 ? 'location' : 'locations'} ready to review. Check the rows before adding them.`;
+      if (!values.length) throw new Error(copy.needLocation);
+      if (values.length > remaining) throw new Error(formatMapMessage(copy.tooManyRows, { count: remaining }));
+      rows = values.map((input, index) => ({ input, number: index + 1, issue: validateRow(input, copy).issue }));
+      status.textContent = values.length === 1 ? copy.previewOne : formatMapMessage(copy.previewMany, { count: values.length });
     } catch (error) {
       rows = [];
-      status.textContent = error instanceof Error ? error.message : 'The locations could not be read.';
+      status.textContent = error instanceof Error ? error.message : copy.readFailed;
     } finally { setBusy(false); render(); }
   });
 
@@ -135,32 +136,32 @@ export function setupImport(geocoder: ReturnType<typeof createGeocoder>, config:
     if (busy) return;
     const remaining = rows.filter((row) => !row.done);
     if (remaining.length > capacity()) {
-      status.textContent = `There is room for ${capacity()} more locations. Edit the source and preview fewer rows.`;
+      status.textContent = formatMapMessage(copy.capacityChanged, { count: capacity() });
       return;
     }
     setBusy(true);
     render();
     let processed = 0;
     let nextAddressAt = 0;
-    let lookupIssue = config.geocodeBulk ? '' : 'Bulk address lookup is unavailable. Enter latitude and longitude for this row.';
+    let lookupIssue = config.geocodeBulk ? '' : copy.rowNoLookup;
     const resolved: Array<{ row: PendingRow; marker: Marker }> = [];
     const needsLookup = remaining.some((row) => {
-      const validation = validateRow(row.input);
+      const validation = validateRow(row.input, copy);
       return !row.results && !validation.marker && !validation.issue;
     });
     try {
       if (needsLookup && !lookupIssue) {
         try { await geocoder.unlock(); }
-        catch (error) { lookupIssue = reason(error, 'Location verification could not start.'); }
+        catch (error) { lookupIssue = reason(error, copy.lookupVerifyFailed, lang); }
       }
       for (const row of remaining) {
-        status.textContent = `Checking location ${++processed} of ${remaining.length}…`;
-        const validation = validateRow(row.input);
+        status.textContent = formatMapMessage(copy.checking, { current: ++processed, total: remaining.length });
+        const validation = validateRow(row.input, copy);
         row.issue = validation.issue;
         if (validation.issue) continue;
         if (validation.marker) { resolved.push({ row, marker: validation.marker }); continue; }
         let picked = row.selection;
-        if (!picked && row.results) { row.issue = 'Choose the correct result or edit the address.'; continue; }
+        if (!picked && row.results) { row.issue = copy.chooseOrEdit; continue; }
         if (!picked && lookupIssue) { row.issue = lookupIssue; continue; }
         if (!picked) {
           try {
@@ -168,25 +169,26 @@ export function setupImport(geocoder: ReturnType<typeof createGeocoder>, config:
             if (wait > 0) await new Promise<void>((done) => window.setTimeout(done, wait));
             nextAddressAt = Date.now() + 1100;
             const results = await geocoder.search(row.input.address, 'bulk');
-            if (!results.length) { row.issue = 'No match found. Correct the address or enter coordinates.'; continue; }
-            if (results.length > 1) { row.results = results; row.issue = 'Choose the correct result or edit the address.'; continue; }
+            if (!results.length) { row.issue = copy.noMatch; continue; }
+            if (results.length > 1) { row.results = results; row.issue = copy.chooseOrEdit; continue; }
             picked = results[0];
           } catch (error) {
-            row.issue = reason(error, 'Search failed. Try this address again.');
+            row.issue = reason(error, copy.lookupFailed, lang);
             if (error instanceof ApiError && [403, 429, 503].includes(error.status)) lookupIssue = row.issue;
             continue;
           }
         }
         const result = markerSchema.safeParse({ ...row.input, ...picked, title: row.input.title || picked.title });
         if (result.success) resolved.push({ row, marker: result.data });
-        else row.issue = 'Check the row details and try again.';
+        else row.issue = copy.checkRow;
       }
       if (resolved.length && add(resolved.map(({ marker }) => marker))) {
         for (const { row } of resolved) row.done = true;
       }
       const pending = rows.filter((row) => !row.done).length;
       const added = remaining.length - pending;
-      status.textContent = `${added} added. ${pending ? `${pending} still need attention. Review them and try again.` : 'All locations are on the map.'}`;
+      const completed = formatMapMessage(copy.importAdded, { count: added });
+      status.textContent = completed + ' ' + (pending ? formatMapMessage(copy.importPending, { count: pending }) : copy.importDone);
     } finally { setBusy(false); render(); }
   });
 }

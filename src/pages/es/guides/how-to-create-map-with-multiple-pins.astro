@@ -1,0 +1,53 @@
+---
+import MapContentLayout from '../../../components/multiple-maps/MapContentLayout.astro';
+---
+
+<MapContentLayout
+  title="Cómo crear un mapa con varios marcadores paso a paso"
+  heading="Cómo crear un mapa con varios marcadores"
+  description="Aprende a añadir varios puntos a un mapa, cambiar los colores de los marcadores y publicar el resultado con un enlace o un código de inserción."
+  intro="En esta guía crearás un mapa para una visita a un museo. Marcarás la entrada y un segundo punto de encuentro, y escribirás indicaciones que el grupo podrá leer al abrir cada marcador. Puedes seguir los mismos pasos para sedes, tiendas o paradas de un recorrido."
+  kind="article"
+>
+  <article class="mm-reading prose-container readable-surface">
+    <h2>Qué es un mapa con varios marcadores</h2>
+    <p>Es un mapa interactivo que muestra varios puntos de interés. Cada marcador identifica una ubicación y puede incluir un nombre, una nota y un enlace. Úsalo para señalar lugares como entradas, aparcamientos o puntos de recogida.</p>
+    <h2>Crear un mapa con varios puntos en seis pasos</h2>
+    <h3>1. Abre el generador de mapas</h3>
+    <p>Entra en el <a href="/es/multiple-location-map-generator/">generador gratuito de mapas con varias ubicaciones</a>. La lista de ubicaciones y la vista previa te permiten comprobar dónde queda cada marcador.</p>
+    <h3>2. Añade la primera ubicación</h3>
+    <p>Selecciona <strong>Introducir coordenadas</strong>. Para el Museo de Brooklyn, escribe <code>40.6712</code> como latitud y <code>-73.9636</code> como longitud. Ponle un nombre al punto y pulsa <strong>Guardar ubicación</strong>. Si la búsqueda de direcciones está disponible, puedes buscar el museo y elegir el resultado que corresponda a su dirección.</p>
+    <h3>3. Coloca un segundo marcador</h3>
+    <p>Elige <strong>Colocar marcador en el mapa</strong> y pulsa sobre el lugar donde se reunirá el grupo. Guarda el punto y usa <strong>Mostrar todas las ubicaciones</strong> para ver ambos marcadores.</p>
+    <figure>
+      <img src="/guides/native-multiple-map-editor.webp" width="1152" height="787" alt="Vista del editor con la lista de ubicaciones y tres marcadores numerados en Nueva York" loading="lazy" decoding="async" />
+      <figcaption>Los números de los marcadores corresponden al orden de la lista. Captura del editor en inglés.</figcaption>
+    </figure>
+    <h3>4. Personaliza los marcadores</h3>
+    <p>Pulsa <strong>Editar</strong> junto al punto de encuentro y añade una nota concreta, como «Nos reunimos junto a la entrada principal a las 10:00». Puedes cambiar el color o el icono. Abre el marcador en la vista previa para comprobar cómo se lee la nota.</p>
+    <figure>
+      <img src="/guides/native-multiple-map-marker-editor.webp" width="544" height="728" alt="Formulario con campos para el título, las coordenadas, el color y el icono del marcador" loading="lazy" decoding="async" />
+      <figcaption>El editor de marcadores permite cambiar el aspecto y los datos que verá el visitante. Captura en inglés.</figcaption>
+    </figure>
+    <h3>5. Guarda el mapa y descarga el archivo de recuperación</h3>
+    <p>Escribe un título claro, como «Visita al Museo de Brooklyn». Pulsa <strong>Generar mapa y código de inserción</strong> y completa la verificación. Descarga el archivo de recuperación para poder modificar el mapa más adelante.</p>
+    <h3>6. Comparte el enlace o inserta el mapa</h3>
+    <p>Elige <strong>Copiar enlace del mapa</strong> para enviarlo al grupo. Si tienes una página para el evento, usa <strong>Copiar código de inserción</strong> y pega el iframe en un bloque HTML compatible.</p>
+
+    <h2>Añadir varias direcciones de una vez</h2>
+    <p>Abre <strong>Añadir varias ubicaciones</strong>, pega una dirección por línea y revisa los resultados. Si la búsqueda múltiple no está habilitada, introduce las coordenadas de cada fila. Consulta las <a href="/es/multiple-location-map-generator/#import-locations">instrucciones para importar direcciones o un CSV</a> si ya tienes una hoja de cálculo.</p>
+    <h2>Cambiar el color de los marcadores</h2>
+    <p>Selecciona <strong>Editar</strong>, escoge un color y guarda la ubicación. Comprueba que se distinga sobre el fondo elegido. En la <a href="/es/multiple-location-map-generator/#customize-pins">sección de personalización</a> encontrarás ejemplos de iconos, colores y etiquetas.</p>
+    <h2>Comprobar la inserción en tu web</h2>
+    <p>Activa <strong>Anchura adaptable</strong> para ajustarla a la columna. Comprueba que los marcadores y las notas se puedan abrir en un móvil. Si el sistema elimina los iframes, añade el enlace público al mapa.</p>
+    <h2>Problemas habituales</h2>
+    <ul>
+      <li><strong>El punto aparece en otra ciudad.</strong> Comprueba el código postal y la ciudad o introduce coordenadas verificadas.</li>
+      <li><strong>Varios puntos aparecen agrupados en el editor.</strong> Abre el grupo o amplía la vista para ver cada marcador.</li>
+      <li><strong>El mapa insertado muestra la versión anterior.</strong> La caché tarda un poco en actualizarse. Recarga la página después de un minuto.</li>
+    </ul>
+    <h2>Preguntas frecuentes</h2>
+    <details><summary>¿Puedo marcar un lugar sin dirección?</summary><p>Sí. Usa la latitud y la longitud o selecciona directamente un punto en el mapa.</p></details>
+    <details><summary>¿Puedo editar el mapa desde otro dispositivo?</summary><p>Sí. Abre el archivo de recuperación en el editor de ese dispositivo. Compártelo solo con quienes deban poder editar o borrar el mapa.</p></details>
+  </article>
+</MapContentLayout>

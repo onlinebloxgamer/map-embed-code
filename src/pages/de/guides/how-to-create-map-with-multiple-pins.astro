@@ -1,0 +1,53 @@
+---
+import MapContentLayout from '../../../components/multiple-maps/MapContentLayout.astro';
+---
+
+<MapContentLayout
+  title="Karte mit mehreren Markierungen erstellen | Schritt für Schritt"
+  heading="So erstellst du eine Karte mit mehreren Markierungen"
+  description="Setze mehrere Punkte auf eine Karte, passe Symbole und Farben an und teile oder bette deine Karte ein. Eine Anleitung in sechs Schritten."
+  intro="In dieser Anleitung erstellst du eine kleine Karte für einen Museumsbesuch. Du markierst den Eingang und einen zweiten Treffpunkt und ergänzt Hinweise für die Gruppe. Nach denselben Schritten kannst du auch mehrere Filialen, Veranstaltungsorte oder Stationen eines Rundgangs eintragen."
+  kind="article"
+>
+  <article class="mm-reading prose-container readable-surface">
+    <h2>Was ist eine Karte mit mehreren Markierungen?</h2>
+    <p>Sie zeigt mehrere Orte auf einer gemeinsamen interaktiven Karte. Jede Markierung kann einen eigenen Namen, einen Hinweis und einen Link enthalten. So lässt sich zum Beispiel erkennen, welcher Eingang zu einem Veranstaltungsraum führt oder wo Gäste parken können.</p>
+    <h2>Eine Karte mit mehreren Punkten in sechs Schritten erstellen</h2>
+    <h3>1. Den Kartengenerator öffnen</h3>
+    <p>Öffne den <a href="/de/multiple-location-map-generator/">kostenlosen Kartengenerator für mehrere Standorte</a>. In der Standortliste kannst du Einträge prüfen und ihre Reihenfolge ändern. Die Vorschau zeigt die Positionen auf der Karte.</p>
+    <h3>2. Den ersten Standort hinzufügen</h3>
+    <p>Klicke auf <strong>Koordinaten eingeben</strong>. Gib für das Brooklyn Museum den Breitengrad <code>40.6712</code> und den Längengrad <code>-73.9636</code> ein. Benenne den Standort und wähle <strong>Standort speichern</strong>. Wird die Adresssuche angeboten, kannst du alternativ nach dem Museum suchen und die Adresse abgleichen.</p>
+    <h3>3. Einen zweiten Punkt markieren</h3>
+    <p>Wähle <strong>Markierung auf Karte setzen</strong> und klicke auf den geplanten Treffpunkt. Speichere den Standort und prüfe beide Punkte gemeinsam mit <strong>Alle Standorte anzeigen</strong>.</p>
+    <figure>
+      <img src="/guides/native-multiple-map-editor.webp" width="1152" height="787" alt="Karteneditor mit einer Liste und drei nummerierten Markierungen in New York" loading="lazy" decoding="async" />
+      <figcaption>Die Nummern auf der Karte entsprechen der Reihenfolge in der Liste. Die Abbildung zeigt den englischen Editor.</figcaption>
+    </figure>
+    <h3>4. Farbe, Symbol und Text anpassen</h3>
+    <p>Wähle beim Treffpunkt <strong>Bearbeiten</strong>. Ergänze einen Hinweis wie „Treffen um 10 Uhr vor dem Haupteingang“ und wähle ein passendes Symbol. Öffne die Markierung in der Vorschau, um den Hinweis zu prüfen.</p>
+    <figure>
+      <img src="/guides/native-multiple-map-marker-editor.webp" width="544" height="728" alt="Formular zum Bearbeiten von Standortname, Koordinaten, Farbe und Markierungssymbol" loading="lazy" decoding="async" />
+      <figcaption>Im Bearbeitungsfenster kannst du das Symbol und die Angaben zum Standort ändern. Die Abbildung zeigt die englische Oberfläche.</figcaption>
+    </figure>
+    <h3>5. Karte speichern und Wiederherstellungsdatei sichern</h3>
+    <p>Gib einen Titel ein, etwa „Treffpunkte am Brooklyn Museum“. Klicke auf <strong>Karte und Einbettungscode erstellen</strong> und schließe die Prüfung ab. Lade die Wiederherstellungsdatei herunter, damit du später Änderungen speichern kannst.</p>
+    <h3>6. Karte teilen oder einbetten</h3>
+    <p>Wähle <strong>Kartenlink kopieren</strong> und sende den Link an die Gruppe. Für eine Veranstaltungsseite wähle <strong>Einbettungscode kopieren</strong> und füge den Iframe in einen HTML-Block ein.</p>
+
+    <h2>Mehrere Adressen auf einmal hinzufügen</h2>
+    <p>Wähle <strong>Mehrere Standorte hinzufügen</strong> und füge je Zeile eine Adresse ein. Prüfe die Zeilen. Ist die Sammelsuche nicht verfügbar, trage für jede Zeile die Koordinaten ein. In der <a href="/de/multiple-location-map-generator/#import-locations">Anleitung zum Adress- und CSV-Import</a> findest du das passende Tabellenformat.</p>
+    <h2>Farben der Markierungen ändern</h2>
+    <p>Wähle <strong>Bearbeiten</strong>, ändere die Farbe und speichere den Standort. Prüfe den Kontrast vor dem gewählten Kartenhintergrund. Der Abschnitt <a href="/de/multiple-location-map-generator/#customize-pins">Farben, Symbole und Beschriftungen anpassen</a> zeigt, wann sich unterschiedliche Symbole eignen.</p>
+    <h2>Die Einbettung auf deiner Website prüfen</h2>
+    <p>Mit <strong>Responsive Breite</strong> passt sich die Karte an deine Seitenspalte an. Prüfe, ob sich die Markierungen auf dem Smartphone öffnen lassen. Kann dein Website-Editor keine Iframes einfügen, verwende den öffentlichen Kartenlink.</p>
+    <h2>Häufige Probleme</h2>
+    <ul>
+      <li><strong>Die Markierung liegt im falschen Ort.</strong> Ergänze die Postleitzahl und den Ort oder verwende geprüfte Koordinaten.</li>
+      <li><strong>Markierungen sind im Editor gruppiert.</strong> Öffne die Gruppe oder zoome hinein, um die einzelnen Punkte zu sehen.</li>
+      <li><strong>Die eingebettete Karte zeigt alte Daten.</strong> Lade die Seite nach etwa einer Minute neu, wenn die zwischengespeicherte Version abgelaufen ist.</li>
+    </ul>
+    <h2>Häufige Fragen</h2>
+    <details><summary>Kann ich einen Ort ohne Adresse markieren?</summary><p>Ja. Gib die Koordinaten ein oder setze die Markierung direkt auf der Karte.</p></details>
+    <details><summary>Kann ich die Karte auf einem anderen Gerät bearbeiten?</summary><p>Ja. Öffne dort die Wiederherstellungsdatei im Editor. Alle mit der Datei können die Karte bearbeiten oder löschen.</p></details>
+  </article>
+</MapContentLayout>
