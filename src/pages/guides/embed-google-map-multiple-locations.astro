@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/layout/Header.astro';
 import Footer from '../../components/layout/Footer.astro';
+import { guideArticleStructuredData } from '../../lib/guide-structured-data';
 
 const pageUrl = 'https://map-embed-code.com/guides/embed-google-map-multiple-locations/';
 const pageTitle = 'How to Embed a Google Map with Multiple Locations';
@@ -46,103 +47,23 @@ const steps = [
   },
 ];
 
-const howToSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'HowTo',
-  name: pageTitle,
-  description: pageDescription,
-  image: 'https://map-embed-code.com/guides/multiple-locations-video-thumbnail.jpg',
-  totalTime: 'PT10M',
-  supply: [{ '@type': 'HowToSupply', name: 'A list of locations or addresses' }],
-  tool: [
-    { '@type': 'HowToTool', name: 'Google account' },
-    { '@type': 'HowToTool', name: 'Google My Maps' },
-    { '@type': 'HowToTool', name: 'Map Embed Code generator' },
-  ],
-  step: steps.map((step, index) => ({
-    '@type': 'HowToStep',
-    position: index + 1,
-    name: step.title,
-    url: `${pageUrl}#${step.id}`,
-    image: `https://map-embed-code.com${step.image}`,
-    text: [
-      'Open Google My Maps from the generator and select Create a New Map.',
-      'Open Untitled map, enter a descriptive map title, and save it.',
-      'Search for the first address or place and select Add to map.',
-      'Repeat the search for the remaining locations, style the markers, and select Share.',
-      'Enable Anyone with this link can view and copy the shared Google My Maps URL.',
-      'Paste the shared URL into the generator My Maps field and generate responsive website code.',
-    ][index],
-  })),
-};
-
-const faqSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: [
-    {
-      '@type': 'Question',
-      name: 'Can I embed multiple locations on Google Maps without an API key?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Yes. Create the locations in Google My Maps, allow visitors with the link to view it, and paste the shared URL into the My Maps generator. This method does not require a Google Maps API key.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Can I add many locations at once?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Yes. Google My Maps can import addresses or coordinates from a CSV, XLSX file, or Google Sheet. Each imported layer can contain up to 2,000 map features.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Will a multi-location Google Map work on mobile?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Yes, when the iframe is placed inside a responsive wrapper so its width follows the screen while its aspect ratio stays consistent.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Is a multiple-location map the same as a multi-stop route?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'No. A multiple-location map displays independent pins. A multi-stop route connects an origin, intermediate stops, and a destination in travel order.',
-      },
-    },
-  ],
-};
-
-const articleSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Article',
-  headline: pageTitle,
-  description: pageDescription,
-  image: 'https://map-embed-code.com/guides/multiple-locations-video-thumbnail.jpg',
-  datePublished: '2026-10-19',
-  dateModified: '2026-10-19',
-  author: { '@type': 'Organization', name: 'Map Embed Code' },
-  publisher: {
-    '@type': 'Organization',
-    name: 'Map Embed Code',
-    url: 'https://map-embed-code.com/',
-    logo: { '@type': 'ImageObject', url: 'https://map-embed-code.com/favicon-96x96.png' },
-  },
-  mainEntityOfPage: pageUrl,
-};
+const articleImage = '/guides/multiple-locations-video-thumbnail.jpg';
+const articleDate = '2026-10-19';
+const structuredData = guideArticleStructuredData({
+  site: Astro.site!, url: pageUrl, lang: 'en', title: pageTitle, description: pageDescription,
+  image: articleImage, datePublished: articleDate, dateModified: articleDate,
+});
 ---
 
 <BaseLayout
   title={pageTitle}
   description={pageDescription}
   canonical={pageUrl}
-  ogImage="/guides/multiple-locations-video-thumbnail.jpg"
+  ogImage={articleImage}
   ogType="article"
-  publishedTime="2026-10-19"
-  modifiedTime="2026-10-19"
-  structuredData={[articleSchema, howToSchema, faqSchema]}
+  publishedTime={articleDate}
+  modifiedTime={articleDate}
+  structuredData={structuredData}
   lang="en"
   alternatePath="/guides/embed-google-map-multiple-locations/"
 >

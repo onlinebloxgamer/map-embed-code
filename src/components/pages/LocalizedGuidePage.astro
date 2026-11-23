@@ -4,6 +4,7 @@ import Header from "../layout/Header.astro";
 import Footer from "../layout/Footer.astro";
 import { localizedPath, localizedUrl } from "../../i18n/config";
 import { guidePaths, localizedGuides, type GuideKey, type TranslatedLocale } from "../../i18n/guides";
+import { guideArticleStructuredData } from "../../lib/guide-structured-data";
 
 interface Props {
     lang: TranslatedLocale;
@@ -16,51 +17,19 @@ const alternatePath = guidePaths[guide];
 const pageUrl = localizedUrl(alternatePath, lang, Astro.site!);
 const home = localizedPath("/", lang);
 const guidesPath = localizedPath("/guides/", lang);
-const stripMarkup = (value: string) => value.replace(/<[^>]*>/g, "").replace(/&[^;]+;/g, " ").trim();
-const howToSections = content.sections.filter((section) => section.kicker || section.ordered);
-
-const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: content.title,
+const dateModified = "2026-10-20";
+const articleImage = guide === "multipleLocations"
+    ? "/guides/multiple-locations-video-thumbnail.jpg"
+    : "/images/google-map-embed-generator.webp";
+const structuredData = guideArticleStructuredData({
+    site: Astro.site!,
+    url: pageUrl,
+    lang,
+    title: content.title,
     description: content.description,
-    dateModified: "2026-10-20",
-    inLanguage: lang,
-    author: { "@type": "Organization", name: "Map Embed Code" },
-    publisher: {
-        "@type": "Organization",
-        name: "Map Embed Code",
-        url: "https://map-embed-code.com/",
-    },
-    mainEntityOfPage: pageUrl,
-};
-
-const howToSchema = {
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    name: content.title,
-    description: content.description,
-    inLanguage: lang,
-    step: howToSections.map((section, index) => ({
-        "@type": "HowToStep",
-        position: index + 1,
-        name: section.title,
-        url: `${pageUrl}#${section.id}`,
-        text: stripMarkup(section.paragraphs?.[0] ?? section.ordered?.join(" ") ?? section.title),
-        ...(section.image ? { image: new URL(section.image, Astro.site).href } : {}),
-    })),
-};
-
-const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    inLanguage: lang,
-    mainEntity: content.faqs.map(([question, answer]) => ({
-        "@type": "Question",
-        name: question,
-        acceptedAnswer: { "@type": "Answer", text: answer },
-    })),
-};
+    image: articleImage,
+    dateModified,
+});
 ---
 
 <BaseLayout
@@ -69,8 +38,8 @@ const faqSchema = {
     canonical={pageUrl}
     ogImage={guide === "multipleLocations" ? "/guides/multiple-locations-video-thumbnail.jpg" : "/og-image.png"}
     ogType="article"
-    modifiedTime="2026-10-20"
-    structuredData={[articleSchema, howToSchema, faqSchema]}
+    modifiedTime={dateModified}
+    structuredData={structuredData}
     lang={lang}
     alternatePath={alternatePath}
 >

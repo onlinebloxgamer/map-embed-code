@@ -2,6 +2,11 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/layout/Header.astro";
 import Footer from "../../components/layout/Footer.astro";
+import { guideIndexStructuredData } from "../../lib/guide-structured-data";
+
+const title = "Google Maps Embed Guides";
+const description = "Step-by-step guides for embedding Google Maps on WordPress, Shopify, Wix, Webflow, and other platforms. All methods are free and require no API key.";
+const url = new URL("/guides/", Astro.site!).href;
 
 const guides = [
     {
@@ -29,12 +34,14 @@ const guides = [
         platform: "Shopify",
     },
 ];
+const structuredData = guideIndexStructuredData({ site: Astro.site!, url, lang: "en", title, description }, guides);
 ---
 
 <BaseLayout
-    title="Google Maps Embed Guides – Map Embed Code"
-    description="Step-by-step guides for embedding Google Maps on WordPress, Shopify, Wix, Webflow, and other platforms. All methods are free and require no API key."
-    canonical="https://map-embed-code.com/guides/"
+    title={`${title} – Map Embed Code`}
+    description={description}
+    canonical={url}
+    structuredData={structuredData}
     lang="en"
     alternatePath="/guides/"
 >
@@ -46,7 +53,7 @@ const guides = [
                     >Guides</span
                 >
                 <h1 class="text-heading-lg page-h1">
-                    Google Maps Embed Guides
+                    {title}
                 </h1>
                 <p class="text-body-lg" style="color:var(--color-body);">
                     Platform-specific instructions for embedding Google Maps on

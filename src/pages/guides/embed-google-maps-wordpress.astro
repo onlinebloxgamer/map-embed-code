@@ -3,46 +3,34 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/layout/Header.astro';
 import Footer from '../../components/layout/Footer.astro';
 
-const howToSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'HowTo',
-  name: 'How to Embed Google Maps in WordPress',
-  description: 'Embed a Google Maps iframe in WordPress without a plugin or API key',
-  step: [
-    {
-      '@type': 'HowToStep',
-      name: 'Generate embed code',
-      text: 'Use Map Embed Code to generate your Google Maps iframe HTML.',
-    },
-    {
-      '@type': 'HowToStep',
-      name: 'Add Custom HTML block',
-      text: 'In the Block Editor, add a Custom HTML block to your page or post.',
-    },
-    {
-      '@type': 'HowToStep',
-      name: 'Paste and publish',
-      text: 'Paste the iframe code into the block and publish the page.',
-    },
-  ],
-};
+import { guideArticleStructuredData } from '../../lib/guide-structured-data';
+
+const title = "How to Embed Google Maps in WordPress";
+const description = "Step-by-step guide to embed Google Maps in WordPress without a plugin or API key. Works with Gutenberg Block Editor, Classic Editor, and all major themes.";
+const alternatePath = '/guides/embed-google-maps-wordpress/';
+const url = new URL(alternatePath, Astro.site!).href;
+const structuredData = guideArticleStructuredData({
+  site: Astro.site!, url, lang: 'en', title, description,
+  image: '/images/google-map-embed-generator.webp',
+});
 ---
 
 <BaseLayout
   title="How to Embed Google Maps in WordPress – Free Guide"
-  description="Step-by-step guide to embed Google Maps in WordPress without a plugin or API key. Works with Gutenberg Block Editor, Classic Editor, and all major themes."
-  canonical="https://map-embed-code.com/guides/embed-google-maps-wordpress/"
+  description={description}
+  canonical={url}
   lang="en"
-  alternatePath="/guides/embed-google-maps-wordpress/"
-  structuredData={howToSchema}
+  alternatePath={alternatePath}
+  ogType="article"
+  structuredData={structuredData}
 >
-  <Header lang="en" translationPath="/guides/embed-google-maps-wordpress/" />
+  <Header lang="en" translationPath={alternatePath} />
   <main id="main-content">
     <div class="page-hero">
       <div class="container readable-surface">
         <a href="/guides/" class="breadcrumb">← Guides</a>
         <span class="text-mono-eyebrow" style="color:var(--color-mute);">WordPress</span>
-        <h1 class="text-heading-lg page-h1">How to Embed Google Maps in WordPress</h1>
+        <h1 class="text-heading-lg page-h1">{title}</h1>
         <p class="text-body-lg" style="color:var(--color-body);">
           Add an interactive Google Map to any WordPress page, post, or sidebar — without a plugin or API key.
         </p>

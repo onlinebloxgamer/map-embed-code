@@ -15,7 +15,14 @@ const marker = { title: 'Museum', lat: 40.67, lng: -73.96, description: '<img sr
 const draft = { title: 'Test map', markers: [marker], settings: {} };
 const tool = '/multiple-location-map-generator/';
 const guide = '/guides/how-to-create-map-with-multiple-pins/';
+const guidePages = [
+  guide,
+  '/guides/embed-google-map-multiple-locations/',
+  '/guides/embed-google-maps-wordpress/',
+  '/guides/embed-google-maps-shopify/',
+];
 const localePrefixes = { en: '', es: '/es', de: '/de' };
+const parseStructuredData = (html) => Array.from(html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g), ([, json]) => JSON.parse(json));
 const styleHost = 'https://tiles.openfreemap.org';
 const fixtureStyle = { version: 8, sources: {}, layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#e3ede6' } }] };
 const styleRequests = [];
@@ -209,7 +216,7 @@ test('static SEO routes are unique, indexed, internally linked, and preserve the
   const titles = new Set();
   const descriptions = new Set();
   for (const [locale, prefix] of Object.entries(localePrefixes)) {
-    for (const path of [tool, guide]) {
+    for (const path of [tool, ...guidePages]) {
       const route = prefix + path;
       const html = readFileSync(join(dist, route, 'index.html'), 'utf8');
       titles.add(html.match(/<title>(.*?)<\/title>/)[1]);
@@ -220,18 +227,56 @@ test('static SEO routes are unique, indexed, internally linked, and preserve the
       assert.ok(html.includes(`href="${prefix}${path === tool ? guide : tool}"`));
       assert.ok(html.includes(`"inLanguage":"${locale}"`));
       assert.ok(sitemap.includes(`<loc>${site}${route}</loc>`));
+      const structuredData = parseStructuredData(html);
+      const breadcrumbs = structuredData.find((item) => item['@type'] === 'BreadcrumbList');
+      assert.equal(breadcrumbs?.itemListElement.at(-1).item, site + route);
+      if (path === tool) {
+        const application = structuredData.find((item) => item['@type'] === 'WebApplication');
+        assert.equal(application?.url, site + route);
+        assert.equal(application.inLanguage, locale);
+        assert.equal(application.applicationCategory, 'DeveloperApplication');
+        assert.equal(application.operatingSystem, 'Any');
+        assert.deepEqual(application.offers, { '@type': 'Offer', price: '0', priceCurrency: 'USD' });
+        assert.deepEqual(application.isPartOf, { '@type': 'WebSite', name: 'Map Embed Code', url: site + '/' });
+        assert.equal(application.featureList.length, 6);
+        assert.match(application.featureList.join(' '), /CSV/);
+      } else {
+        const article = structuredData.find((item) => item['@type'] === 'Article');
+        assert.deepEqual(structuredData.map((item) => item['@type']).sort(), ['Article', 'BreadcrumbList']);
+        assert.equal(article?.url, site + route);
+        assert.equal(article.mainEntityOfPage['@id'], site + route);
+        assert.equal(article.inLanguage, locale);
+        assert.equal(article.author.name, 'Map Embed Code');
+        assert.equal(article.publisher.url, site + '/');
+        assert.ok(existsSync(join(dist, new URL(article.image).pathname)));
+        assert.deepEqual(breadcrumbs.itemListElement.map((crumb) => crumb.item), [site + prefix + '/', site + prefix + '/guides/', site + route]);
+        for (const [field, property] of [['datePublished', 'published_time'], ['dateModified', 'modified_time']]) {
+          const date = html.match(new RegExp(`<meta property="article:${property}" content="([^"]+)"`))?.[1];
+          assert.equal(article[field], date);
+        }
+      }
       if (path === tool) assert.doesNotMatch(html, /id="mm-bulk"|id="mm-paste-fields"|name="website"/);
       for (const [alternate, target] of Object.entries({ ...localePrefixes, 'x-default': '' })) {
         assert.ok(html.includes(`rel="alternate" hreflang="${alternate}" href="${site}${target}${path}"`));
       }
     }
     const index = readFileSync(join(dist, prefix, 'guides', 'index.html'), 'utf8');
+    const collection = parseStructuredData(index).find((item) => item['@type'] === 'CollectionPage');
+    assert.equal(collection?.url, site + prefix + '/guides/');
+    assert.equal(collection.inLanguage, locale);
+    assert.equal(collection.mainEntity['@type'], 'ItemList');
+    const visibleCards = Array.from(index.matchAll(/href="([^"]+)" class="guide-card card"/g), ([, href]) => site + href);
+    const listedGuides = collection.mainEntity.itemListElement;
+    assert.equal(visibleCards.length, guidePages.length);
+    assert.deepEqual(listedGuides.map(({ url }) => url), visibleCards);
+    assert.deepEqual(listedGuides.map(({ position }) => position), [1, 2, 3, 4]);
     assert.ok(index.includes(`href="${prefix}${guide}"`));
     assert.ok(index.includes(`href="${prefix}${tool}#import-locations"`));
     assert.ok(headerRules.replaceAll('\r', '').includes(`\n${prefix}${tool}\n  Content-Security-Policy: ${toolHeaders}`));
   }
-  assert.equal(titles.size, 6);
-  assert.equal(descriptions.size, 6);
+  const routeCount = Object.keys(localePrefixes).length * (guidePages.length + 1);
+  assert.equal(titles.size, routeCount);
+  assert.equal(descriptions.size, routeCount);
   for (const [route, anchor] of Object.entries(retired)) {
     assert.ok(!existsSync(join(dist, route, 'index.html')), `Retired page was built: ${route}`);
     assert.ok(!sitemap.includes(route), `Retired page is in the sitemap: ${route}`);

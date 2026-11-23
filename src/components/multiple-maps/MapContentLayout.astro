@@ -3,7 +3,8 @@ import Header from '../layout/Header.astro';
 import Footer from '../layout/Footer.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { defaultLocale, isLocale, localizedPath, localizedUrl } from '../../i18n/config';
-import { multipleMapsNavigation, multipleMapsPath, multiplePinsGuidePath } from '../../i18n/multiple-maps';
+import { multipleMapsFeatures, multipleMapsNavigation, multipleMapsPath, multiplePinsGuidePath } from '../../i18n/multiple-maps';
+import { guideArticleStructuredData } from '../../lib/guide-structured-data';
 import '../../styles/multiple-map-content.css';
 
 interface Props {
@@ -28,16 +29,26 @@ const breadcrumbs = {
   '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   itemListElement: crumbs.map((item, index) => ({ '@type': 'ListItem', position: index + 1, name: item.name, item: new URL(item.path, Astro.site!).href })),
 };
-const page = {
+const siteUrl = new URL('/', Astro.site!).href;
+const application = {
   '@context': 'https://schema.org',
-  '@type': kind === 'tool' ? 'SoftwareApplication' : 'Article',
   name: heading, description, url: canonical, inLanguage: lang,
-  ...(kind === 'tool' ? { applicationCategory: 'UtilitiesApplication', operatingSystem: 'Web browser', offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' } } : {}),
-  ...(kind === 'article' ? { headline: heading, author: { '@type': 'Organization', name: 'Map Embed Code', url: new URL('/', Astro.site!).href } } : {}),
+  '@type': 'WebApplication',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'Any',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  featureList: multipleMapsFeatures[lang],
+  isPartOf: { '@type': 'WebSite', name: 'Map Embed Code', url: siteUrl },
 };
+const structuredData = kind === 'tool'
+  ? [breadcrumbs, application]
+  : guideArticleStructuredData({
+      site: Astro.site!, lang, url: canonical, title: heading, description,
+      image: '/guides/native-multiple-map-editor.webp',
+    });
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical} ogType={kind === 'article' ? 'article' : 'website'} ogImage="/images/google-map-embed-generator.webp" structuredData={[breadcrumbs, page]} lang={lang} alternatePath={alternatePath}>
+<BaseLayout title={title} description={description} canonical={canonical} ogType={kind === 'article' ? 'article' : 'website'} ogImage="/images/google-map-embed-generator.webp" structuredData={structuredData} lang={lang} alternatePath={alternatePath}>
   <Header lang={lang} translationPath={alternatePath} />
   <main id="main-content" class="mm-content">
     <header class:list={['page-hero', 'mm-hero', { 'mm-hero-tool': kind === 'tool' }]}>

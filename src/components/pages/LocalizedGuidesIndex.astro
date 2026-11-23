@@ -5,6 +5,7 @@ import Footer from "../layout/Footer.astro";
 import { localizedPath, localizedUrl } from "../../i18n/config";
 import { guidePaths, guidesIndexContent, type TranslatedLocale } from "../../i18n/guides";
 import { multipleMapsNavigation, multipleMapsPath, multiplePinsGuidePath } from "../../i18n/multiple-maps";
+import { guideIndexStructuredData } from "../../lib/guide-structured-data";
 
 interface Props {
     lang: TranslatedLocale;
@@ -27,14 +28,25 @@ const mapGuide = {
     },
 }[lang];
 const pageUrl = localizedUrl("/guides/", lang, Astro.site!);
-const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    name: content.title,
-    description: content.description,
+const guideCards = [
+    ...content.cards.map((card) => ({
+        ...card,
+        href: localizedPath(guidePaths[card.key], lang),
+    })),
+    {
+        title: mapGuide.title,
+        description: mapGuide.description,
+        platform: multipleMapsNavigation[lang].tool,
+        href: localizedPath(multiplePinsGuidePath, lang),
+    },
+];
+const structuredData = guideIndexStructuredData({
+    site: Astro.site!,
     url: pageUrl,
-    inLanguage: lang,
-};
+    lang,
+    title: content.title,
+    description: content.description,
+}, guideCards);
 ---
 
 <BaseLayout
@@ -58,20 +70,14 @@ const structuredData = {
         <section class="section" aria-label={content.aria}>
             <div class="container">
                 <div class="guides-grid">
-                    {content.cards.map((card) => (
-                        <a href={localizedPath(guidePaths[card.key], lang)} class="guide-card card">
+                    {guideCards.map((card) => (
+                        <a href={card.href} class="guide-card card">
                             <span class="platform-tag">{card.platform}</span>
                             <h2 class="text-heading-md guide-title">{card.title}</h2>
                             <p class="text-body-md guide-desc">{card.description}</p>
                             <span class="guide-cta">{content.read}</span>
                         </a>
                     ))}
-                    <a href={localizedPath(multiplePinsGuidePath, lang)} class="guide-card card">
-                        <span class="platform-tag">{multipleMapsNavigation[lang].tool}</span>
-                        <h2 class="text-heading-md guide-title">{mapGuide.title}</h2>
-                        <p class="text-body-md guide-desc">{mapGuide.description}</p>
-                        <span class="guide-cta">{content.read}</span>
-                    </a>
                 </div>
             </div>
         </section>

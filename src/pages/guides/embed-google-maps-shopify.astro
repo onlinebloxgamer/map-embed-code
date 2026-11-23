@@ -3,46 +3,34 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/layout/Header.astro';
 import Footer from '../../components/layout/Footer.astro';
 
-const howToSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'HowTo',
-  name: 'How to Embed Google Maps in Shopify',
-  description: 'Embed a Google Maps iframe in a Shopify store without an API key',
-  step: [
-    {
-      '@type': 'HowToStep',
-      name: 'Generate embed code',
-      text: 'Use Map Embed Code to generate your Google Maps iframe HTML.',
-    },
-    {
-      '@type': 'HowToStep',
-      name: 'Open Shopify page in HTML view',
-      text: 'In Shopify admin, open a page and switch to HTML source view.',
-    },
-    {
-      '@type': 'HowToStep',
-      name: 'Paste and save',
-      text: 'Paste the iframe code and click Save.',
-    },
-  ],
-};
+import { guideArticleStructuredData } from '../../lib/guide-structured-data';
+
+const title = "How to Embed Google Maps in Shopify";
+const description = "Step-by-step guide to embed Google Maps in your Shopify store. Add a location map to any page, product description, or theme section — no API key required.";
+const alternatePath = '/guides/embed-google-maps-shopify/';
+const url = new URL(alternatePath, Astro.site!).href;
+const structuredData = guideArticleStructuredData({
+  site: Astro.site!, url, lang: 'en', title, description,
+  image: '/images/google-map-embed-generator.webp',
+});
 ---
 
 <BaseLayout
   title="How to Embed Google Maps in Shopify – Free Guide"
-  description="Step-by-step guide to embed Google Maps in your Shopify store. Add a location map to any page, product description, or theme section — no API key required."
-  canonical="https://map-embed-code.com/guides/embed-google-maps-shopify/"
+  description={description}
+  canonical={url}
   lang="en"
-  alternatePath="/guides/embed-google-maps-shopify/"
-  structuredData={howToSchema}
+  alternatePath={alternatePath}
+  ogType="article"
+  structuredData={structuredData}
 >
-  <Header lang="en" translationPath="/guides/embed-google-maps-shopify/" />
+  <Header lang="en" translationPath={alternatePath} />
   <main id="main-content">
     <div class="page-hero">
       <div class="container readable-surface">
         <a href="/guides/" class="breadcrumb">← Guides</a>
         <span class="text-mono-eyebrow" style="color:var(--color-mute);">Shopify</span>
-        <h1 class="text-heading-lg page-h1">How to Embed Google Maps in Shopify</h1>
+        <h1 class="text-heading-lg page-h1">{title}</h1>
         <p class="text-body-lg" style="color:var(--color-body);">
           Add an interactive Google Map to your Shopify store's contact page, product pages, or theme sections — free and no API key needed.
         </p>
