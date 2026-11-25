@@ -1,0 +1,77 @@
+name: IndexNow after production deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment_id:
+        description: Active Cloudflare Pages production deployment ID
+        required: true
+        type: string
+      mode:
+        description: Submission mode
+        type: choice
+        options: [changed, all]
+        default: changed
+      dry_run:
+        description: Preview URLs without submitting
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: indexnow-production
+  cancel-in-progress: false
+
+jobs:
+  submit:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      STATE_REPOSITORY: ${{ vars.INDEXNOW_STATE_REPOSITORY }}
+      INDEXNOW_MANIFEST: .indexnow/state/manifest.json
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Verify private manifest repository
+        env:
+          GH_TOKEN: ${{ secrets.INDEXNOW_STATE_TOKEN }}
+        run: |
+          [[ "$STATE_REPOSITORY" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]
+          [[ "$STATE_REPOSITORY" != "$GITHUB_REPOSITORY" ]]
+          [[ "$(gh api "repos/$STATE_REPOSITORY" --jq .private)" == true ]]
+      - uses: actions/checkout@v6
+        with:
+          repository: ${{ vars.INDEXNOW_STATE_REPOSITORY }}
+          token: ${{ secrets.INDEXNOW_STATE_TOKEN }}
+          path: .indexnow/state
+      - name: Verify production and submit changes
+        id: indexnow
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_INDEXNOW_TOKEN: ${{ secrets.CLOUDFLARE_INDEXNOW_TOKEN }}
+          INDEXNOW_DEPLOYMENT_ID: ${{ inputs.deployment_id }}
+          MODE: ${{ inputs.mode }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [[ "$DRY_RUN" == true ]]; then
+            npm run "indexnow:$MODE" -- --dry-run
+          else
+            npm run "indexnow:$MODE"
+          fi
+      - name: Save accepted changes to the private manifest repository
+        if: ${{ !cancelled() && !inputs.dry_run && (steps.indexnow.outcome == 'success' || steps.indexnow.outcome == 'failure') }}
+        working-directory: .indexnow/state
+        run: |
+          if [[ -z "$(git status --porcelain -- manifest.json)" ]]; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- manifest.json
+          git commit -m 'Record accepted IndexNow updates'
+          git push origin HEAD

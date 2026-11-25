@@ -10,6 +10,10 @@
     "build": "astro build",
     "check": "astro check && tsc --project functions/tsconfig.json",
     "test:maps": "npm run build && node --test tests/multiple-maps-unit.test.mjs tests/multiple-maps.test.mjs",
+    "test:indexnow": "node --test tests/indexnow.test.mjs",
+    "indexnow:all": "node scripts/indexnow.mjs all",
+    "indexnow:changed": "node scripts/indexnow.mjs changed",
+    "indexnow:check": "node scripts/indexnow.mjs check",
     "deploy": "npm run build && npx wrangler pages deploy dist --project-name=map-embed-code",
     "preview": "astro preview",
     "astro": "astro"
